@@ -1858,6 +1858,7 @@ hook.Add("ShouldCollide","sb_advanced_nextbot_payday2",function(ent1,ent2)
 	if ent1:GetClass()=="sb_advanced_nextbot_payday2" and ent2:GetClass()=="sb_advanced_nextbot_payday2" and ent1.GetTeam and ent2.GetTeam and ent1:GetTeam()==ent2:GetTeam() then
 		return false
 	end
+	if ent2:IsPlayer() and ent2:GetPos():Distance(ent1:GetPos())<32 and ent1:IsNextBot() then return false end
 end)
 
 hook.Add("StartCommand","sb_advanced_nextbot_payday2",function(ply,cmd)
@@ -3464,7 +3465,6 @@ function ENT:Setup(class,spawndata)
 	end
 	
 	self:SetupRelationships()
-	self:SetCollisionGroup(17)
 end
 
 function ENT:SetupGroup(group,spawndata)
