@@ -491,10 +491,10 @@ end
 if SERVER then
 	function serverthink()
 		local time = CurTime()
-		for k, v in ipairs(player.GetRevivingPlayers()) do
-			local time1 = v:GetReviveTime()
+		for k, v in pairs(player.GetRevivingPlayers()) do
+			time1 = v:GetReviveTime()
 			if time1 != 0 then
-				local time2 = time1 + convar6:GetInt()
+				time2 = time1 + convar6:GetInt()
 				if v:GetRevivingEntity():IsBleedOut() == false then
 					v:SetReviving(false)
 					v:SetWalkSpeed(120)
@@ -513,17 +513,17 @@ if SERVER then
 				end
 			end
 		end
-		for k, v in ipairs(player.GetBleedOuts()) do
-			local time1 = v:GetBleedOutTime()
+		for k, v in pairs(player.GetBleedOuts()) do
+			time1 = v:GetBleedOutTime()
 			if convar27:GetBool() == true and time > v:GetBloodDelay() then
 				util.Decal( "Blood", v:EyePos(), v:GetPos() - Vector(0, 0, 10), v )
 				v:SetBloodDelay(CurTime() + 3)
 			end
 			if convar25:GetBool() == true then
 				if v:IsNPCReviving() == false then // Снизу идет поиск нпс ревайвора.
-					local rebels = ents.FindByClass("npc_citizen")
+					rebels = ents.FindByClass("npc_citizen")
 					//table.sort(rebels, function(a, b) return a:GetPos():Distance(v:EyePos()) < b:GetPos():Distance(v:EyePos()) end)
-					for k1, v1 in ipairs(rebels) do
+					for k1, v1 in pairs(rebels) do
 						if v1:Visible(v) and v1:IsTryingToRevive() == false and v1:IsUnreachable(v) == false and v:IsNPCReviving() == false and v1:GetPos():Distance(v:GetPos()) < 512 and v1:Disposition( v ) == D_LI and v:IsBeingReviving() == false then
 							v1:SetTryingToRevive(true)
 							v1:SetReviveEnt(v)
@@ -583,7 +583,7 @@ if SERVER then
 				end
 			end
 			if time1 != 0 and v:IsBeingReviving() == false then
-				local time2 = time1 + convar5:GetInt()
+				time2 = time1 + convar5:GetInt()
 				if time >= time2 then
 					if !IsValid(v:GetAttacker()) then
 						v:Kill()
@@ -594,7 +594,6 @@ if SERVER then
 			end
 		end
 	end
-	hook.Add("Think", "ServerThink", serverthink)
 	hook.Add("KeyPress", "ReviveUseChecker", function(ply, key) // Чек нажатия юз кнопки. На сервере потому что так будет легче
 		if ply:Team() == 2 then return true end
 		if key == 32 and ply:IsBleedOut() == false and ply:IsReviving() == false then
@@ -1101,7 +1100,7 @@ end
 // Server Player Functions are set ^
 function player.GetRevivingPlayers() // Дает список всех воскрешающих игроков.
 	local tab = {}
-	for k, v in ipairs(player.GetAll()) do
+	for k, v in pairs(player.GetAll()) do
 		if v:IsReviving() == true then
 			table.insert(tab, v)
 		end
@@ -1110,7 +1109,7 @@ function player.GetRevivingPlayers() // Дает список всех воск�
 end
 function player.GetBleedOuts() // Для рисовки обводки игроков. Работает онли на сервере, так что когда кто то падает/встает эта штука передается клиенту.
 	local tab = {}
-	for k, v in ipairs(player.GetAll()) do
+	for k, v in pairs(player.GetAll()) do
 		if v:IsBleedOut() == true then
 			table.insert(tab, v)
 		end
@@ -1119,18 +1118,17 @@ function player.GetBleedOuts() // Для рисовки обводки игро�
 end
 function ents.GetShootingAtBleedOuts()
 	local tab = {}
-	for k, v in ipairs(ents.FindByClass("npc_*")) do
+	for k, v in pairs(ents.FindByClass("npc_*")) do
 		if v:GetEnemy():IsPlayer() then
 			if v:GetEnemy():IsBleedOut() == true then
 				table.insert(tab, v)
 			end
 		end
 	end
-	return tab
 end
 function player.GetNoBleedOuts() // Для теста, дебаг функция, делает абсолютно обратную функцию player.GetBleedOuts(). Т.е - не упавшие игроки
 	local tab = {}
-	for k, v in ipairs(player.GetAll()) do
+	for k, v in pairs(player.GetAll()) do
 		if v:IsBleedOut() == false then
 			table.insert(tab, v)
 		end
@@ -1225,6 +1223,7 @@ if SERVER then
 			return true
 		end
 	end)
+	hook.Add("Think", "ServerThink", serverthink)
 	hook.Add("PlayerDeath", "BleedOutDeath", function(victim, inflicto, attacker)
 		if victim:IsBleedOut() == false and victim:IsReviving() == true then
 			victim:SetReviving(false)
