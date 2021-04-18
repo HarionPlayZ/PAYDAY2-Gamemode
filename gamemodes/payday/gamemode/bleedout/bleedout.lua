@@ -594,6 +594,7 @@ if SERVER then
 			end
 		end
 	end
+	hook.Add("Think", "ServerThink", serverthink)
 	hook.Add("KeyPress", "ReviveUseChecker", function(ply, key) // Чек нажатия юз кнопки. На сервере потому что так будет легче
 		if ply:Team() == 2 then return true end
 		if key == 32 and ply:IsBleedOut() == false and ply:IsReviving() == false then
@@ -1223,7 +1224,6 @@ if SERVER then
 			return true
 		end
 	end)
-	hook.Add("Think", "ServerThink", serverthink)
 	hook.Add("PlayerDeath", "BleedOutDeath", function(victim, inflicto, attacker)
 		if victim:IsBleedOut() == false and victim:IsReviving() == true then
 			victim:SetReviving(false)
