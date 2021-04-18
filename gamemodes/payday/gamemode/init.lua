@@ -4,13 +4,11 @@ CreateConVar("padpd2", 0)
 AddCSLuaFile ( "shared.lua" )
 include ('shared.lua')
 
-AddCSLuaFile("bleedout/bleedout.lua")
-include("bleedout/bleedout.lua")
-
 include ('server/pd2_hud.lua')
 include ('server/pd2_assautphases.lua')
 include ('server/pd2_assault_settings.lua')
 include ('server/bleedout_init.lua')
+include("bleedout/bleedout.lua")
 include ('server/custody_pd2.lua')
 include ('server/armorregen.lua')
 include('server/sh_ablative_armor.lua')
@@ -20,7 +18,7 @@ include('server/pd2_moneyshop.lua')
 include('server/pd2_xplevel.lua')
 include('shared/pd2_class_triggers.lua')
 
-
+AddCSLuaFile("bleedout/bleedout.lua")
 AddCSLuaFile('client/pd2_timer.lua')
 AddCSLuaFile("client/pd2text.lua")
 AddCSLuaFile('client/pd2_show_items.lua')
