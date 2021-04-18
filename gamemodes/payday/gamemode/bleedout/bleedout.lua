@@ -15,19 +15,24 @@ AddCSLuaFile() -- Для того что бы передавалась клие�
 local tabhalo = {} -- Создание столбика для обводки + иконок над игроками.
 local convar = GetConVar( "bleedout_shouldtakedmg" )
 local convar0 = GetConVar( "sbox_playershurtplayers" )
+--! Разработчикам: Эта переменная нигде не используется
 local convar2 = GetConVar( "bleedout_draw_outlines" )
 local convar3 = GetConVar( "bleedout_draw_icons" )
 local convar4 = GetConVar( "bleedout_enable" )
 local convar5 = GetConVar( "bleedout_death_time" )
 local convar6 = GetConVar( "bleedout_revive_time" )
 local convar7 = GetConVar( "bleedout_icon_drawmode" )
+--! Разработчикам: Эта переменная нигде не используется
 local convar8 = GetConVar( "bleedout_outline_color_r" )
+--! Разработчикам: Эта переменная нигде не используется
 local convar9 = GetConVar( "bleedout_outline_color_g" )
+--! Разработчикам: Эта переменная нигде не используется
 local convar10 = GetConVar( "bleedout_outline_color_b" )
 local convar12 = GetConVar( "bleedout_shouldshoot" )
 local convar13 = GetConVar( "bleedout_icon_custom" )
 local convar14 = GetConVar( "bleedout_icon_size" )
 local convar15 = GetConVar( "bleedout_draw_blood" )
+--! Разработчикам: Эта переменная нигде не используется
 local convar16 = GetConVar( "bleedout_draw_colorcorrection" )
 local convar17 = GetConVar( "bleedout_num_bleedouts" )
 local convar18 = GetConVar( "bleedout_draw_timer" )
@@ -41,17 +46,22 @@ local convar25 = GetConVar( "bleedout_npc_can_revive" )
 local convar26 = GetConVar( "bleedout_view_draw_body" )
 local convar27 = GetConVar( "bleedout_enable_bleeding" )
 local convar28 = GetConVar( "bleedout_sound_enable" )
+--! Разработчикам: Эта переменная нигде не используется
 local convar29 = GetConVar( "bleedout_reviveonkill" )
+--! Разработчикам: Эта переменная нигде не используется
 local convar30 = GetConVar( "bleedout_killcount" )
 local convar31 = GetConVar( "bleedout_hp" )
+--! Разработчикам: Эта переменная нигде не используется
 local convar32 = GetConVar( "bleedout_blacknwhite" )
 local convar33 = GetConVar( "bleedout_heartbeat" )
+--! Разработчикам: Эта переменная нигде не используется
 local delay = CurTime() + 3
 local loweredview = Vector(0, 0, 38) -- Используется в FireBullets, CalcView, CalcViewModelView
 local normalhullbottom, normalhulltop, duckhullbottom, duckhulltop = Vector(-16, -16, 0), Vector(16, 16, 72), Vector(-16, -16, 0), Vector(16, 16, 36) -- Хуллы для игрока, используется в self:SetHull()
 local distancetotrace = 91
 local PLAYER = FindMetaTable("Player") -- Метатабл для игроков
 local NPC = FindMetaTable("NPC")
+--! Разработчикам: Эти переменные нигде не используются
 local cyclex, cycley = 0.6,0.65 -- Период анимации, своровал с nzombies
 local loweredpos = Vector(0,0, -32) -- Вычитаем из обычного вектора.
 local rotate = Angle(0,0,-20) -- Вращение
@@ -62,6 +72,7 @@ local function SearchForClassInTable(tab, class)
 	end
 	return nil
 end
+--! Разработчикам: Эта функция нигде не используется
 local function DrawColorCorrection(t, from, to)
 	local tab = {
 		["$pp_colour_addr"] = Lerp(t, from["$pp_colour_addr"], to["$pp_colour_addr"]),
@@ -618,10 +629,12 @@ if CLIENT then
 	local mator = Material("bleedout/REVIVESKULL.png") -- Иконка revive над игроками
 	local mator0 = Material("bleedout/REVIVEICON.png") -- COD версия иконки
 	local mator1 = Material("bleedout/BLOODONSCR.png") -- Кровь
+	--! Разработчикам: Эта переменная нигде не используется
 	local itext1 = Material("bleedout/BLOODONSCR.png"):GetTexture("$basetexture") -- Кешированая текстура
 	local mator2 = Material("bleedout/BLEEDINGOUT.png") -- Таймер
 	local skullmat = Material("bleedout/SKULL.png") -- Черепок
 	local syrmat = Material("bleedout/SYRINGE.png") -- Шприц
+	--! Разработчикам: Эта переменная нигде не используется
 	local itext2 = Material("bleedout/BLEEDINGOUT.png"):GetTexture("$basetexture") -- Кешированая текстура
 	local centre = ScrW() / 2
 	local centrey = ScrH() - 96
@@ -826,6 +839,7 @@ if CLIENT then
 			return true
 		end
 	end)
+	--! Разработчикам: Эта переменная нигде не используется
 	local totab = 
 	{
 		[ "$pp_colour_addr" ] = 0,
@@ -838,6 +852,7 @@ if CLIENT then
 		[ "$pp_colour_mulg" ] = 0,
 		[ "$pp_colour_mulb" ] = 0
 	}
+	--! Разработчикам: Эта переменная нигде не используется
 	local fromtab = 
 	{
 		[ "$pp_colour_addr" ] = 0,
@@ -850,6 +865,7 @@ if CLIENT then
 		[ "$pp_colour_mulg" ] = 1,
 		[ "$pp_colour_mulb" ] = 1,
 	}
+	--! Разработчикам: Эта переменная нигде не используется
 	local blacknwhitetab = 
 	{
 		[ "$pp_colour_addr" ] = 0,
@@ -912,6 +928,7 @@ end)
 hook.Add("UpdateAnimation", "BleedOutAnims", function(ply, vel, seqspeed)-- Своровано с nzombies, обьяснить не смогу. Не бейте тапками пж
 	if ply:IsBleedOut() == true then
 		local movement = 0
+		--! Разработчикам: Эта переменная нигде не используется
 		local len = vel:Length2D()
 		ply:ManipulateBonePosition(0, loweredpos)
 		ply:ManipulateBoneAngles(0, rotate)
