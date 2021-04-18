@@ -1,6 +1,8 @@
 local ourMat = Material("custody.png")
 local ourMat2 = Material("pr1.png")
 local ourMat3 = nil
+local dif1 = {'Normal', 'Hard', 'Very Hard', 'Overkill', 'Mayhem', 'Death Wish', 'Death Sentence'}
+local dif2 = {'', 'Å', 'Å', 'Å', 'Ä', 'Ç', 'É'}
 
 hook.Add( "InitPostEntity", "pd2_load_brief", function()
 	if game.GetMap() == "pd2_jewelry_store_mission" then
@@ -15,6 +17,7 @@ hook.Add( "InitPostEntity", "pd2_load_brief", function()
 end)
 
 hook.Add("HUDPaint", "IconOfPrisonpd2", function()
+	surface.CreateFont("timer_font",{font="pd2",size=60,weight=800} )
 	if LocalPlayer():GetNWBool("pd2prison") then
 		surface.SetDrawColor( 255, 255, 255, 255 ) -- Set the drawing color
 		surface.SetMaterial( ourMat ) -- Use our cached material
