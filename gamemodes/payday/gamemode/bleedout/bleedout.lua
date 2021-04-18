@@ -1205,16 +1205,7 @@ if SERVER then
 					ply:SetAttackerWeapon( dmginfo:GetAttacker():GetActiveWeapon() )
 				end
 			end
-		elseif ply:IsNPC() == true then
-			if ply:Health() <= dmginfo:GetDamage() and dmginfo:GetInflictor():IsPlayer() == true and ply:Disposition( dmginfo:GetInflictor() ) != D_LI and dmginfo:GetInflictor():IsBleedOut() == true then
-				dmginfo:GetInflictor().fragsbeforedeath = dmginfo:GetInflictor().fragsbeforedeath + 1
-			end
-			if ply:Health() <= dmginfo:GetDamage() and convar29:GetBool() == true and dmginfo:GetInflictor():IsPlayer() == true and ply:Disposition( dmginfo:GetInflictor() ) != D_LI and dmginfo:GetInflictor():IsBleedOut() == true and dmginfo:GetInflictor().fragsbeforedeath == convar30:GetFloat() then
-				dmginfo:GetInflictor():Revive()
-				dmginfo:GetInflictor().fragsbeforedeath = 0
-			end
 		end
-
 	end)
 	hook.Add("PlayerShouldTakeDamage", "BleedOutDamage", function(attacked, inflictor)
 		local time = CurTime()
