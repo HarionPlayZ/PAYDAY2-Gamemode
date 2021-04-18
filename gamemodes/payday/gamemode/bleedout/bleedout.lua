@@ -491,7 +491,7 @@ end
 if SERVER then
 	function serverthink()
 		local time = CurTime()
-		for k, v in pairs(player.GetRevivingPlayers()) do
+		for k, v in ipairs(player.GetRevivingPlayers()) do
 			time1 = v:GetReviveTime()
 			if time1 != 0 then
 				time2 = time1 + convar6:GetInt()
@@ -513,7 +513,7 @@ if SERVER then
 				end
 			end
 		end
-		for k, v in pairs(player.GetBleedOuts()) do
+		for k, v in ipairs(player.GetBleedOuts()) do
 			time1 = v:GetBleedOutTime()
 			if convar27:GetBool() == true and time > v:GetBloodDelay() then
 				util.Decal( "Blood", v:EyePos(), v:GetPos() - Vector(0, 0, 10), v )
@@ -523,7 +523,7 @@ if SERVER then
 				if v:IsNPCReviving() == false then // Снизу идет поиск нпс ревайвора.
 					rebels = ents.FindByClass("npc_citizen")
 					//table.sort(rebels, function(a, b) return a:GetPos():Distance(v:EyePos()) < b:GetPos():Distance(v:EyePos()) end)
-					for k1, v1 in pairs(rebels) do
+					for k1, v1 in ipairs(rebels) do
 						if v1:Visible(v) and v1:IsTryingToRevive() == false and v1:IsUnreachable(v) == false and v:IsNPCReviving() == false and v1:GetPos():Distance(v:GetPos()) < 512 and v1:Disposition( v ) == D_LI and v:IsBeingReviving() == false then
 							v1:SetTryingToRevive(true)
 							v1:SetReviveEnt(v)
