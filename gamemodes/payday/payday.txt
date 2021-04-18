@@ -2,7 +2,7 @@
 {
 	"title"		"PAYDAY 2 Alpha"
 	"base"		"base"
-	"version"    "0.8.8"
+	"version"    "0.8.9"
 	"maps"		"^pd2_"
 	"menusystem"    "1"
 	"category"	"pve"
