@@ -1126,6 +1126,7 @@ function ents.GetShootingAtBleedOuts()
 			end
 		end
 	end
+	return tab
 end
 function player.GetNoBleedOuts() // Для теста, дебаг функция, делает абсолютно обратную функцию player.GetBleedOuts(). Т.е - не упавшие игроки
 	local tab = {}
