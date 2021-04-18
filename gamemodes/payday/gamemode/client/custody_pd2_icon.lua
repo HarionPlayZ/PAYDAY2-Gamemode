@@ -17,7 +17,7 @@ hook.Add( "InitPostEntity", "pd2_load_brief", function()
 end)
 
 hook.Add("HUDPaint", "IconOfPrisonpd2", function()
-	surface.CreateFont("timer_font",{font="pd2",size=60,weight=800} )
+	surface.CreateFont("pd2",{font="Payday2",size=60,weight=800} )
 	if LocalPlayer():GetNWBool("pd2prison") then
 		surface.SetDrawColor( 255, 255, 255, 255 ) -- Set the drawing color
 		surface.SetMaterial( ourMat ) -- Use our cached material
@@ -32,6 +32,13 @@ hook.Add("HUDPaint", "IconOfPrisonpd2", function()
 		surface.SetDrawColor( 255, 255, 255, 255 ) -- Set the drawing color
 		surface.SetMaterial( ourMat3 ) -- Use our cached material
 		surface.DrawTexturedRect( 0, 0, ScrW(), ScrH() ) -- Actually draw the rectangle
+	end
+	if LocalPlayer():GetNWBool("pd2dif") then
+		surface.SetDrawColor( 0, 0, 0, 255 ) -- Set the drawing color
+		surface.DrawRect( 0, 0, ScrW(), ScrH() ) -- Actually draw the rectangle
+
+		draw.SimpleText( dif1[GetConVar("padpd2"):GetInt()+1], "pd2", ScrW() * 0.5, ScrH() * 0.45, Color( 255, 215, 0, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
+		draw.SimpleText( dif2[GetConVar("padpd2"):GetInt()+1], "pd2", ScrW() * 0.5, ScrH() * 0.45+50, Color( 255, 215, 0, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
 	end
 end)
 
