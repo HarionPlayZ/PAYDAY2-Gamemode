@@ -526,6 +526,8 @@ if SERVER then
 				end
 			end
 		end
+
+		local vectors
 		for k, v in ipairs(player.GetBleedOuts()) do
 			local time1 = v:GetBleedOutTime()
 			if convar27:GetBool() == true and time > v:GetBloodDelay() then
@@ -533,8 +535,6 @@ if SERVER then
 				v:SetBloodDelay(CurTime() + 3)
 			end
 			if convar25:GetBool() == true then
-				local vectors
-
 				if v:IsNPCReviving() == false then -- Снизу идет поиск нпс ревайвора.
 					local rebels = ents.FindByClass("npc_citizen")
 					--table.sort(rebels, function(a, b) return a:GetPos():Distance(v:EyePos()) < b:GetPos():Distance(v:EyePos()) end)
