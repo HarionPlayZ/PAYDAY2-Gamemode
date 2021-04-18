@@ -8,6 +8,3 @@ include('client/pd2_timer.lua')
 include("bleedout/bleedout.lua")
 include("client/pd2text.lua")
 include ('shared.lua')
-
-
-

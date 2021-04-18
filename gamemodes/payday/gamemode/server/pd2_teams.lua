@@ -21,13 +21,14 @@ function pl:PD2SetPolice()
 	self:SetHealth(health_police[GetConVar( "padpd2" ):GetInt()+1])
 	self:SetMaxHealth( self:Health() )
 	self:SetArmor(0)
-	local swat = self:Give(table.Random(weapon_random_swat))
-	self:GiveAmmo(swat:Clip1() * 500, swat:GetPrimaryAmmoType(), true)
+	local weapon = self:Give(table.Random(weapon_random_swat))
+	self:GiveAmmo(weapon:Clip1() * 500, weapon:GetPrimaryAmmoType(), true)
     self:SetWalkSpeed(150)
     self:SetRunSpeed(230)
     self:SetNoCollideWithTeammates( true )
     self:SetNoTarget(true)
     self:SetPos(random_spawn_p[math.random(1,3)])
+    self:AllowFlashlight(true)
     if not start_player_police then 
         self:Freeze(true)
         self:SetRenderMode(10)
@@ -35,7 +36,6 @@ function pl:PD2SetPolice()
         self:DrawWorldModel( false )
         self:SetNWBool("pd2policestop", true)
     end
-    self:AllowFlashlight(true)
 end
 
 function pl:PD2SetGang()
@@ -68,28 +68,28 @@ function pl:PD2SetGang()
 	self:GiveAmmo(500, 'pistol', true)
 	self:GiveAmmo(50, 8, true)
     self:SetBodyGroups( "02" )
-    local main = self:GetNWString('weapon_main')
-    if main == '' then 
-        main = self:Give(table.Random(weapon_random_main))
+    local m_weapon = self:GetNWString('weapon_main')
+    if m_weapon == '' then 
+        m_weapon = self:Give(table.Random(weapon_random_main))
     else
-        main = self:Give(main)
+        m_weapon = self:Give(m_weapon)
     end
-    if main:IsValid() then
-        self:GiveAmmo(main:Clip1() * 5, main:GetPrimaryAmmoType(), true)
+    if m_weapon:IsValid() then
+        self:GiveAmmo(m_weapon:Clip1() * 5, m_weapon:GetPrimaryAmmoType(), true)
     else
-        main = self:Give(table.Random(weapon_random_main))
+        m_weapon = self:Give(table.Random(weapon_random_main))
     end
-    local sec = self:GetNWString('weapon_sec')
-    if sec == '' then
-        sec = self:Give(table.Random(weapon_random_second))
+    local s_weapon = self:GetNWString('weapon_sec')
+    if s_weapon == '' then
+        s_weapon = self:Give(table.Random(weapon_random_second))
     else
-        sec = self:Give(sec)
+        s_weapon = self:Give(s_weapon)
     end
-    if sec:IsValid() then    
-        self:GiveAmmo(sec:Clip1() * 5, sec:GetPrimaryAmmoType(), true)
+    if s_weapon:IsValid() then    
+        self:GiveAmmo(s_weapon:Clip1() * 5, s_weapon:GetPrimaryAmmoType(), true)
     else
-        sec = self:Give(table.Random(weapon_random_second))
-        self:GiveAmmo(sec:Clip1() * 5, sec:GetPrimaryAmmoType(), true)
+        s_weapon = self:Give(table.Random(weapon_random_second))
+        self:GiveAmmo(s_weapon:Clip1() * 5, s_weapon:GetPrimaryAmmoType(), true)
     end   
     self:GiveAmmo(2, 55, true)
     self:Give("cw_extrema_ratio_official")

@@ -39,14 +39,10 @@ hook.Add("PostEntityTakeDamage","pd2_hud",function(ent,dmg,took)
 	end
 end)
 
-local update = 0
-hook.Add("Think","pd2_hud",function()
-	if !allow_team:GetBool() or CurTime()-update<0.5 then return end
-	update = CurTime()
-	
+timer.Create('pd2_hud',0.5,0,function()
+	if !allow_team:GetBool() then return end
 	for k,v in ipairs(player.GetAll()) do
 		local wep = v:GetActiveWeapon()
-		
 		if IsValid(wep) then
 			if wep:GetPrimaryAmmoType()!=-1 then
 				v:SetNWInt("pd2_hud_clip1",wep:GetMaxClip1())
@@ -55,7 +51,6 @@ hook.Add("Think","pd2_hud",function()
 				v:SetNWInt("pd2_hud_clip1",-1)
 				v:SetNWInt("pd2_hud_pammo",-1)
 			end
-			
 			if wep:GetSecondaryAmmoType()!=-1 then
 				v:SetNWInt("pd2_hud_clip2",wep:GetMaxClip2())
 				v:SetNWInt("pd2_hud_sammo",v:GetAmmoCount(wep:GetSecondaryAmmoType())+math.max(0,wep:Clip2()))
@@ -65,4 +60,4 @@ hook.Add("Think","pd2_hud",function()
 			end
 		end
 	end
-end)
+end )

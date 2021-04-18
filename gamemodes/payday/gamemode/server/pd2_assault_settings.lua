@@ -17,6 +17,7 @@ timer.Create("singleplayererror", 0.5, 0, function()
 	end
 end)
 
+if not game.SinglePlayer() then timer.Stop("singleplayererror") end
 
 hook.Add( "Initialize", "pd2_load_vec", function()
 	if game.GetMap() == "pd2_jewelry_store_mission" then
@@ -64,10 +65,6 @@ hook.Add( "Initialize", "pd2_load_vec", function()
 			box:SetAngles(Angle(0, 0, 90))
 			box:Spawn()
 		end)
-	end
-	timer.Stop("singleplayererror")
-	if game.SinglePlayer() then
-		timer.Start("singleplayererror")
 	end
 end)
 
