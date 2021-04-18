@@ -491,114 +491,104 @@ end
 if SERVER then
 	function serverthink()
 		local time = CurTime()
-
-		do
-			local players = player.GetRevivingPlayers()
-			for i = 1, #players do
-				local v = players[i]
-				time1 = v:GetReviveTime()
-				if time1 != 0 then
-					time2 = time1 + convar6:GetInt()
-					if v:GetRevivingEntity():IsBleedOut() == false then
-						v:SetReviving(false)
-						v:SetWalkSpeed(120)
-						v:SetRunSpeed(180)
-						v:GetRevivingEntity():StopReviving() // GetRevivingEntity - игрок, которого воскрешают. 
-						v:GetRevivingEntity():Revive()
-						v:SetRevivingEntity(Entity(0)) // Очищаем ненужные вещи.
-					end
-					if time >= time2 then
-						v:SetReviving(false)
-						v:SetWalkSpeed(120)
-						v:SetRunSpeed(180)
-						v:GetRevivingEntity():StopReviving() // GetRevivingEntity - игрок, которого воскрешают. 
-						v:GetRevivingEntity():Revive()
-						v:SetRevivingEntity(Entity(0)) // Очищаем ненужные вещи.
-					end
+		for k, v in pairs(player.GetRevivingPlayers()) do
+			time1 = v:GetReviveTime()
+			if time1 != 0 then
+				time2 = time1 + convar6:GetInt()
+				if v:GetRevivingEntity():IsBleedOut() == false then
+					v:SetReviving(false)
+					v:SetWalkSpeed(120)
+					v:SetRunSpeed(180)
+					v:GetRevivingEntity():StopReviving() // GetRevivingEntity - игрок, которого воскрешают. 
+					v:GetRevivingEntity():Revive()
+					v:SetRevivingEntity(Entity(0)) // Очищаем ненужные вещи.
+				end
+				if time >= time2 then
+					v:SetReviving(false)
+					v:SetWalkSpeed(120)
+					v:SetRunSpeed(180)
+					v:GetRevivingEntity():StopReviving() // GetRevivingEntity - игрок, которого воскрешают. 
+					v:GetRevivingEntity():Revive()
+					v:SetRevivingEntity(Entity(0)) // Очищаем ненужные вещи.
 				end
 			end
 		end
-
-		do
-			local players = player.GetBleedOuts()
-			for i = 1, #players do
-				local v = players[i]
-				time1 = v:GetBleedOutTime()
-				if convar27:GetBool() == true and time > v:GetBloodDelay() then
-					util.Decal( "Blood", v:EyePos(), v:GetPos() - Vector(0, 0, 10), v )
-					v:SetBloodDelay(CurTime() + 3)
-				end
-				if convar25:GetBool() == true then
-					if v:IsNPCReviving() == false then // Снизу идет поиск нпс ревайвора.
-						rebels = ents.FindByClass("npc_citizen")
-						//table.sort(rebels, function(a, b) return a:GetPos():Distance(v:EyePos()) < b:GetPos():Distance(v:EyePos()) end)
-						for k1, v1 in pairs(rebels) do
-							if v1:Visible(v) and v1:IsTryingToRevive() == false and v1:IsUnreachable(v) == false and v:IsNPCReviving() == false and v1:GetPos():Distance(v:GetPos()) < 512 and v1:Disposition( v ) == D_LI and v:IsBeingReviving() == false then
-								v1:SetTryingToRevive(true)
-								v1:SetReviveEnt(v)
-								vectors = v:GetPos() + Vector(0, 0, 31)
-								v1:SetSaveValue("m_vecLastPosition", vectors)
-								v1:SetSchedule(SCHED_FORCED_GO_RUN)
-								v:SetNPCReviving(true)
-								v:SetNPCRevivour(v1)
-							end
-						end
-					else
-						local revivour = v:GetNPCRevivour()
-						if IsValid(revivour) == false or revivour:GetPos():Distance(v:GetPos() + Vector(0, 0, 36)) > 512 or v:IsBleedOut() == false or v:IsBeingReviving() == true and !IsValid(v:GetNPCRevivour()) then 
-							v:SetNPCRevivour(Entity(0))
-							if IsValid(revivour) then 
-									revivour:SetReviving(false)
-									revivour:SetReviveTime(0)
-									revivour:SetTryingToRevive(false)
-									revivour:SetReviveEnt(Entity(0)) end
-							revivour = Entity(0)
-							v:SetNPCReviving(false)
-							if v:IsBeingNPCReviving() == true then
-								v:SetBeingNPCReviving(false)
-								v:StopReviving()
-							end
-						elseif v:GetPos():Distance(vectors) > 64 then
+		for k, v in pairs(player.GetBleedOuts()) do
+			time1 = v:GetBleedOutTime()
+			if convar27:GetBool() == true and time > v:GetBloodDelay() then
+				util.Decal( "Blood", v:EyePos(), v:GetPos() - Vector(0, 0, 10), v )
+				v:SetBloodDelay(CurTime() + 3)
+			end
+			if convar25:GetBool() == true then
+				if v:IsNPCReviving() == false then // Снизу идет поиск нпс ревайвора.
+					rebels = ents.FindByClass("npc_citizen")
+					//table.sort(rebels, function(a, b) return a:GetPos():Distance(v:EyePos()) < b:GetPos():Distance(v:EyePos()) end)
+					for k1, v1 in pairs(rebels) do
+						if v1:Visible(v) and v1:IsTryingToRevive() == false and v1:IsUnreachable(v) == false and v:IsNPCReviving() == false and v1:GetPos():Distance(v:GetPos()) < 512 and v1:Disposition( v ) == D_LI and v:IsBeingReviving() == false then
+							v1:SetTryingToRevive(true)
+							v1:SetReviveEnt(v)
 							vectors = v:GetPos() + Vector(0, 0, 31)
-							revivour:SetSaveValue("m_vecLastPosition", vectors)
-							revivour:SetSchedule(SCHED_FORCED_GO_RUN)
+							v1:SetSaveValue("m_vecLastPosition", vectors)
+							v1:SetSchedule(SCHED_FORCED_GO_RUN)
+							v:SetNPCReviving(true)
+							v:SetNPCRevivour(v1)
 						end
-						if revivour != Entity(0) then
-							if revivour:GetPos():Distance(v:GetPos() + Vector(0, 0, 36)) <= 128 and revivour:IsReviving() == false and !revivour:IsMoving() and v:IsBleedOut() == true and v:IsBeingReviving() == false then
-								revivour:SetSequence("Crouch_idleD")
-								revivour:SetReviving(true)
-								revivour:SetReviveTime(CurTime())
-								v:SetBeingReviving(true)
-								v:SetBeingNPCReviving(true)
-								v:StartReviving()
-							elseif revivour:IsReviving() == true then
-								revivour:SetSequence("Crouch_idleD")
-								local npctime1 = CurTime()
-								local npctime2 = revivour:GetReviveTime() + convar6:GetInt()
-								if npctime1 >= npctime2 then
-									revivour:SetReviving(false)
-									revivour:SetReviveTime(0)
-									v:SetBeingNPCReviving(false)
-									revivour:SetTryingToRevive(false)
-									revivour:SetReviveEnt(Entity(0))
-									v:SetNPCRevivour(Entity(0))
-									v:SetNPCReviving(false)
-									v:StopReviving()
-									v:Revive()
-									revivour = Entity(0)
-								end
+					end
+				else
+					local revivour = v:GetNPCRevivour()
+					if IsValid(revivour) == false or revivour:GetPos():Distance(v:GetPos() + Vector(0, 0, 36)) > 512 or v:IsBleedOut() == false or v:IsBeingReviving() == true and !IsValid(v:GetNPCRevivour()) then 
+						v:SetNPCRevivour(Entity(0))
+						if IsValid(revivour) then 
+								revivour:SetReviving(false)
+								revivour:SetReviveTime(0)
+								revivour:SetTryingToRevive(false)
+								revivour:SetReviveEnt(Entity(0)) end
+						revivour = Entity(0)
+						v:SetNPCReviving(false)
+						if v:IsBeingNPCReviving() == true then
+							v:SetBeingNPCReviving(false)
+							v:StopReviving()
+						end
+					elseif v:GetPos():Distance(vectors) > 64 then
+						vectors = v:GetPos() + Vector(0, 0, 31)
+						revivour:SetSaveValue("m_vecLastPosition", vectors)
+						revivour:SetSchedule(SCHED_FORCED_GO_RUN)
+					end
+					if revivour != Entity(0) then
+						if revivour:GetPos():Distance(v:GetPos() + Vector(0, 0, 36)) <= 128 and revivour:IsReviving() == false and !revivour:IsMoving() and v:IsBleedOut() == true and v:IsBeingReviving() == false then
+							revivour:SetSequence("Crouch_idleD")
+							revivour:SetReviving(true)
+							revivour:SetReviveTime(CurTime())
+							v:SetBeingReviving(true)
+							v:SetBeingNPCReviving(true)
+							v:StartReviving()
+						elseif revivour:IsReviving() == true then
+							revivour:SetSequence("Crouch_idleD")
+							local npctime1 = CurTime()
+							local npctime2 = revivour:GetReviveTime() + convar6:GetInt()
+							if npctime1 >= npctime2 then
+								revivour:SetReviving(false)
+								revivour:SetReviveTime(0)
+								v:SetBeingNPCReviving(false)
+								revivour:SetTryingToRevive(false)
+								revivour:SetReviveEnt(Entity(0))
+								v:SetNPCRevivour(Entity(0))
+								v:SetNPCReviving(false)
+								v:StopReviving()
+								v:Revive()
+								revivour = Entity(0)
 							end
 						end
 					end
 				end
-				if time1 != 0 and v:IsBeingReviving() == false then
-					time2 = time1 + convar5:GetInt()
-					if time >= time2 then
-						if !IsValid(v:GetAttacker()) then
-							v:Kill()
-							v:GodDisable()
-							v:Revive()
-						end
+			end
+			if time1 != 0 and v:IsBeingReviving() == false then
+				time2 = time1 + convar5:GetInt()
+				if time >= time2 then
+					if !IsValid(v:GetAttacker()) then
+						v:Kill()
+						v:GodDisable()
+						v:Revive()
 					end
 				end
 			end
