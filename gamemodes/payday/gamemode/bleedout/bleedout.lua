@@ -1101,7 +1101,7 @@ end
 // Server Player Functions are set ^
 function player.GetRevivingPlayers() // Дает список всех воскрешающих игроков.
 	local tab = {}
-	for k, v in pairs(player.GetAll()) do
+	for k, v in ipairs(player.GetAll()) do
 		if v:IsReviving() == true then
 			table.insert(tab, v)
 		end
@@ -1110,7 +1110,7 @@ function player.GetRevivingPlayers() // Дает список всех воск�
 end
 function player.GetBleedOuts() // Для рисовки обводки игроков. Работает онли на сервере, так что когда кто то падает/встает эта штука передается клиенту.
 	local tab = {}
-	for k, v in pairs(player.GetAll()) do
+	for k, v in ipairs(player.GetAll()) do
 		if v:IsBleedOut() == true then
 			table.insert(tab, v)
 		end
@@ -1119,7 +1119,7 @@ function player.GetBleedOuts() // Для рисовки обводки игро�
 end
 function ents.GetShootingAtBleedOuts()
 	local tab = {}
-	for k, v in pairs(ents.FindByClass("npc_*")) do
+	for k, v in ipairs(ents.FindByClass("npc_*")) do
 		if v:GetEnemy():IsPlayer() then
 			if v:GetEnemy():IsBleedOut() == true then
 				table.insert(tab, v)
@@ -1129,7 +1129,7 @@ function ents.GetShootingAtBleedOuts()
 end
 function player.GetNoBleedOuts() // Для теста, дебаг функция, делает абсолютно обратную функцию player.GetBleedOuts(). Т.е - не упавшие игроки
 	local tab = {}
-	for k, v in pairs(player.GetAll()) do
+	for k, v in ipairs(player.GetAll()) do
 		if v:IsBleedOut() == false then
 			table.insert(tab, v)
 		end
