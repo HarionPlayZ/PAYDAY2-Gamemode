@@ -2,7 +2,7 @@ local ourMat = Material("custody.png")
 local ourMat2 = Material("pr1.png")
 local ourMat3 = nil
 local dif1 = {'Normal', 'Hard', 'Very Hard', 'Overkill', 'Mayhem', 'Death Wish', 'Death Sentence'}
-local dif2 = {'', 'Å', 'Å', 'Å', 'Ä', 'Ç', 'É'}
+local dif2 = {'', 'Å', 'Å Å', 'Å Å Å', 'Å Å Å Ä', 'Å Å Å Ä Ç', 'Å Å Å Ä Ç É'}
 surface.CreateFont("pd2",{font="Payday2",size=60,weight=800} )
 
 hook.Add( "InitPostEntity", "pd2_load_brief", function()
