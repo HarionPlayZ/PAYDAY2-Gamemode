@@ -1,19 +1,18 @@
 local bindingstabwaspressed = {}
-if table.IsEmpty( file.Find("bleedout.txt", "DATA") )then
-	bindingstab = {
-		bleedout_suicide = KEY_G,
-		bleedout_help = KEY_H
-	}
-	local filetxt = util.TableToJSON(bindingstab, true)
-	file.Write("bleedout.txt", filetxt)
+local bindingstab = {
+	bleedout_suicide = KEY_G,
+	bleedout_help = KEY_H
+}
+
+if not file.Exists("bleedout.txt", "DATA") then
+	file.Write("bleedout.txt", util.TableToJSON(bindingstab, true))
 else
-	local filetxt = file.Read("bleedout.txt", "DATA")
-	bindingstab = util.JSONToTable(filetxt)
+	bindingstab = util.JSONToTable(file.Read("bleedout.txt", "DATA"))
 end
 
-AddCSLuaFile() // Для того что бы передавалась клиенту (ну на всякий случай)
+AddCSLuaFile() -- Для того что бы передавалась клиенту (ну на всякий случай)
 
-local tabhalo = {} // Создание столбика для обводки + иконок над игроками.
+local tabhalo = {} -- Создание столбика для обводки + иконок над игроками.
 local convar = GetConVar( "bleedout_shouldtakedmg" )
 local convar0 = GetConVar( "sbox_playershurtplayers" )
 local convar2 = GetConVar( "bleedout_draw_outlines" )
@@ -48,22 +47,22 @@ local convar31 = GetConVar( "bleedout_hp" )
 local convar32 = GetConVar( "bleedout_blacknwhite" )
 local convar33 = GetConVar( "bleedout_heartbeat" )
 local delay = CurTime() + 3
-local loweredview = Vector(0, 0, 38) // Используется в FireBullets, CalcView, CalcViewModelView
-local normalhullbottom, normalhulltop, duckhullbottom, duckhulltop = Vector(-16, -16, 0), Vector(16, 16, 72), Vector(-16, -16, 0), Vector(16, 16, 36) // Хуллы для игрока, используется в self:SetHull()
+local loweredview = Vector(0, 0, 38) -- Используется в FireBullets, CalcView, CalcViewModelView
+local normalhullbottom, normalhulltop, duckhullbottom, duckhulltop = Vector(-16, -16, 0), Vector(16, 16, 72), Vector(-16, -16, 0), Vector(16, 16, 36) -- Хуллы для игрока, используется в self:SetHull()
 local distancetotrace = 91
-local PLAYER = FindMetaTable("Player") // Метатабл для игроков
+local PLAYER = FindMetaTable("Player") -- Метатабл для игроков
 local NPC = FindMetaTable("NPC")
-local cyclex, cycley = 0.6,0.65 // Период анимации, своровал с nzombies
-local loweredpos = Vector(0,0, -32) // Вычитаем из обычного вектора.
+local cyclex, cycley = 0.6,0.65 -- Период анимации, своровал с nzombies
+local loweredpos = Vector(0,0, -32) -- Вычитаем из обычного вектора.
 local rotate = Angle(0,0,-20) -- Вращение
 
-function SearchForClassInTable(tab, class)
+local function SearchForClassInTable(tab, class)
 	for k, v in pairs(tab) do
 		if v:GetClass() == class then return v end
 	end
 	return nil
 end
-function DrawColorCorrection(t, from, to)
+local function DrawColorCorrection(t, from, to)
 	local tab = {
 		["$pp_colour_addr"] = Lerp(t, from["$pp_colour_addr"], to["$pp_colour_addr"]),
 		["$pp_colour_addg"] = Lerp(t, from["$pp_colour_addg"], to["$pp_colour_addg"]),
@@ -77,105 +76,105 @@ function DrawColorCorrection(t, from, to)
 	}
 	DrawColorModify(tab)
 end
-function LerpColor(t, fromcol, tocol)
-	local from1, from2, from3 = ColorToHSL(fromcol) // Как подсказывают на форумах и вики: лучше переводить в hsv, а потом уже лерпать.
+local function LerpColor(t, fromcol, tocol)
+	local from1, from2, from3 = ColorToHSL(fromcol) -- Как подсказывают на форумах и вики: лучше переводить в hsv, а потом уже лерпать.
 	local to1, to2, to3 = ColorToHSL(tocol)
 	local f1 = Lerp(t, from1, to1)
 	local f2 = Lerp(t, from2, to2)
 	local f3 = Lerp(t, from3, to3)
 	return HSLToColor(f1, f2, f3)
 end
-function BuildCircle(xx, yy, radius)
-	local triangle = {} // P.s На будущее - если мне лень пользоваться math.cos - могу представить это как угол, а потом forward()
-		triangle[1] = { 
-			{x = xx + radius * -0.382683, y = yy + radius * -0.923880},
-			{x = xx, y = yy - radius},
-			{x = xx, y = yy}
-		}
-		triangle[2] = { 
-			{x = xx + radius * -0.707107, y = yy + radius * -0.707107},
-			{x = xx + radius * -0.382683, y = yy + radius * -0.923880},
-			{x = xx, y = yy}
-		}
-		triangle[3] = { 
-			{x = xx + radius * -0.920505, y = yy + radius * -0.390731},
-			{x = xx + radius * -0.707107, y = yy + radius * -0.707107},
-			{x = xx, y = yy}
-		}
-		triangle[4] = { 
-			{x = xx - radius, y = yy},
-			{x = xx + radius * -0.920505, y = yy + radius * -0.390731},
-			{x = xx, y = yy}
-		}
-		triangle[5] = { 
-			{x = xx + radius * -0.920505, y = yy + radius * 0.390731},
-			{x = xx - radius, y = yy},
-			{x = xx, y = yy}
-		}
-		triangle[6] = { 
-			{x = xx + radius * -0.707107, y = yy + radius * 0.707107},
-			{x = xx + radius * -0.920505, y = yy + radius * 0.390731},
-			{x = xx, y = yy}
-		}
-		triangle[7] = { 
-			{x = xx + radius * -0.382683, y = yy + radius * 0.923880},
-			{x = xx + radius * -0.707107, y = yy + radius * 0.707107},
-			{x = xx, y = yy}
-		}
-		triangle[8] = { 
-			{x = xx, y = yy + radius},
-			{x = xx + radius * -0.382683, y = yy + radius * 0.923880},
-			{x = xx, y = yy}
-		}
-		triangle[9] = { 
-			{x = xx + radius * 0.382683, y = yy + radius * 0.923880},
-			{x = xx, y = yy + radius},
-			{x = xx, y = yy}
-		}
-		triangle[10] = { 
-			{x = xx + radius * 0.707107, y = yy + radius * 0.707107},
-			{x = xx + radius * 0.382683, y = yy + radius * 0.923880},
-			{x = xx, y = yy}
-		}
-		triangle[11] = { 
-			{x = xx + radius * 0.920505, y = yy + radius * 0.390731},
-			{x = xx + radius * 0.707107, y = yy + radius * 0.707107},
-			{x = xx, y = yy}
-		}
-		triangle[12] = { 
-			{x = xx + radius, y = yy},
-			{x = xx + radius * 0.920505, y = yy + radius * 0.390731},
-			{x = xx, y = yy}
-		}
-		triangle[13] = { 
-			{x = xx + radius * 0.920505, y = yy + radius * -0.390731},
-			{x = xx + radius, y = yy},
-			{x = xx, y = yy}
-		}
-		triangle[14] = { 
-			{x = xx + radius * 0.707107, y = yy + radius * -0.707107},
-			{x = xx + radius * 0.920505, y = yy + radius * -0.390731},
-			{x = xx, y = yy}
-		}
-		triangle[15] = { 
-			{x = xx + radius * 0.382683, y = yy + radius * -0.923880},
-			{x = xx + radius * 0.707107, y = yy + radius * -0.707107},
-			{x = xx, y = yy}
-		}
-		triangle[16] = { 
-			{x = xx, y = yy - radius},
-			{x = xx + radius * 0.382683, y = yy + radius * -0.923880},
-			{x = xx, y = yy}
-		}
+local function BuildCircle(xx, yy, radius)
+	local triangle = {} -- P.s На будущее - если мне лень пользоваться math.cos - могу представить это как угол, а потом forward()
+	triangle[1] = { 
+		{x = xx + radius * -0.382683, y = yy + radius * -0.923880},
+		{x = xx, y = yy - radius},
+		{x = xx, y = yy}
+	}
+	triangle[2] = { 
+		{x = xx + radius * -0.707107, y = yy + radius * -0.707107},
+		{x = xx + radius * -0.382683, y = yy + radius * -0.923880},
+		{x = xx, y = yy}
+	}
+	triangle[3] = { 
+		{x = xx + radius * -0.920505, y = yy + radius * -0.390731},
+		{x = xx + radius * -0.707107, y = yy + radius * -0.707107},
+		{x = xx, y = yy}
+	}
+	triangle[4] = { 
+		{x = xx - radius, y = yy},
+		{x = xx + radius * -0.920505, y = yy + radius * -0.390731},
+		{x = xx, y = yy}
+	}
+	triangle[5] = { 
+		{x = xx + radius * -0.920505, y = yy + radius * 0.390731},
+		{x = xx - radius, y = yy},
+		{x = xx, y = yy}
+	}
+	triangle[6] = { 
+		{x = xx + radius * -0.707107, y = yy + radius * 0.707107},
+		{x = xx + radius * -0.920505, y = yy + radius * 0.390731},
+		{x = xx, y = yy}
+	}
+	triangle[7] = { 
+		{x = xx + radius * -0.382683, y = yy + radius * 0.923880},
+		{x = xx + radius * -0.707107, y = yy + radius * 0.707107},
+		{x = xx, y = yy}
+	}
+	triangle[8] = { 
+		{x = xx, y = yy + radius},
+		{x = xx + radius * -0.382683, y = yy + radius * 0.923880},
+		{x = xx, y = yy}
+	}
+	triangle[9] = { 
+		{x = xx + radius * 0.382683, y = yy + radius * 0.923880},
+		{x = xx, y = yy + radius},
+		{x = xx, y = yy}
+	}
+	triangle[10] = { 
+		{x = xx + radius * 0.707107, y = yy + radius * 0.707107},
+		{x = xx + radius * 0.382683, y = yy + radius * 0.923880},
+		{x = xx, y = yy}
+	}
+	triangle[11] = { 
+		{x = xx + radius * 0.920505, y = yy + radius * 0.390731},
+		{x = xx + radius * 0.707107, y = yy + radius * 0.707107},
+		{x = xx, y = yy}
+	}
+	triangle[12] = { 
+		{x = xx + radius, y = yy},
+		{x = xx + radius * 0.920505, y = yy + radius * 0.390731},
+		{x = xx, y = yy}
+	}
+	triangle[13] = { 
+		{x = xx + radius * 0.920505, y = yy + radius * -0.390731},
+		{x = xx + radius, y = yy},
+		{x = xx, y = yy}
+	}
+	triangle[14] = { 
+		{x = xx + radius * 0.707107, y = yy + radius * -0.707107},
+		{x = xx + radius * 0.920505, y = yy + radius * -0.390731},
+		{x = xx, y = yy}
+	}
+	triangle[15] = { 
+		{x = xx + radius * 0.382683, y = yy + radius * -0.923880},
+		{x = xx + radius * 0.707107, y = yy + radius * -0.707107},
+		{x = xx, y = yy}
+	}
+	triangle[16] = { 
+		{x = xx, y = yy - radius},
+		{x = xx + radius * 0.382683, y = yy + radius * -0.923880},
+		{x = xx, y = yy}
+	}
 	return triangle
 end
-function DrawCircle(tab, t, color)
+local function DrawCircle(tab, t, color)
 	draw.NoTexture()
 	surface.SetDrawColor(color.r, color.g, color.b, color.a)
 	local tab1 = {{}, {}, {}}
-	if t <= 0.0625 then // Тут, к сожалению царит луа, так что никаких switch statement. Даже вариант с таблицей с функцииями хуже справляется.
+	if t <= 0.0625 then -- Тут, к сожалению царит луа, так что никаких switch statement. Даже вариант с таблицей с функцииями хуже справляется.
 		local t = t / 0.0625
-		tab1[1].x = Lerp(t, tab[1][2].x, tab[1][1].x) // Так что придется довольствоваться if'ами. Может в луа они лучше чем с C..
+		tab1[1].x = Lerp(t, tab[1][2].x, tab[1][1].x) -- Так что придется довольствоваться if'ами. Может в луа они лучше чем с C..
 		tab1[1].y = Lerp(t, tab[1][2].y, tab[1][1].y)
 		tab1[2].x = tab[1][2].x
 		tab1[2].y = tab[1][2].y
@@ -365,109 +364,109 @@ function DrawCircle(tab, t, color)
 		end
 	end
 end
-function NPC:IsTryingToRevive() // Простенькая функция
+function NPC:IsTryingToRevive() -- Простенькая функция
 	return self:GetNWBool("TryingToRevive")
 end
-function NPC:SetTryingToRevive(bool) // Простенькая функция
+function NPC:SetTryingToRevive(bool) -- Простенькая функция
 	 self:SetNWBool("TryingToRevive", bool)
 end
-function NPC:GetReviveEnt() // Простенькая функция
+function NPC:GetReviveEnt() -- Простенькая функция
 	return self:GetNWEntity("NpcReviveent")
 end
-function NPC:SetReviveEnt(ent) // Простенькая функция
+function NPC:SetReviveEnt(ent) -- Простенькая функция
 	self:SetNWEntity("NpcReviveent", ent)
 end
-function NPC:IsReviving() // Простенькая функция
+function NPC:IsReviving() -- Простенькая функция
 	return self:GetNWBool("NPCReviving")
 end
-function NPC:SetReviving(bool) // Простенькая функция
+function NPC:SetReviving(bool) -- Простенькая функция
 	self:SetNWBool("NPCReviving", bool)
 end
-function NPC:GetReviveTime() // Простенькая функция
+function NPC:GetReviveTime() -- Простенькая функция
 	return self:GetNWFloat("NPCReviveTime")
 end
-function NPC:SetReviveTime(time) // Простенькая функция
+function NPC:SetReviveTime(time) -- Простенькая функция
 	self:SetNWFloat("NPCReviveTime", time)
 end
-function PLAYER:IsReviving() // Простенькая функция
+function PLAYER:IsReviving() -- Простенькая функция
 	return self:GetNWBool("Reviving")
 end
-function PLAYER:SetReviving(bool) // Простенькая функция
+function PLAYER:SetReviving(bool) -- Простенькая функция
 	self:SetNWBool("Reviving", bool)
 end
-function PLAYER:GetBloodDelay() // Простенькая функция
+function PLAYER:GetBloodDelay() -- Простенькая функция
 	return self:GetNWFloat("Delay")
 end
-function PLAYER:SetBloodDelay(time) // Простенькая функция
+function PLAYER:SetBloodDelay(time) -- Простенькая функция
 	self:SetNWFloat("Delay", time)
 end
-function PLAYER:IsNPCReviving() // Простенькая функция
+function PLAYER:IsNPCReviving() -- Простенькая функция
 	return self:GetNWBool("NPCReviving")
 end
-function PLAYER:SetNPCReviving(bool) // Простенькая функция
+function PLAYER:SetNPCReviving(bool) -- Простенькая функция
 	self:SetNWBool("NPCReviving", bool)
 end
-function PLAYER:GetNPCRevivour() // Простенькая функция
+function PLAYER:GetNPCRevivour() -- Простенькая функция
 	return self:GetNWEntity("NPCRevivingEnt")
 end
-function PLAYER:SetNPCRevivour(ent) // Простенькая функция
+function PLAYER:SetNPCRevivour(ent) -- Простенькая функция
 	self:SetNWEntity("NPCRevivingEnt", ent)
 end
-function PLAYER:GetAttacker() // Простенькая функция
+function PLAYER:GetAttacker() -- Простенькая функция
 	return self:GetNWEntity("Attacker")
 end
-function PLAYER:SetAttacker(ent) // Простенькая функция
+function PLAYER:SetAttacker(ent) -- Простенькая функция
 	self:SetNWEntity("Attacker", ent)
 end
-function PLAYER:GetAttackerWeapon() // Простенькая функция
+function PLAYER:GetAttackerWeapon() -- Простенькая функция
 	return self:GetNWEntity("AttackerWeap")
 end
-function PLAYER:SetAttackerWeapon(ent) // Простенькая функция
+function PLAYER:SetAttackerWeapon(ent) -- Простенькая функция
 	self:SetNWEntity("AttackerWeap", ent)
 end
-function PLAYER:IsBeingReviving() // Простенькая функция
+function PLAYER:IsBeingReviving() -- Простенькая функция
 	return self:GetNWBool("BeingReviving")
 end
-function PLAYER:SetBeingReviving(bool) // Простенькая функция
+function PLAYER:SetBeingReviving(bool) -- Простенькая функция
 	self:SetNWBool("BeingReviving", bool)
 end
-function PLAYER:IsBeingNPCReviving() // Простенькая функция
+function PLAYER:IsBeingNPCReviving() -- Простенькая функция
 	return self:GetNWBool("BeingNPCReviving")
 end
-function PLAYER:SetBeingNPCReviving(bool) // Простенькая функция
+function PLAYER:SetBeingNPCReviving(bool) -- Простенькая функция
 	self:SetNWBool("BeingNPCReviving", bool)
 end
-function PLAYER:GetNumBleedOuts() // Простенькая функция
+function PLAYER:GetNumBleedOuts() -- Простенькая функция
 	return self:GetNWInt("NumBleedOuts")
 end
-function PLAYER:SetNumBleedOuts(num) // Простенькая функция
+function PLAYER:SetNumBleedOuts(num) -- Простенькая функция
 	self:SetNWInt("NumBleedOuts", num)
 end
-function PLAYER:GetReviveTimeFromEntity() // entity - игрок, которого возрождают
+function PLAYER:GetReviveTimeFromEntity() -- entity - игрок, которого возрождают
 	return self:GetNWFloat("ReviveTimeFromEnt")
 end
-function PLAYER:SetReviveTimeFromEntity(time) // Простенькая функция
+function PLAYER:SetReviveTimeFromEntity(time) -- Простенькая функция
 	self:SetNWFloat("ReviveTimeFromEnt", time)
 end
-function PLAYER:GetReviveTime() // Простенькая функция
+function PLAYER:GetReviveTime() -- Простенькая функция
 	return self:GetNWFloat("ReviveTime")
 end
-function PLAYER:SetReviveTime(time) // Простенькая функция
+function PLAYER:SetReviveTime(time) -- Простенькая функция
 	self:SetNWFloat("ReviveTime", time)
 end
-function PLAYER:GetBleedOutTime() // Простенькая функция
+function PLAYER:GetBleedOutTime() -- Простенькая функция
 	return self:GetNWFloat("BleedOutTime")
 end
 function PLAYER:SetBleedOutTime(timing)
 	self:SetNWFloat("BleedOutTime", timing)
 end
-function PLAYER:IsBleedOut() // Простенькая функция, показывающая упал ли игрок или нет?
+function PLAYER:IsBleedOut() -- Простенькая функция, показывающая упал ли игрок или нет?
 	return self:GetNWBool("BleedOut")
 end
-function PLAYER:SetBleedOut(bool) // bool - да или нет. Упал или встал? Вот в чем вопрос
+function PLAYER:SetBleedOut(bool) -- bool - да или нет. Упал или встал? Вот в чем вопрос
 	local curtime = CurTime()
-	if curtime == nil then //11
-		curtime = RealTime() //11
+	if curtime == nil then --11
+		curtime = RealTime() --11
 	end
 	self:SetNWBool("BleedOut", bool)
 	if bool == true then
@@ -484,15 +483,15 @@ function PLAYER:SetRevivingEntity(ent)
 end
 
 --- ^ shared functions
-if SERVER then // Добавляю нетворк вары. Все предназначено для клиента.
-	util.AddNetworkString("bleedout_go") // Когда кто то упал
-	util.AddNetworkString("bleedout_out") // Когда кто то всталл
-	util.AddNetworkString("bleedout_settable") // Сам процесс воскрешения.
-	util.AddNetworkString("bleedout_suicide") // Типо команда, позволяющая сдохнуть. Наподобии kill
-	util.AddNetworkString("bleedout_help") // Типо команда, позволяющая позвать на помощь.
+if SERVER then -- Добавляю нетворк вары. Все предназначено для клиента.
+	util.AddNetworkString("bleedout_go") -- Когда кто то упал
+	util.AddNetworkString("bleedout_out") -- Когда кто то всталл
+	util.AddNetworkString("bleedout_settable") -- Сам процесс воскрешения.
+	util.AddNetworkString("bleedout_suicide") -- Типо команда, позволяющая сдохнуть. Наподобии kill
+	util.AddNetworkString("bleedout_help") -- Типо команда, позволяющая позвать на помощь.
 end
 if SERVER then
-	function serverthink()
+	local function serverthink()
 		local time = CurTime()
 		for k, v in ipairs(player.GetRevivingPlayers()) do
 			local time1 = v:GetReviveTime()
@@ -502,17 +501,17 @@ if SERVER then
 					v:SetReviving(false)
 					v:SetWalkSpeed(120)
 					v:SetRunSpeed(180)
-					v:GetRevivingEntity():StopReviving() // GetRevivingEntity - игрок, которого воскрешают. 
+					v:GetRevivingEntity():StopReviving() -- GetRevivingEntity - игрок, которого воскрешают. 
 					v:GetRevivingEntity():Revive()
-					v:SetRevivingEntity(Entity(0)) // Очищаем ненужные вещи.
+					v:SetRevivingEntity(Entity(0)) -- Очищаем ненужные вещи.
 				end
 				if time >= time2 then
 					v:SetReviving(false)
 					v:SetWalkSpeed(120)
 					v:SetRunSpeed(180)
-					v:GetRevivingEntity():StopReviving() // GetRevivingEntity - игрок, которого воскрешают. 
+					v:GetRevivingEntity():StopReviving() -- GetRevivingEntity - игрок, которого воскрешают. 
 					v:GetRevivingEntity():Revive()
-					v:SetRevivingEntity(Entity(0)) // Очищаем ненужные вещи.
+					v:SetRevivingEntity(Entity(0)) -- Очищаем ненужные вещи.
 				end
 			end
 		end
@@ -523,9 +522,11 @@ if SERVER then
 				v:SetBloodDelay(CurTime() + 3)
 			end
 			if convar25:GetBool() == true then
-				if v:IsNPCReviving() == false then // Снизу идет поиск нпс ревайвора.
+				local vectors
+
+				if v:IsNPCReviving() == false then -- Снизу идет поиск нпс ревайвора.
 					local rebels = ents.FindByClass("npc_citizen")
-					//table.sort(rebels, function(a, b) return a:GetPos():Distance(v:EyePos()) < b:GetPos():Distance(v:EyePos()) end)
+					--table.sort(rebels, function(a, b) return a:GetPos():Distance(v:EyePos()) < b:GetPos():Distance(v:EyePos()) end)
 					for k1, v1 in ipairs(rebels) do
 						if v1:Visible(v) and v1:IsTryingToRevive() == false and v1:IsUnreachable(v) == false and v:IsNPCReviving() == false and v1:GetPos():Distance(v:GetPos()) < 512 and v1:Disposition( v ) == D_LI and v:IsBeingReviving() == false then
 							v1:SetTryingToRevive(true)
@@ -542,17 +543,18 @@ if SERVER then
 					if IsValid(revivour) == false or revivour:GetPos():Distance(v:GetPos() + Vector(0, 0, 36)) > 512 or v:IsBleedOut() == false or v:IsBeingReviving() == true and !IsValid(v:GetNPCRevivour()) then 
 						v:SetNPCRevivour(Entity(0))
 						if IsValid(revivour) then 
-								revivour:SetReviving(false)
-								revivour:SetReviveTime(0)
-								revivour:SetTryingToRevive(false)
-								revivour:SetReviveEnt(Entity(0)) end
+							revivour:SetReviving(false)
+							revivour:SetReviveTime(0)
+							revivour:SetTryingToRevive(false)
+							revivour:SetReviveEnt(Entity(0))
+						end
 						revivour = Entity(0)
 						v:SetNPCReviving(false)
 						if v:IsBeingNPCReviving() == true then
 							v:SetBeingNPCReviving(false)
 							v:StopReviving()
 						end
-					elseif v:GetPos():Distance(vectors) > 64 then
+					elseif vectors and v:GetPos():Distance(vectors) > 64 then
 						vectors = v:GetPos() + Vector(0, 0, 31)
 						revivour:SetSaveValue("m_vecLastPosition", vectors)
 						revivour:SetSchedule(SCHED_FORCED_GO_RUN)
@@ -598,7 +600,7 @@ if SERVER then
 		end
 	end
 	hook.Add("Think", "ServerThink", serverthink)
-	hook.Add("KeyPress", "ReviveUseChecker", function(ply, key) // Чек нажатия юз кнопки. На сервере потому что так будет легче
+	hook.Add("KeyPress", "ReviveUseChecker", function(ply, key) -- Чек нажатия юз кнопки. На сервере потому что так будет легче
 		if ply:Team() == 2 then return true end
 		if key == 32 and ply:IsBleedOut() == false and ply:IsReviving() == false then
 			ply:TryRevive()
@@ -611,16 +613,16 @@ if SERVER then
 	end)
 end
 if CLIENT then
-	function PLAYER:Revive()
-	end
-	local mator = Material("bleedout/REVIVESKULL.png") // Иконка revive над игроками
-	local mator0 = Material("bleedout/REVIVEICON.png") // COD версия иконки
-	local mator1 = Material("bleedout/BLOODONSCR.png") // Кровь
-	local itext1 = Material("bleedout/BLOODONSCR.png"):GetTexture("$basetexture") // Кешированая текстура
-	local mator2 = Material("bleedout/BLEEDINGOUT.png") // Таймер
-	local skullmat = Material("bleedout/SKULL.png") // Черепок
-	local syrmat = Material("bleedout/SYRINGE.png") // Шприц
-	local itext2 = Material("bleedout/BLEEDINGOUT.png"):GetTexture("$basetexture") // Кешированая текстура
+	function PLAYER:Revive() end
+
+	local mator = Material("bleedout/REVIVESKULL.png") -- Иконка revive над игроками
+	local mator0 = Material("bleedout/REVIVEICON.png") -- COD версия иконки
+	local mator1 = Material("bleedout/BLOODONSCR.png") -- Кровь
+	local itext1 = Material("bleedout/BLOODONSCR.png"):GetTexture("$basetexture") -- Кешированая текстура
+	local mator2 = Material("bleedout/BLEEDINGOUT.png") -- Таймер
+	local skullmat = Material("bleedout/SKULL.png") -- Черепок
+	local syrmat = Material("bleedout/SYRINGE.png") -- Шприц
+	local itext2 = Material("bleedout/BLEEDINGOUT.png"):GetTexture("$basetexture") -- Кешированая текстура
 	local centre = ScrW() / 2
 	local centrey = ScrH() - 96
 	local circle = BuildCircle(centre, centrey, 64)
@@ -631,7 +633,7 @@ if CLIENT then
 			local time = CurTime()
 			local time1 = LocalPlayer():GetBleedOutTime() + convar5:GetInt()
 			local time2 = time1 - time
-			local percenttime = time2 / convar5:GetInt() // Делает это в виде процента десятичной системы
+			local percenttime = time2 / convar5:GetInt() -- Делает это в виде процента десятичной системы
 			if percenttime < 0 then percenttime = 1 end
 			surface.SetDrawColor(255, 255, 255, Lerp(percenttime, 255, 0) / 6 )
 			surface.DrawTexturedRect(0, 0, ScrW(), ScrH())
@@ -656,7 +658,7 @@ if CLIENT then
 			local time2 = time1 - time
 			local time3 = ( time2 - convar6:GetFloat() ) * -1
 			local percenttime = time3 / convar6:GetInt()
-			widthdif = ScrW() * 0.6 - ScrW() * 0.4
+			local widthdif = ScrW() * 0.6 - ScrW() * 0.4
 			local greenboxmetr = widthdif * percenttime
 			local greenred = LerpColor(percenttime, Color(255,0,0), Color(0,255,0))
 			draw.DrawText("Reviving.", "Trebuchet24", ScrW() * 0.5, ScrH() * 0.8, Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER)
@@ -684,12 +686,12 @@ if CLIENT then
 			surface.DrawCircle(centre, centrey, 63.5, 0, 0, 0)
 			surface.DrawCircle(centre, centrey, 64, 0, 0, 0)
 		end
-		time = CurTime()
+
 		if LocalPlayer():GetBleedOutTime() != 0 and convar18:GetBool() == true and convar19:GetInt() == 0 then
 			local time = CurTime()
 			local time1 = LocalPlayer():GetBleedOutTime() + convar5:GetInt()
 			local time2 = time1 - time
-			local percenttime = time2 / convar5:GetInt() // Делает это в виде процента десятичной системы
+			local percenttime = time2 / convar5:GetInt() -- Делает это в виде процента десятичной системы
 			DrawCircle(circle, percenttime, LerpColor(percenttime, Color(255,0,0), Color(0,255,0)))
 			DrawCircle(circle2, 1, Color(0,0,0))
 			surface.SetMaterial(skullmat)
@@ -699,8 +701,8 @@ if CLIENT then
 			local time = CurTime()
 			local time1 = LocalPlayer():GetBleedOutTime() + convar5:GetInt()
 			local time2 = time1 - time
-			widthdif = ScrW() * 0.85 - ScrW() * 0.7 // Так как я делаю это без знаний сколько у игрока разрешение - использую scrw и тому подобное. Сейчас это отнимание большей части и меньшей и получение их разницы. В итоге получаем ширину
-			local percenttime1 = time2 / convar5:GetInt() // Делает это в виде процента десятичной системы
+			local widthdif = ScrW() * 0.85 - ScrW() * 0.7 -- Так как я делаю это без знаний сколько у игрока разрешение - использую scrw и тому подобное. Сейчас это отнимание большей части и меньшей и получение их разницы. В итоге получаем ширину
+			local percenttime1 = time2 / convar5:GetInt() -- Делает это в виде процента десятичной системы
 			local greenboxmetr1 = widthdif * percenttime1
 			surface.SetDrawColor(255, 255, 255, 230)
 			surface.SetMaterial(mator2)
@@ -710,7 +712,7 @@ if CLIENT then
 			surface.DrawRect(ScrW() * 0.7, ScrH() * 0.8, ScrW() * 0.85 - ScrW() * 0.7, ScrH() * 0.825 - ScrH() * 0.8)
 			surface.SetDrawColor(greenred.r, greenred.g, greenred.b)
 			surface.DrawRect(ScrW() * 0.7, ScrH() * 0.8, greenboxmetr1, ScrH() * 0.825 - ScrH() * 0.8)
-		elseif LocalPlayer():GetBleedOutTime() != 0 and convar18:GetBool() == true and convar19:GetInt() == 2 then // Legacy UI
+		elseif LocalPlayer():GetBleedOutTime() != 0 and convar18:GetBool() == true and convar19:GetInt() == 2 then -- Legacy UI
 			local time = CurTime()
 			local time1 = LocalPlayer():GetBleedOutTime() + convar5:GetInt()
 			local time2 = math.ceil(time1 - time)
@@ -720,7 +722,7 @@ if CLIENT then
 			local time = CurTime()
 			local time1 = LocalPlayer():GetBleedOutTime() + convar5:GetInt()
 			local time2 = time1 - time
-			local percenttime = time2 / convar5:GetInt() // Делает это в виде процента десятичной системы
+			local percenttime = time2 / convar5:GetInt() -- Делает это в виде процента десятичной системы
 			DrawCircle(circle, percenttime, LerpColor(percenttime, Color(255,0,0), Color(0,255,0)))
 			DrawCircle(circle2, 1, Color(0,0,0))
 			surface.SetMaterial(skullmat)
@@ -737,10 +739,10 @@ if CLIENT then
 				if convar13:GetString() != "bleedout/REVIVEICON.png" and convar13:GetString() != "bleedout/REVIVESKULL.png" then
 					cam.Start2D()
 					surface.SetDrawColor(255, 255, 255)
-					local mat1 = Material(convar13:GetString(), alphatest) // Кастомный материал
+					local mat1 = Material(convar13:GetString(), alphatest) -- Кастомный материал
 					surface.SetMaterial(mat1)
-					vpos = ply:GetPos() + Vector(0, 0, 72)
-					local pos = vpos:ToScreen() // Для оптимизации, если не видно - значит хер с ним.
+					local vpos = ply:GetPos() + Vector(0, 0, 72)
+					local pos = vpos:ToScreen() -- Для оптимизации, если не видно - значит хер с ним.
 					surface.SetDrawColor( 255,255,255 )
 					if pos.visible == true then
 						surface.DrawTexturedRect( pos.x - convar14:GetInt() * 0.5 , pos.y - convar14:GetInt() * 0.5, convar14:GetInt() * 2, convar14:GetInt() * 2 )
@@ -751,8 +753,8 @@ if CLIENT then
 					surface.SetMaterial(mator0)
 					local time1 = ply:GetBleedOutTime() + convar5:GetInt()
 					local time2 = time1 - time
-					vpos = ply:GetPos() + Vector(0, 0, 72)
-					local pos = vpos:ToScreen() // Для оптимизации, если не видно - значит хер с ним.
+					local vpos = ply:GetPos() + Vector(0, 0, 72)
+					local pos = vpos:ToScreen() -- Для оптимизации, если не видно - значит хер с ним.
 					local percenttime = time2 / convar5:GetInt()
 					if percenttime > 0 then
 						surface.SetDrawColor(LerpColor(percenttime, Color(255,0,0), Color(0,255,0)).r, LerpColor(percenttime, Color(255,0,0), Color(0,255,0)).g, LerpColor(percenttime, Color(255,0,0), Color(0,255,0)).b)
@@ -768,8 +770,8 @@ if CLIENT then
 					surface.SetMaterial(mator)
 					local time1 = ply:GetBleedOutTime() + convar5:GetInt()
 					local time2 = time1 - time
-					vpos = ply:GetPos() + Vector(0, 0, 72)
-					local pos = vpos:ToScreen() // Для оптимизации, если не видно - значит хер с ним.
+					local vpos = ply:GetPos() + Vector(0, 0, 72)
+					local pos = vpos:ToScreen() -- Для оптимизации, если не видно - значит хер с ним.
 					local percenttime = time2 / convar5:GetInt()
 					if percenttime > 0 then
 						surface.SetDrawColor(LerpColor(percenttime, Color(255,0,0), Color(0,255,0)).r, LerpColor(percenttime, Color(255,0,0), Color(0,255,0)).g, LerpColor(percenttime, Color(255,0,0), Color(0,255,0)).b)
@@ -781,17 +783,17 @@ if CLIENT then
 					end
 					cam.End2D()
 				end
-			elseif convar13:GetString() != "bleedout/REVIVESKULL.png" and convar13:GetString() != "bleedout/REVIVEICON.png" then // Функция, которая позволяет менять текстурки иконок с помощью конс. Команд.
+			elseif convar13:GetString() != "bleedout/REVIVESKULL.png" and convar13:GetString() != "bleedout/REVIVEICON.png" then -- Функция, которая позволяет менять текстурки иконок с помощью конс. Команд.
 				render.DepthRange(0, 0)
-				local mat1 = Material(convar13:GetString(), alphatest) // Кастомный материал
-				render.SetMaterial(mat1) // Ставит кастомный материал.
-				vpos = ply:GetPos() + Vector(0, 0, 72)
+				local mat1 = Material(convar13:GetString(), alphatest) -- Кастомный материал
+				render.SetMaterial(mat1) -- Ставит кастомный материал.
+				local vpos = ply:GetPos() + Vector(0, 0, 72)
 				render.DrawSprite(vpos, convar14:GetInt(), convar14:GetInt(), Color(255,255,255) )
 				render.DepthRange(0, 1)
 			elseif convar13:GetString() == "bleedout/REVIVEICON.png" then
 				render.DepthRange(0, 0)
-				render.SetMaterial(mator0) // Ставит кастомный материал.
-				vpos = ply:GetPos() + Vector(0, 0, 72)
+				render.SetMaterial(mator0) -- Ставит кастомный материал.
+				local vpos = ply:GetPos() + Vector(0, 0, 72)
 				local time = CurTime()
 				local time1 = ply:GetBleedOutTime() + convar5:GetInt()
 				local time2 = time1 - time
@@ -804,8 +806,8 @@ if CLIENT then
 				render.DepthRange(0, 1)
 			elseif convar13:GetString() == "bleedout/REVIVESKULL.png" then
 				render.DepthRange(0, 0)
-				render.SetMaterial(mator) // Ставит кастомный материал.
-				vpos = ply:GetPos() + Vector(0, 0, 72)
+				render.SetMaterial(mator) -- Ставит кастомный материал.
+				local vpos = ply:GetPos() + Vector(0, 0, 72)
 				local time = CurTime()
 				local time1 = ply:GetBleedOutTime() + convar5:GetInt()
 				local time2 = time1 - time
@@ -819,7 +821,7 @@ if CLIENT then
 			end
 		end
 	end)
-	hook.Add("PlayerBindPress", "DisableJumpingAndCrouching", function(ply, bind, bool) // Если игрок упал, то он не сможет нажать прыжок и присед
+	hook.Add("PlayerBindPress", "DisableJumpingAndCrouching", function(ply, bind, bool) -- Если игрок упал, то он не сможет нажать прыжок и присед
 		if bind == "+jump" and ply:IsBleedOut() == true or bind == "+duck" and ply:IsBleedOut() == true then
 			return true
 		end
@@ -907,7 +909,7 @@ hook.Add("CalcMainActivity", "BleedOutActivity", function(ply, vel)
 		return ply.CalcIdeal, -1
 	end
 end)
-hook.Add("UpdateAnimation", "BleedOutAnims", function(ply, vel, seqspeed)// Своровано с nzombies, обьяснить не смогу. Не бейте тапками пж
+hook.Add("UpdateAnimation", "BleedOutAnims", function(ply, vel, seqspeed)-- Своровано с nzombies, обьяснить не смогу. Не бейте тапками пж
 	if ply:IsBleedOut() == true then
 		local movement = 0
 		local len = vel:Length2D()
@@ -955,7 +957,7 @@ hook.Add("SetupMove", "BleedOutSetupMove", function(ply, move, cmd)
 		end
 	end
 end)
-function bleedoutsetfunc(ply, bool) // Спавн функция игроков, выставляет их булины падений при спавне.
+local function bleedoutsetfunc(ply, bool) -- Спавн функция игроков, выставляет их булины падений при спавне.
 	ply:SetBleedOut(false)
 	ply:SetReviveTime(0)
 	ply:SetReviving(false)
@@ -967,12 +969,12 @@ function bleedoutsetfunc(ply, bool) // Спавн функция игроков,
 	ply:SetNPCRevivour(Entity(0))
 	ply:SetBeingNPCReviving(false)
 end
-function bleedoutviewfunc(ply, pos, angles, fov) // view - столбик, оставляем все как есть, но с другим вектором
+local function bleedoutviewfunc(ply, pos, angles, fov) -- view - столбик, оставляем все как есть, но с другим вектором
 	local view = {}
 	local head = ply:LookupAttachment("eyes")
 	local headpos = ply:GetAttachment(head)
 	view.origin = pos - loweredview
-	if ply:Crouching() == true then // Если игрок приседает - убираем это в корне
+	if ply:Crouching() == true then -- Если игрок приседает - убираем это в корне
 		view.origin = pos - loweredview + Vector(0,0, 36)
 	end
 	if convar20:GetBool() == true then
@@ -988,7 +990,7 @@ function bleedoutviewfunc(ply, pos, angles, fov) // view - столбик, ос�
 	view.drawviewer = convar26:GetBool()
 	return view
 end
-function bleedoutviewmodelviewfunc(wep, vm, oldp, olda, pos, ang)
+local function bleedoutviewmodelviewfunc(wep, vm, oldp, olda, pos, ang)
 	local finalpos = pos - loweredview
 	if LocalPlayer():Crouching() == true then
 		 finalpos = pos - loweredview + Vector(0, 0, 36)
@@ -1017,7 +1019,7 @@ hook.Add("EntityFireBullets", "BleedOutFireBullets", function(ply, tab)
 				tab.Src = headpos
 			end
 		end
-		return true // для того, что бы изменить начальное положение пули.
+		return true -- для того, что бы изменить начальное положение пули.
 	end
 end)
 hook.Add("PlayerSpawn", "BleedoutSpawn", function(ply)
@@ -1027,7 +1029,7 @@ hook.Add("PlayerSpawn", "BleedoutSpawn", function(ply)
 	ply:SetMaxHealth(2500)
 	ply:SetHealth(2500)
 end)
-// --- Hook functions are set! ^
+-- --- Hook functions are set! ^
 if SERVER then
 	function PLAYER:TryRevive()
 		self:LagCompensation( true )
@@ -1035,7 +1037,7 @@ if SERVER then
 		self:LagCompensation(false)
 		if self:IsBleedOut() == false and self:IsReviving() == false and trace.Hit == true and trace.Entity:IsPlayer() == true and trace.Entity:IsBleedOut() == true and trace.Entity:IsBeingReviving() == false then
 			self:SetReviveTimeFromEntity(CurTime() - trace.Entity:GetBleedOutTime())
-			trace.Entity:StartReviving() // Начатие процесса ревайвинга.
+			trace.Entity:StartReviving() -- Начатие процесса ревайвинга.
 			self:SetReviving(true)
 			self:EmitSound("pd2_voice/incap_helping.mp3")
 			self:SetRevivingEntity(trace.Entity)
@@ -1056,7 +1058,7 @@ if SERVER then
 	function PLAYER:GoBleedOut()
 		if self:Team() == 2 then self:Kill() return true end
 		self:SetBleedOut(true)
-		if convar22:GetBool() == true then // convar22 - как я помню является конварой с нотаргетом. Если включена - значит ок.
+		if convar22:GetBool() == true then -- convar22 - как я помню является конварой с нотаргетом. Если включена - значит ок.
 			self:SetNoTarget(true)
 		end
 		self:ExitVehicle()
@@ -1073,13 +1075,13 @@ if SERVER then
 			self:SetRevivingEntity(Entity(0))
 		end
 		self:SetHealth(self:GetMaxHealth() * ( convar31:GetFloat() / 100) )
-		self:SetHull(duckhullbottom, duckhulltop) // Делаем хулл такой же как у игрока в присяде
-		net.Start("bleedout_go") // Скидываем на клиентскую часть, что бы клиенты помучались))
+		self:SetHull(duckhullbottom, duckhulltop) -- Делаем хулл такой же как у игрока в присяде
+		net.Start("bleedout_go") -- Скидываем на клиентскую часть, что бы клиенты помучались))
 		net.WriteEntity(self)
 		net.WriteTable(player.GetBleedOuts())
 		net.Broadcast()
 	end
-	function PLAYER:Revive() // Воскрешение
+	function PLAYER:Revive() -- Воскрешение
 		if self:Team() == 2 then return true end
 		self:SetActiveWeapon(self.OldWeap)
 		self:SetBleedOut(false)
@@ -1101,8 +1103,8 @@ if SERVER then
 		net.Broadcast()
 	end
 end
-// Server Player Functions are set ^
-function player.GetRevivingPlayers() // Дает список всех воскрешающих игроков.
+-- Server Player Functions are set ^
+function player.GetRevivingPlayers() -- Дает список всех воскрешающих игроков.
 	local tab = {}
 	for k, v in ipairs(player.GetAll()) do
 		if v:IsReviving() == true then
@@ -1111,7 +1113,7 @@ function player.GetRevivingPlayers() // Дает список всех воск�
 	end
 	return tab
 end
-function player.GetBleedOuts() // Для рисовки обводки игроков. Работает онли на сервере, так что когда кто то падает/встает эта штука передается клиенту.
+function player.GetBleedOuts() -- Для рисовки обводки игроков. Работает онли на сервере, так что когда кто то падает/встает эта штука передается клиенту.
 	local tab = {}
 	for k, v in ipairs(player.GetAll()) do
 		if v:IsBleedOut() == true then
@@ -1131,7 +1133,7 @@ function ents.GetShootingAtBleedOuts()
 	end
 	return tab
 end
-function player.GetNoBleedOuts() // Для теста, дебаг функция, делает абсолютно обратную функцию player.GetBleedOuts(). Т.е - не упавшие игроки
+function player.GetNoBleedOuts() -- Для теста, дебаг функция, делает абсолютно обратную функцию player.GetBleedOuts(). Т.е - не упавшие игроки
 	local tab = {}
 	for k, v in ipairs(player.GetAll()) do
 		if v:IsBleedOut() == false then
@@ -1140,7 +1142,7 @@ function player.GetNoBleedOuts() // Для теста, дебаг функция
 	end
 	return tab
 end
-// Other functions are set ^
+-- Other functions are set ^
 if SERVER then
 	net.Receive("bleedout_suicide", function(len, ply)
 		if IsValid(ply) and ply:IsBleedOut() == true then
@@ -1168,21 +1170,21 @@ if SERVER then
 	end)
 end
 if CLIENT then
-	net.Receive("bleedout_settable", function() // Предназначено для передачи тейбла с игроками, упавшими. Хорошая вещь однако
+	net.Receive("bleedout_settable", function() -- Предназначено для передачи тейбла с игроками, упавшими. Хорошая вещь однако
 		tabhalo = net.ReadTable()
 		table.RemoveByValue(tabhalo, LocalPlayer())
 	end)
 	net.Receive("bleedout_go", function()
-		ply = net.ReadEntity()
-		tabhalo = net.ReadTable() // Кидает клиенту столбик с падающими игроками
-		table.RemoveByValue( tabhalo, LocalPlayer() ) // Если этого не сделать - будут сверху граф. артефакты.
+		local ply = net.ReadEntity()
+		tabhalo = net.ReadTable() -- Кидает клиенту столбик с падающими игроками
+		table.RemoveByValue( tabhalo, LocalPlayer() ) -- Если этого не сделать - будут сверху граф. артефакты.
 		if ply == LocalPlayer() then
 			hook.Add("CalcView", "BleedOutView", bleedoutviewfunc)
 			hook.Add("CalcViewModelView", "BleedOutViewModelView", bleedoutviewmodelviewfunc)
 		end
 	end)
 		net.Receive("bleedout_out", function() 
-		ply = net.ReadEntity()
+		local ply = net.ReadEntity()
 		tabhalo = net.ReadTable()
 		table.RemoveByValue( tabhalo, LocalPlayer() )
 		if ply == LocalPlayer() then
@@ -1194,9 +1196,9 @@ end
 hook.Add("PlayerSpawn", "BleedOutSet", bleedoutsetfunc)
 if SERVER then
 	hook.Add("EntityTakeDamage", "PlayerBleedOutWhen", function(ply, dmginfo)
-		if (ply:IsPlayer() ) then // Если ply = игрок и получил дамаг от пули.
+		if (ply:IsPlayer() ) then -- Если ply = игрок и получил дамаг от пули.
 			if ply:IsBleedOut() == true then
-				dmginfo:ScaleDamage( (ply:GetMaxHealth() - convar23:GetInt()) / 100) // Почему тут MaxHealth я уже не помню
+				dmginfo:ScaleDamage( (ply:GetMaxHealth() - convar23:GetInt()) / 100) -- Почему тут MaxHealth я уже не помню
 			end
 			if ply:Health() <= dmginfo:GetDamage() and ply:IsBleedOut() == false and convar4:GetBool() == true and ply:GetNumBleedOuts() < convar17:GetInt() then
 				dmginfo:SetDamage(0)
@@ -1230,7 +1232,7 @@ if SERVER then
 		victim:Revive()
 		victim:SetNumBleedOuts(0)
 	end)
-	hook.Add("PlayerDisconnected", "BleedOutDisconnect", function(ply) // Убираем с столбика значение игрока с дисконектом
+	hook.Add("PlayerDisconnected", "BleedOutDisconnect", function(ply) -- Убираем с столбика значение игрока с дисконектом
 		if ply:IsBleedOut() == true then
 			local tab = player.GetBleedOuts()
 			table.RemoveByValue(tab, ply)
@@ -1239,7 +1241,7 @@ if SERVER then
 			net.Broadcast()
 		end
 	end)
-	hook.Add("EntityRemoved", "BleedOutRemove", function(ent) // ТОже самое, но если игрок магически исчез.
+	hook.Add("EntityRemoved", "BleedOutRemove", function(ent) -- ТОже самое, но если игрок магически исчез.
 		if ent:IsPlayer() == true then
 			if ent:IsBleedOut() == true then
 				local tab = player.GetBleedOuts()
@@ -1251,4 +1253,4 @@ if SERVER then
 		end
 	end)
 end
-// Создано великим магистром под ником Jaff специально для HarionPlayZ.
+-- Создано великим магистром под ником Jaff специально для HarionPlayZ.
