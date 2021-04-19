@@ -3,6 +3,8 @@ local ourMat2 = Material("pr1.png")
 local ourMat3 = nil
 local dif1 = {'Normal', 'Hard', 'Very Hard', 'Overkill', 'Mayhem', 'Death Wish', 'Death Sentence'}
 local dif2 = {'', 'Å', 'Å Å', 'Å Å Å', 'Å Å Å Ä', 'Å Å Å Ä Ç', 'Å Å Å Ä Ç É'}
+local color1 = {Color( 255, 255, 255, 255 ), Color( 255, 215, 0, 255 ), Color( 255, 215, 0, 255 ), Color( 255, 215, 0, 255 ), Color( 255, 215, 0, 255 ), Color( 255, 70, 0, 255 ), Color( 255, 0, 0, 255 )}
+
 surface.CreateFont("pd2",{font="Payday2",size=60,weight=800} )
 
 hook.Add( "InitPostEntity", "pd2_load_brief", function()
@@ -37,7 +39,7 @@ hook.Add("HUDPaint", "IconOfPrisonpd2", function()
 		surface.SetDrawColor( 0, 0, 0, 255 ) -- Set the drawing color
 		surface.DrawRect( 0, 0, ScrW(), ScrH() ) -- Actually draw the rectangle
 
-		draw.SimpleText( dif1[GetConVar("padpd2"):GetInt()+1], "pd2", ScrW() * 0.5, ScrH() * 0.45, Color( 255, 215, 0, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
+		draw.SimpleText( dif1[GetConVar("padpd2"):GetInt()+1], "pd2", ScrW() * 0.5, ScrH() * 0.45, color1[GetConVar("padpd2"):GetInt()+1], TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
 		draw.SimpleText( dif2[GetConVar("padpd2"):GetInt()+1], "pd2", ScrW() * 0.5, ScrH() * 0.45+50, Color( 255, 215, 0, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
 	end
 end)
