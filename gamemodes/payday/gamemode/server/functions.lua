@@ -99,7 +99,7 @@ end
 hook.Add( "EntityTakeDamage", "NextbotDamageBlockIfTeam", function( target, dmginfo )
 	local attacker = dmginfo:GetAttacker()
 	if target:IsPlayer() and target:Team() == 2 then
-		if attacker:IsNextbot() then return true end
+		if attacker:IsNextBot() then return true end
 	end
 end )
 
