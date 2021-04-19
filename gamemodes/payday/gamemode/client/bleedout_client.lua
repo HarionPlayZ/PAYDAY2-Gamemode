@@ -1,22 +1,23 @@
 local redconvar = GetConVar("bleedout_outline_color_r")
 local greenconvar = GetConVar("bleedout_outline_color_g")
 local blueconvar = GetConVar("bleedout_outline_color_b")
+local bindingstab = {
+	bleedout_suicide = KEY_G,
+	bleedout_help = KEY_H
+}
+
 hook.Add("AddToolMenuCategories", "BleedOutMenuAdd", function() 
-	spawnmenu.AddToolCategory("Options", "BleedOutMenu", "#Revive System") // Создаем менюшку для настроек BleedOut'а
+	spawnmenu.AddToolCategory("Options", "BleedOutMenu", "#Revive System") -- Создаем менюшку для настроек BleedOut'а
 end)
-if table.IsEmpty( file.Find("bleedout.txt", "DATA") )then
-	bindingstab = {
-		bleedout_suicide = KEY_G,
-		bleedout_help = KEY_H
-	}
-	local filetxt = util.TableToJSON(bindingstab, true)
-	file.Write("bleedout.txt", filetxt)
+
+if not file.Exists("bleedout.txt", "DATA") then
+	file.Write("bleedout.txt", util.TableToJSON(bindingstab, true))
 else
-	local filetxt = file.Read("bleedout.txt", "DATA")
-	bindingstab = util.JSONToTable(filetxt)
+	bindingstab = util.JSONToTable(file.Read("bleedout.txt", "DATA"))
 end
+
 local itextures = file.Find("materials/bleedout/*.png", "MOD")
-hook.Add("PopulateToolMenu", "BleedOutMenuPopulate", function() // Наполняем менюшку
+hook.Add("PopulateToolMenu", "BleedOutMenuPopulate", function() -- Наполняем менюшку
 	spawnmenu.AddToolMenuOption("Options", "BleedOutMenu", "BleedOutAdmin", "#Admin", "", "", function(panel)
 		panel:ClearControls()
 		panel:CheckBox("Enable Revive System", "bleedout_enable")
@@ -48,25 +49,25 @@ hook.Add("PopulateToolMenu", "BleedOutMenuPopulate", function() // Наполн�
 		panel:CheckBox("Draw death timer", "bleedout_draw_timer")
 		panel:CheckBox("Draw revive timer", "bleedout_draw_revive_timer")
 		panel:CheckBox("Enable view roll", "bleedout_view_roll")
-		local combobox, labl = panel:ComboBox("Icon draw mode", "bleedout_icon_drawmode")
+		local combobox = panel:ComboBox("Icon draw mode", "bleedout_icon_drawmode")
 		combobox:AddChoice( "3D mode", 1 )
 		combobox:AddChoice( "2D mode", 0 )
-//		panel:CheckBox("Enable custom icons", "bleedout_icon_custom_enable")
-		local combobox1, labl1 = panel:ComboBox("Bleedout icon", "bleedout_icon_custom")
+--		panel:CheckBox("Enable custom icons", "bleedout_icon_custom_enable")
+		local combobox1 = panel:ComboBox("Bleedout icon", "bleedout_icon_custom")
 		combobox1:AddChoice( "SKULL", "bleedout/REVIVESKULL.png" )
 		combobox1:AddChoice( "CoD-Styled", "bleedout/REVIVEICON.png" )
 		for k, v in pairs(itextures) do
-			itexture = "bleedout/" .. tostring(v)
-			combobox1:AddChoice( tostring(v), itexture ) // Тут находятся кастомные файлики
+			local itexture = "bleedout/" .. tostring(v)
+			combobox1:AddChoice( tostring(v), itexture ) -- Тут находятся кастомные файлики
 		end
 		panel:Help("You need to place your .png icons to 'GAMEFOLDER/garrysmod/materials/bleedout' path. Then restart server/rejoin server.")
-		local combobox2, labl2 = panel:ComboBox("HUD-Style", "bleedout_legacyui")
+		local combobox2 = panel:ComboBox("HUD-Style", "bleedout_legacyui")
 		combobox2:AddChoice( "Circle-Styled", 0 )
 		combobox2:AddChoice( "Circle-Styled(Outlined)", 3 )
 		combobox2:AddChoice( "Bar-Styled", 1 )
 		combobox2:AddChoice( "Text-Styled", 2 )
-//		panel:Help(" You can choose the HUD style if you want.")
-		colormixer = vgui.Create("DColorMixer")
+--		panel:Help(" You can choose the HUD style if you want.")
+		local colormixer = vgui.Create("DColorMixer")
 		colormixer:SetAlphaBar(false)
 		colormixer:SetColor( Color( redconvar:GetInt(), greenconvar:GetInt(), blueconvar:GetInt() ) )
 		colormixer:SetPalette(false)
@@ -75,9 +76,9 @@ hook.Add("PopulateToolMenu", "BleedOutMenuPopulate", function() // Наполн�
 		colormixer:SetConVarB("bleedout_outline_color_b")
 		colormixer:SetLabel("Outline color")
 		panel:AddItem(colormixer)
-	//	panel:NumSlider("Outline color red", "bleedout_outline_color_r", 0, 255, false)
-	//	panel:NumSlider("Outline color green", "bleedout_outline_color_g", 0, 255, false)
-	//	panel:NumSlider("Outline color blue", "bleedout_outline_color_b", 0, 255, false)
+	--	panel:NumSlider("Outline color red", "bleedout_outline_color_r", 0, 255, false)
+	--	panel:NumSlider("Outline color green", "bleedout_outline_color_g", 0, 255, false)
+	--	panel:NumSlider("Outline color blue", "bleedout_outline_color_b", 0, 255, false)
 		local dbinder1 = vgui.Create("DBinder")
 		dbinder1:SetValue(bindingstab.bleedout_suicide)
 		dbinder1:SetSize(32, 35)
