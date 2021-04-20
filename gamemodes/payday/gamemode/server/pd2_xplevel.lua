@@ -1,17 +1,29 @@
 local ply = FindMetaTable("Player")
-local path = "pd2_xp_data/xp.txt"
+local path = "pd2/xp_data"
+local singlpath = path.."/singl.txt"
+local fullpath = path.."/xp.txt"
 
-if not file.IsDir( "pd2_xp_data", "DATA" ) then
-	file.CreateDir("pd2_xp_data")
-	file.Write( path, "76561198201651767 0" )
+if not file.IsDir( path, "DATA" ) then
+	file.CreateDir(path)
+	file.Write( fullpath, "76561198201651767 0" )
 end
 
-if not file.Exists( path, "DATA" ) then
-	file.Write( path, "76561198201651767 0" )
+if not file.Exists( fullpath, "DATA" ) then
+	file.Write( fullpath, "76561198201651767 0" )
+end
+local host_xp = 0
+
+if game.SinglePlayer() then
+	file.Write( singlpath,'0' )
+else
+	if file.Exists(singlpath,"DATA") then
+		host_xp = tonumber(file.Read(singlpath))
+		file.Delete(singlpath)
+	end
 end
 
 local function getxptable()
-	return string.Split(file.Read( path, "DATA" ), "\n")
+	return string.Split(file.Read( fullpath, "DATA" ), "\n")
 end
 
 local function getxptable_id(ply)
@@ -25,7 +37,7 @@ local function getxptable_id(ply)
 end
 
 local function rewritexp(id, number)
-	local tab = string.Split(file.Read( path, "DATA" ), "\n")
+	local tab = string.Split(file.Read( fullpath, "DATA" ), "\n")
 	local replace = string.Split(tab[id], " ")[1].." "..tostring(number)
 	tab[id] = replace
 	local txt = ""
@@ -33,17 +45,26 @@ local function rewritexp(id, number)
 		txt = txt..t.."\n"
 	end
 	txt = string.Left(txt,string.len(txt)-1)
-	file.Write( path, txt )
+	file.Write( fullpath, txt )
 end
 
-function ply:pd2_set_xp(xp)
-	rewritexp(getxptable_id(self), xp)
-	self:pd2_update_level()
-end
-
-function ply:pd2_add_xp(xp)
-	rewritexp(getxptable_id(self), xp+self:pd2_get_xp())
-	self:pd2_update_level()
+if game.SinglePlayer() then
+	function ply:pd2_set_xp(xp)
+		local x = xp+tonumber(file.Read(singlpath))
+		file.Write(singlpath,tostring(x))
+	end
+	function ply:pd2_add_xp(xp)
+		file.Write(singlpath,xp)
+	end
+else
+	function ply:pd2_set_xp(xp)
+		rewritexp(getxptable_id(self), xp)
+		self:pd2_update_level()
+	end
+	function ply:pd2_add_xp(xp)
+		rewritexp(getxptable_id(self), xp+self:pd2_get_xp())
+		self:pd2_update_level()
+	end
 end
 
 function ply:pd2_get_xp()
@@ -83,7 +104,8 @@ hook.Add("PlayerInitialSpawn", "pd2_player_join_steamid_xp", function(ply)
 				exist = true
 			end
 		end
-		if not exist then file.Append(path, "\n"..ply:SteamID64().." 0") end
+		if not exist then file.Append(fullpath, "\n"..ply:SteamID64().." 0") end
 		ply:pd2_add_xp(0)
+		if ply:IsListenServerHost() then ply:pd2_add_xp(host_xp) end
 	end
 end)

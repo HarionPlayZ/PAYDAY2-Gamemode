@@ -1,6 +1,4 @@
 AddCSLuaFile()
-AddCSLuaFile("sh_sounds.lua")
-include("sh_sounds.lua")
 
 if CLIENT then
 	SWEP.DrawCrosshair = false
@@ -13,6 +11,8 @@ if CLIENT then
 	SWEP.MoveType = 2
 	SWEP.ViewModelMovementScale = 0.8
 	SWEP.DisableSprintViewSimulation = true
+	
+	if not game.SinglePlayer() then include("sh_sounds.lua") end
 end
 
 SWEP.CanRestOnObjects = false

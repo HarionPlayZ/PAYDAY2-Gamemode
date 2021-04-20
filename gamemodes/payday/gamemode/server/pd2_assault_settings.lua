@@ -10,15 +10,6 @@ local timer_s = math.random( 30, 120 )
 
 start_player_police = false
 
-timer.Create("singleplayererror", 0.5, 0, function()
-	for k, v in pairs(player.GetAll()) do
-		v:ChatPrint("Please launch gamemode in multiplayer!")
-		v:EmitSound("buttons/combine_button_locked.wav")
-	end
-end)
-
-if not game.SinglePlayer() then timer.Stop("singleplayererror") end
-
 hook.Add( "Initialize", "pd2_load_vec", function()
 	if game.GetMap() == "pd2_jewelry_store_mission" then
 		vec1 = Vector(-5835.604980, 810.292603, 68.031250)
