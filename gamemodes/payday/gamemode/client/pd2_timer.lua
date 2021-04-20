@@ -11,10 +11,6 @@ end
 
 function start_display_time()
 	hook.Add("HUDPaint","TimerPD2",TimerDisplay)
-	for k, v in pairs(player.GetAll()) do
-		timer.Simple(0, function() v:SetNWBool("pd2dif", true) v:ConCommand("pd2_hud_enable 0") end)
-		timer.Simple(5, function() v:SetNWBool("pd2dif", false) v:ConCommand("pd2_hud_enable 1") end)
-	end
 end
 net.Receive( 'start_display_time', start_display_time )
 
