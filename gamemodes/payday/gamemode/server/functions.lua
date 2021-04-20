@@ -59,6 +59,13 @@ hook.Add( "AcceptInput", "AcceptInputsPD2", function( ent, name, activator, call
 	end
 end )
 
+hook.Add('PD2AlarmStealth', 'cam_alarm', function()
+	ents.FindByName("alarm_trigger")[1]:Fire("Trigger")
+	for k, v in pairs(ents.FindByClass("pd2_camera")) do
+		v.Active = false
+	end
+end)
+
 hook.Add( "EntityTakeDamage", "EntityDamageBlockIfTeam", function( target, dmginfo )
 	local attacker = dmginfo:GetAttacker()
 	if target:IsPlayer() and attacker:IsPlayer() then 
@@ -186,6 +193,10 @@ util.AddNetworkString( 'set_start_time'  )
 function start_display_time()
 	net.Start('start_display_time')
 	net.Send(player.GetAll())
+	for k, v in pairs(player.GetAll()) do
+		timer.Simple(0, function() v:SetNWBool("pd2dif", true) v:ConCommand("pd2_hud_enable 0") end)
+		timer.Simple(5, function() v:SetNWBool("pd2dif", false) v:ConCommand("pd2_hud_enable 1") end)
+	end
 end
 
 function stop_display_time()

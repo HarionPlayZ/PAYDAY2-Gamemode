@@ -39,13 +39,13 @@ for i,v in pairs(bone_table) do
         start = self:GetPos()+self:GetAngles():Forward()*5,
         endpos = vec,
         filter = {self,ent,self.Model},
-        mask=MASK_ALL
+        mask = MASK_ALL
     } )
 	if not tr.Hit then return true end
 end
 return false end
 
-local tab = ents.FindByClass('camera')
+local tab = {}
 timer.Create('camera_think',delay,0,function()
 for i,ent in pairs( tab ) do if IsValid(ent) then ent:think() end end
 local ca
@@ -57,18 +57,18 @@ end
 end )
 
 function ENT:Initialize()
-tab = ents.FindByClass('camera')
+	tab = ents.FindByClass('pd2_camera')
 
-self.Active = true
-self.inconetableent = {}
+	self.Active = true
+	self.inconetableent = {}
 
-local model = ents.Create('prop_physics')
-model:SetModel('models/props_c17/oildrum001.mdl')
-model:SetPos(self:GetPos())
-model:SetAngles(self:GetAngles())
-model:Spawn()
-model:GetPhysicsObject():EnableMotion(false)
-self.Model = model
+	local model = ents.Create('prop_physics')
+	model:SetModel('models/props/cs_assault/camera.mdl')
+	model:SetPos(self:GetPos())
+	model:SetAngles(self:GetAngles())
+	model:Spawn()
+	model:GetPhysicsObject():EnableMotion(false)
+	self.Model = model
 end
 
 function ENT:OnRemove()
@@ -85,6 +85,7 @@ if not self.Active then return end
 					table.insert(self.inconetableent,ent)
 					ent:SetNWFloat('camalarm_start',CurTime()-ent:GetNWFloat('camalarm'))
 					ent:SetNWFloat('camalarm',0)
+					ent:EmitSound("warning_camera.mp3")
 				end
 			end
 		end
@@ -98,7 +99,11 @@ if not self.Active then return end
 		local t = p:GetNWFloat('camalarm_start')
 		if t!=0 then
 			if (CurTime()-t)*p:GetNWFloat('stealth')*2>1 then
-				hook.Call('cam_alarm',nil,self)
+				hook.Run('PD2AlarmStealth')
+				p:EmitSound("detection_camera_or_citizen.mp3")
+				p:SetNWFloat('camalarm', 0)
+				p:SetNWFloat('camalarm_start',0)
+				self.Active = false				
 			end
 		end
 	end
