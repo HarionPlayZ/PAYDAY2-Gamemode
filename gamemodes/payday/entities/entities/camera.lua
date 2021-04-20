@@ -4,101 +4,102 @@ ENT.Base = "base_gmodentity"
 ENT.Spawnable = true
 ENT.Type = "point"
 
-if CLIENT then return end
+local delay = 0.04
 
-local delay = 0.02
-local stealth = 0.5
+if CLIENT then
 
-local bone_table = {
-2,
-6,
-10,
-11,
-15,
-16,
-19,
-20,
-23,
-24,
-}
-function ENT:TraceBoneCount(ent)
-local count,vec = 0
+local function camera_alarm()
+	local lp = LocalPlayer()
+	local cas = lp:GetNWFloat('camalarm_start')
+	local ca = lp:GetNWFloat('camalarm')
+	if cas == 0 and ca == 0 then return end
+	if cas == 0 then 
+		cas = math.min(ca,1)
+	else
+		cas = math.min((CurTime()-cas)*lp:GetNWFloat('stealth')*2,1)
+	end
+	
+	surface.SetDrawColor(127,127,127,255)
+	surface.DrawRect(ScrW()*0.35,ScrH()*0.8,ScrW()*0.3,ScrH()*0.03)
+	surface.SetDrawColor(0,0,0,255)
+	surface.DrawRect(ScrW()*0.36,ScrH()*0.81,ScrW()*0.28,ScrH()*0.01)
+	surface.SetDrawColor(255,0,0,255)
+	surface.DrawRect(ScrW()*0.36,ScrH()*0.81,ScrW()*0.28*cas,ScrH()*0.01)
+end
+hook.Add('HUDPaint','camera_alarm',camera_alarm)
+
+return end
+
+local bone_table = {2,6,10,11,15,16,19,20,23,24}
+function ENT:TraceBone(ent)
+local vec
 for i,v in pairs(bone_table) do
     vec = ent:GetBonePosition(v)
     local tr = util.TraceLine( {
         start = self:GetPos()+self:GetAngles():Forward()*5,
         endpos = vec,
-        filter = {self,ent},
+        filter = {self,ent,self.Model},
         mask=MASK_ALL
     } )
-    if not tr.Hit then
-        count = count + 1
-    end
+	if not tr.Hit then return true end
 end
-return count
-end
+return false end
 
-local function camera_think()
 local tab = ents.FindByClass('camera')
-	while true do
-		if table.IsEmpty(tab) then tab = ents.FindByClass('camera') end
-		if table.IsEmpty(tab) then timer.Stop('camera_think') coroutine.yield() end
-		for i, ent in pairs( tab ) do
-			ent:think()
-		end
-	coroutine.yield()
-	end
-end
-local co
 timer.Create('camera_think',delay,0,function()
-	if not co or not coroutine.resume( co ) then
-		co = coroutine.create(camera_think)
-		coroutine.resume( co )
-	end
-	
-	-- end
-		-- ply:SetNWFloat("stealth_pd2", math.max(ply:GetNWFloat("stealth_pd2")-stealth*delay/4, 0))
+for i,ent in pairs( tab ) do if IsValid(ent) then ent:think() end end
+local ca
+for i,p in pairs( player.GetAll() ) do
+	ca = p:GetNWFloat('camalarm')
+	if ca>0 then p:SetNWFloat('camalarm',math.max(ca-delay/p:GetNWFloat('stealth')/10,0)) end
+	if ca>1 then p:SetNWFloat('camalarm',1) end
+end
 end )
-timer.Stop('camera_think')
 
 function ENT:Initialize()
-timer.Start('camera_think')
+tab = ents.FindByClass('camera')
 
-self.NextFrame = 0
 self.Active = true
-self.Alarm = true
 self.inconetableent = {}
 
-local model = ents.Create('prop_dynamic')
-model:SetModel('models/props/cs_assault/camera.mdl')
+local model = ents.Create('prop_physics')
+model:SetModel('models/props_c17/oildrum001.mdl')
 model:SetPos(self:GetPos())
 model:SetAngles(self:GetAngles())
 model:Spawn()
-model:SetParent(self)
+model:GetPhysicsObject():EnableMotion(false)
+self.Model = model
+end
+
+function ENT:OnRemove()
+	if IsValid(self.Model) then self.Model:Remove() end
 end
 
 function ENT:think()
 if not self.Active then return end
-if self.NextFrame <= CurTime() then
-self.NextFrame = CurTime() + delay
-	local cone = ents.FindInCone(self:GetPos(), self:GetAngles():Forward(), 300, math.cos(math.rad(45)))
+	local cone = ents.FindInCone(self:GetPos(), self:GetAngles():Forward(), 500, math.cos(math.rad(45)))
 	for i, ent in pairs(cone) do
 		if ent:IsPlayer() then
-			if ent:Alive() and self:TraceBoneCount(ent) > 0 then
-				if not self.inconetableent[ent] then 
-					self.inconetableent[ent]=CurTime() 
+			if ent:Alive() and self:TraceBone(ent) then
+				if not table.HasValue(self.inconetableent,ent) then 
+					table.insert(self.inconetableent,ent)
+					ent:SetNWFloat('camalarm_start',CurTime()-ent:GetNWFloat('camalarm'))
+					ent:SetNWFloat('camalarm',0)
 				end
 			end
 		end
 	end
-	for k,v in pairs(self.inconetableent) do
-		if not IsValid(k) then print(true) table.RemoveByValue(self.inconetableent,v) end
-		if not table.HasValue(cone,k) then table.RemoveByValue(self.inconetableent,v) end
-		k:ChatPrint(tostring(CurTime()-v>1/stealth))
-		print(CurTime()-v)
-		if CurTime()-v>1/stealth then
-			self.Alarm = true
+	for i,p in pairs(self.inconetableent) do
+		if not table.HasValue(cone,p) then
+			table.remove(self.inconetableent,i)
+			p:SetNWFloat('camalarm',(CurTime()-p:GetNWFloat('camalarm_start'))*p:GetNWFloat('stealth')*2)
+			p:SetNWFloat('camalarm_start',0)
+		end
+		local t = p:GetNWFloat('camalarm_start')
+		if t!=0 then
+			if (CurTime()-t)*p:GetNWFloat('stealth')*2>1 then
+				hook.Call('cam_alarm',nil,self)
+			end
 		end
 	end
-end
 end

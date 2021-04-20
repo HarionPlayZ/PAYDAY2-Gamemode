@@ -1,9 +1,8 @@
 local function Think()
-	local enabled = 1
-	local speed = 1 / 100
+	local speed = 0.01
 	local time = FrameTime()
 	
-	for _, ply in ipairs( player.GetAll() ) do
+	for i, ply in ipairs( player.GetAll() ) do
 		if ( not ply:Alive() or ply:Team() == 2 ) then goto next_player end
 
 		local armor = ply:Armor()
@@ -11,7 +10,7 @@ local function Think()
 			ply.ArmorRegenNext = CurTime() + 5
 		end
 		
-		if ( CurTime() > ( ply.ArmorRegenNext or 0 ) && enabled ) then
+		if CurTime() > ( ply.ArmorRegenNext or 0 ) then
 			ply.ArmorRegen = ( ply.ArmorRegen or 0 ) + time
 			if ( ply.ArmorRegen >= speed ) then
 				local add = math.floor( ply.ArmorRegen / speed )
