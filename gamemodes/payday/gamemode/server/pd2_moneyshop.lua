@@ -16,7 +16,9 @@ end
 local host_money = 0
 
 if game.SinglePlayer() then
-	file.Write( singlpath,'0' )
+	if not file.Exists( singlpath, "DATA" ) then
+		file.Write( singlpath,'0' )
+	end
 else
 	if file.Exists(singlpath,"DATA") then
 		host_money = tonumber(file.Read(singlpath))
