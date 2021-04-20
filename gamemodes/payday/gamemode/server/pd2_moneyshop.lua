@@ -126,7 +126,7 @@ function ply:BuyWeapon(name, slot)
 	end
 end
 
-local commandtable = {'List of all commands:', '/showmoney - show your money.', '/showlevel - show your level(not xp).', '/buy - this command buy any weapon from list.', '/helpweapon - if you want help with buying weapon.', '/helparmor - if you want help with buying armor.', '/gang - change team on gang.', '/police - change team on police.', '/spectator - change team on spectator.', '/votedif 0-6 - You can set difficulty in game.', '/showdif - Show voted difficulty in game.', 'If you write in console (bind g medkit_use_pd2) you will can use medkit on g button.'}
+local commandtable = {'List of all commands:', '/showmoney - show your money.', '/showlevel - show your level.', '/buy - this command buy any weapon from list.', '/helpweapon - if you want help with buying weapon.', '/helparmor - if you want help with buying armor.', '/gang - change team on gang.', '/police - change team on police.', '/spectator - change team on spectator.', '/votedif 0-6 - You can set difficulty in game.', '/showdif - Show voted difficulty in game.', 'If you write in console (bind g medkit_use_pd2) you will can use medkit on g button.'}
 hook.Add("PlayerSay", "BuyWeaponsPD2", function( ply, text )
 	if text == "/helpweapon" then
 		ply:ChatPrint('List:')
