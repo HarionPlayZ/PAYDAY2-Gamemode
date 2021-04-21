@@ -8,6 +8,8 @@ local con7 = GetConVar( "pd2_assaultphases_server_controlduration" )
 local timer_c = math.random( 60, 240 )
 local timer_s = math.random( 30, 120 )
 
+-- global_game_id = 0
+
 start_player_police = false
 
 hook.Add( "Initialize", "pd2_load_vec", function()
