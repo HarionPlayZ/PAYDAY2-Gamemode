@@ -939,16 +939,6 @@ hook.Add("UpdateAnimation", "BleedOutAnims", function(ply, vel, seqspeed)-- Св
 		ply:ManipulateBoneAngles(0, Angle(0,0,0))
 	end
 end)
-hook.Add("CreateMove", "BleedOutHotKeys", function()
-	for k, v in pairs(bindingstab) do
-		if input.WasKeyPressed(v) and bindingstabwaspressed[v] != true then
-			ply:ConCommand(k)
-			bindingstabwaspressed[v] = true
-		elseif !input.WasKeyPressed(v) and bindingstabwaspressed[v] == true then
-			bindingstabwaspressed[v] = false
-		end
-	end
-end)
 hook.Add("SetupMove", "BleedOutSetupMove", function(ply, move, cmd)
 	if ply:IsBleedOut() == true and convar24:GetBool() == true and ply:IsReviving() == false and ply:IsBeingReviving() == false then
 		move:SetMaxSpeed(50)

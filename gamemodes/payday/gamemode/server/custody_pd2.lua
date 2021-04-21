@@ -20,61 +20,57 @@ hook.Add("PlayerSpawn", "falseifspawnedicon", function(ply)
 end)
 
 hook.Add("PlayerDeath","playerdeath", function(victim, inflictor, attacker)
-	if not IsFirstTimePredicted() then return end
-	if victim:Team() == 2 then timer.Simple(10, function() victim:Spawn() end) return true end
-	if victim:Team() == 1001 then timer.Simple(1, function() victim:Spawn() end) return true end
-	timer.Simple(0.1,function() if(CLIENT&&victim:IsValid()) then end end)
-	victim:SetNWBool("cant_respawn", true)
-	victim:Spectate(5)
-	victim:SetObserverMode(5)
-	victim:SetNWBool("pd2prison", true)
-	victim:EmitSound("custody.mp3")
-	victim:SetTeam(1001)
 	for k, v in pairs (player.GetAll()) do
 		v:ChatPrint(victim:Name() .. langs_pd2['pd2.arrest.player'])
 	end
 	local all_death = true
 	local maps = {"pd2_warehouse_mission", "pd2_htbank_mission", "pd2_jewelry_store_mission"}
-		for i,p in pairs(player:GetAll())do
-			if p:Team() == 1 then
-				if p:Alive() and p!=victim then all_death = false end
-			end
+	for i,p in pairs(player:GetAll())do
+		if p:Team() == 1 then
+			if p:Alive() and p!=victim then all_death = false end
 		end
-		if all_death then
-			for k, v in pairs (player.GetAll()) do
-				timer.Simple(1, function() v:ChatPrint(langs_pd2['pd2.arrest.players.all']) v:ScreenFade( SCREENFADE.OUT, Color( 0, 0, 0, 255 ), 4, 1 ) GetConVar( "pd2_assaultphases_server_assaultphase" ):SetInt( 0 ) end)
-				timer.Simple(5, function() RunConsoleCommand( "map", table.Random(maps) ) end)
-				if v:Team() == 2 then
-					v:pd2_add_money(1000)
-					v:pd2_add_xp(1000)
-					v:ChatPrint('Good job! You earned 1000$ and 1000 xp.')
-				end
-			v:UnSpectate()
+	end
+	if all_death then
+		for k, v in pairs (player.GetAll()) do
+			timer_Map(1, function() v:ChatPrint(langs_pd2['pd2.arrest.players.all']) v:ScreenFade( SCREENFADE.OUT, Color( 0, 0, 0, 255 ), 4, 1 ) GetConVar( "pd2_assaultphases_server_assaultphase" ):SetInt( 0 ) end)
+			if v:Team() == 2 then
+				v:pd2_add_money(1000)
+				v:pd2_add_xp(1000)
+				v:ChatPrint('Good job! You earned 1000$ and 1000 xp.')
 			end
+		v:UnSpectate()
 		end
+	end
+	if IsValid(victim) then
+		if victim:Team() == 2 then timer_Map(10, function() victim:Spawn() end) return true end
+		if victim:Team() == 1001 then timer_Map(1, function() victim:Spawn() end) return true end
+		victim:SetNWBool("cant_respawn", true)
+		victim:Spectate(5)
+		victim:SetObserverMode(5)
+		victim:SetNWBool("pd2prison", true)
+		victim:EmitSound("custody.mp3")
+		victim:SetTeam(1001)
+	end
 end)
 
 hook.Add("PlayerDeathThink","no_respawn", function(ply)
 	if not IsFirstTimePredicted() then return end
 	if ply:Team() == 2 then return true end
-	if (!ply:GetNWBool("cant_respawn")) then
-		ply:RemoveAllAmmo()
-	end
-	return false
-end)
+	if not ply:GetNWBool("cant_respawn") then ply:RemoveAllAmmo() end
+return false end)
 
 concommand.Add("pd2_spawnplayers", function(ply)
-	for k, v in pairs(player.GetAll()) do
-		if not v:Alive() then
-			v:SetNWBool("pd2prison", false)
-			v:Spawn()
+	for i,p in pairs(player.GetAll()) do
+		if not p:Alive() then
+			p:SetNWBool("pd2prison", false)
 		end
+		p:Spawn()
 	end
 end)
 
 hook.Add( "KeyPress", "keypress_spectatepd2", function( ply, key )
 	if ply:Alive() then return end
-	if ( key == 1 ) then
+	if key == 1 then
 		ply:SetNWInt( 'pd2_spectator_mod', ply:GetNWInt('pd2_spectator_mod')+1)
 		local pd2_int1 = player.GetAll()[ply:GetNWInt('pd2_spectator_mod')]
 		if not IsValid(pd2_int1) then
@@ -83,8 +79,15 @@ hook.Add( "KeyPress", "keypress_spectatepd2", function( ply, key )
 		end
 		ply:SpectateEntity(pd2_int1)
 	end
+	if key == 2048 then
+		ply:SetNWInt( 'pd2_spectator_mod', ply:GetNWInt('pd2_spectator_mod')-1)
+		local pd2_int1 = player.GetAll()[ply:GetNWInt('pd2_spectator_mod')]
+		if not IsValid(pd2_int1) then
+			ply:SetNWInt( 'pd2_spectator_mod', player.GetCount())
+			pd2_int1 = player.GetAll()[ply:GetNWInt('pd2_spectator_mod')]
+		end
+		ply:SpectateEntity(pd2_int1)
+	end
 end )
 
-hook.Add("PlayerDisconnected", "TryFixDisconnect", function(ply)
-    ply:Kill()
-end)
+hook.Add("PlayerDisconnected", "TryFixDisconnect", function(ply) ply:Kill() end)

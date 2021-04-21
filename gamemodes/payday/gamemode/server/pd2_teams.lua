@@ -162,6 +162,6 @@ end)
 hook.Add( "AcceptInput", "AcceptInput", function( ent, name, activator, caller, data )
 	if ent:GetName() == "button_start" and name == "Use" then
 		ctgang_pd2 = false
-		timer.Simple(60, function() changeteam = false end)
+		timer_Map(60, function() changeteam = false end)
 	end
 end )

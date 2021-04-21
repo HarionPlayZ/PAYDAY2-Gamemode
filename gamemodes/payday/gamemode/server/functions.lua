@@ -29,13 +29,13 @@ hook.Add( "AcceptInput", "AcceptInputsPD2", function( ent, name, activator, call
     			v:EmitSound('pd2_plan_music.ogg')
     			v:ConCommand('pd2_hud_enable 0')
     			v:SelectWeapon( "cw_extrema_ratio_official" )
-    			timer.Simple(60, function() v:SetNWBool("pd2brief", false) v:Freeze(false) v:ConCommand('pd2_hud_enable 1') end)
+    			timer_Map(60, function() v:SetNWBool("pd2brief", false) v:Freeze(false) v:ConCommand('pd2_hud_enable 1') end)
     		end
     	end
-	    timer.Simple(59.9, function() pd2_start_allplayers("PLACE DRILL ON SAFE") end)
+	    timer_Map(59.9, function() pd2_start_allplayers("PLACE DRILL ON SAFE") end)
 	end
 	if ent:GetName() == "alarm_trigger" then
-		timer.Simple(40, function() start_player_police = true end)
+		timer_Map(40, function() start_player_police = true end)
 	end
 	if name == "FireUser1" then
 	    if ent:GetName() == "door_safe" then
@@ -50,7 +50,7 @@ hook.Add( "AcceptInput", "AcceptInputsPD2", function( ent, name, activator, call
 	end
 	if ent:GetName() == "button_start" and name == "Use" then
 		spawn = false
-		timer.Simple(60, function() start_display_time() set_start_time(CurTime()) end)
+		timer_Map(60, function() start_display_time() set_start_time(CurTime()) end)
 	end
 	if activator:IsPlayer() then
 		if ent:GetName() == "tele_trigger1" and activator:Team() == 2 then
@@ -94,8 +94,8 @@ function startending()
 		if v:Team() == 1 then
 			local dif = GetConVar('padpd2'):GetInt()+1
 			v:ChatPrint("Gang escaped! Restart after 30 sec...")
-			timer.Simple(25, function() v:ScreenFade( SCREENFADE.OUT, Color( 0, 0, 0, 255 ), 4, 2 ) end)
-			timer.Simple(30, function() RunConsoleCommand("map", table.Random(maps)) end)
+			timer_Map(25, function() v:ScreenFade( SCREENFADE.OUT, Color( 0, 0, 0, 255 ), 4, 2 ) end)
+			timer_Map(30, function() RunConsoleCommand("map", table.Random(maps)) end)
 			v:pd2_add_money(money_dif_pd2[dif])
 			v:pd2_add_xp(xp_tables[dif])
 			v:ChatPrint('You earned '..money_dif_pd2[dif]..'$ money.')
@@ -195,7 +195,7 @@ function start_display_time()
 	net.Send(player.GetAll())
 	for k, v in pairs(player.GetAll()) do
 		timer.Simple(0, function() v:SetNWBool("pd2dif", true) v:ConCommand("pd2_hud_enable 0") end)
-		timer.Simple(5, function() v:SetNWBool("pd2dif", false) v:ConCommand("pd2_hud_enable 1") end)
+		timer_Map(5, function() v:SetNWBool("pd2dif", false) v:ConCommand("pd2_hud_enable 1") end)
 	end
 end
 
@@ -213,7 +213,7 @@ end
 timer.Create("killteam1", 2, 1, function()
 	for k, v in pairs(player.GetAll()) do
 		if v:Team() == 1 then
-			timer.Simple(2, function() v:Kill() end)
+			timer_Map(2, function() v:Kill() end)
 		end
 	end
 end)

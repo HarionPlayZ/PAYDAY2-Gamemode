@@ -2,7 +2,6 @@
 CODE/FILE FROM https://github.com/Facepunch/garrysmod/pull/1590
 BY SHADOWBONNIERUS
 ]]
-print(1)
 
 OUTLINE_MODE_BOTH	= 0
 OUTLINE_MODE_NOTVISIBLE	= 1

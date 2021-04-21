@@ -32,6 +32,7 @@ include('server/functions.lua')
 include('server/pd2_teams.lua')
 include('server/pd2_moneyshop.lua')
 include('server/pd2_xplevel.lua')
+include('server/pd2_map.lua')
 include('shared/pd2_class_triggers.lua')
 
 function GM:PlayerSetHandsModel(ply, ent)
