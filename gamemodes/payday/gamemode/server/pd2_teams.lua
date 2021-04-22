@@ -68,29 +68,20 @@ function pl:PD2SetGang()
 	self:GiveAmmo(500, 'pistol', true)
 	self:GiveAmmo(50, 8, true)
     self:SetBodyGroups( "02" )
-    local m_weapon = self:GetNWString('weapon_main')
-    if m_weapon == '' then 
-        m_weapon = self:Give(table.Random(weapon_random_main))
-    else
-        m_weapon = self:Give(m_weapon)
-    end
-    if m_weapon:IsValid() then
-        self:GiveAmmo(m_weapon:Clip1() * 5, m_weapon:GetPrimaryAmmoType(), true)
-    else
-        m_weapon = self:Give(table.Random(weapon_random_main))
-    end
-    local s_weapon = self:GetNWString('weapon_sec')
-    if s_weapon == '' then
-        s_weapon = self:Give(table.Random(weapon_random_second))
-    else
-        s_weapon = self:Give(s_weapon)
-    end
-    if s_weapon:IsValid() then    
-        self:GiveAmmo(s_weapon:Clip1() * 5, s_weapon:GetPrimaryAmmoType(), true)
-    else
-        s_weapon = self:Give(table.Random(weapon_random_second))
-        self:GiveAmmo(s_weapon:Clip1() * 5, s_weapon:GetPrimaryAmmoType(), true)
-    end   
+    local prim_weapon = self:GetNWString('weapon_main')
+		if prim_weapon == '' then 
+			prim_weapon = self:Give(table.Random(weapon_random_main))
+			if IsValid(prim_weapon) then self:GiveAmmo(prim_weapon:Clip1() * 5, prim_weapon:GetPrimaryAmmoType(), true) end
+		else
+			prim_weapon = self:Give(prim_weapon)
+		end
+    local sec_weapon = self:GetNWString('weapon_sec')
+		if sec_weapon == '' then
+			sec_weapon = self:Give(table.Random(weapon_random_second))
+			if IsValid(sec_weapon) then self:GiveAmmo(sec_weapon:Clip1() * 5, sec_weapon:GetPrimaryAmmoType(), true) end
+		else
+			sec_weapon = self:Give(sec_weapon)
+		end   
     self:GiveAmmo(2, 55, true)
     self:Give("cw_extrema_ratio_official")
     self:Give("cw_pd2_frag_grenade")
@@ -118,14 +109,14 @@ end
 
 
 hook.Add("PlayerSay", "JoinTeams", function( ply, text )
-    if string.lower(text) == "/police" then
+    if text == "/police" or text == "!police" then
     	if GetConVar("policejoin"):GetInt() == 1 then ply:ChatPrint("Host disabled police team!") return end
     	if ply:Team() == 1 and changeteam == false then ply:ChatPrint("You cant change team on police, when game started and you gangster!") return true end
         timer.Simple(0, function() ply:Spawn() end)
         ply:PD2SetPolice()
         ply:EmitSound("pd2_player_join.ogg")
     end
-    if string.lower(text) == "/gang" then
+    if text == "/gang" or text == "!gang" then
         if voted == false then ply:ChatPrint('Difficulty not choosed!') return end
         if ply:Team() == 1 then return true end
     	if changeteam == false then ply:ChatPrint("You cant change team, when game started!") return true end

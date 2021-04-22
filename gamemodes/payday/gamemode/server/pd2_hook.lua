@@ -19,8 +19,8 @@ local commandtable = {
 	'/buy or /buy - this command buy any weapon from list.',
 	'/weapon or !weapon - if you want help with buying weapon.',
 	'/armor or !armor - if you want help with buying armor.',
-	'/gang - change team on gang.',
-	'/police - change team on police.',
+	'/gang or !gang - change team on gang.',
+	'/police or !police - change team on police.',
 	'/spectator - change team on spectator.',
 	'/votedif 0-6 - You can set difficulty in game.',
 	'/dif or !dif - Show voted difficulty in game.',
@@ -41,8 +41,12 @@ hook.Add("PlayerSay", "VoteDifficultyPD2", function( ply, text )
 	end
 	if voted == true then return end
 	if ctgang_pd2 == false then return end
-	if text == '/votedif 0' or text == '/votedif 1' or text == '/votedif 2' or text == '/votedif 3' or text == '/votedif 4' or text == '/votedif 5' or text == '/votedif 6' then
-		local arg = tonumber(string.Split(text,' ')[2])-1
+	local txt = string.Split(text,' ')
+	if txt[1] == '/votedif' or txt[1] == '!votedif' then
+		local arg = tonumber(txt[2])
+		if not isnumber(arg) then arg = 0 end
+		if arg < 0 then arg = 0 end
+		if arg > 6 then arg = 6 end
 		if ply:GetNWInt("pd2_level_data") < arg*5 then ply:ChatPrint("You don't have "..tostring(arg*5).." level to play on this difficulty!")  return end
 		GetConVar('padpd2'):SetInt(arg)
 		voted = true
