@@ -1,4 +1,6 @@
 local ply = FindMetaTable("Player")
+local ent = FindMetaTable('Entity')
+
 local text1 = "PUT DRILL ON SAFE"
 
 util.AddNetworkString("pd2_net_starters1")
@@ -19,59 +21,6 @@ end
 function ply:pd2_texts(txt)
 	self:SetNWString("PD2TextsOBJ", txt)
 end
-
-hook.Add( "AcceptInput", "AcceptInputsPD2", function( ent, name, activator, caller, data )
-    if ent:GetName() == "button_start" and name == "Use" then
-    	for k, v in pairs(player.GetAll()) do
-    		if v:Team() == 1 then
-    			v:Freeze(true)
-    			v:SetNWBool("pd2brief", true)
-    			v:EmitSound('pd2_plan_music.ogg')
-    			v:ConCommand('pd2_hud_enable 0')
-    			v:SelectWeapon( "cw_extrema_ratio_official" )
-    			timer_Map(60, function() v:SetNWBool("pd2brief", false) v:Freeze(false) v:ConCommand('pd2_hud_enable 1') end)
-    		end
-    	end
-	    timer_Map(59.9, function() pd2_start_allplayers("PLACE DRILL ON SAFE") end)
-	end
-	if ent:GetName() == "alarm_trigger" then
-		timer_Map(40, function() start_player_police = true end)
-	end
-	if name == "FireUser1" then
-	    if ent:GetName() == "door_safe" then
-	    	pd2_start_allplayers("STEAL CASH IN SAFE")
-	    end
-	    if ent:GetName() == "gold" then
-	    	pd2_start_allplayers("WAIT ESCAPE VAN")
-	    end
-	    if ent:GetName() == "van_escape" then
-	    	pd2_start_allplayers("YOU CAN ESCAPE")
-	    end
-	end
-	if ent:GetName() == "button_start" and name == "Use" then
-		spawn = false
-		timer_Map(60, function() start_display_time() set_start_time(CurTime()) end)
-	end
-	if activator:IsPlayer() then
-		if ent:GetName() == "tele_trigger1" and activator:Team() == 2 then
-			return false 
-		end
-	end
-end )
-
-hook.Add('PD2AlarmStealth', 'cam_alarm', function()
-	ents.FindByName("alarm_trigger")[1]:Fire("Trigger")
-	for k, v in pairs(ents.FindByClass("pd2_camera")) do
-		v.Active = false
-	end
-end)
-
-hook.Add( "EntityTakeDamage", "EntityDamageBlockIfTeam", function( target, dmginfo )
-	local attacker = dmginfo:GetAttacker()
-	if target:IsPlayer() and attacker:IsPlayer() then 
-		if target:Team() == attacker:Team() then return true end
-	end
-end )
 
 concommand.Add("medkit_use_pd2", function(ply)
 	if ply:GetNWInt("havemedkit") == 0 then return true end
@@ -102,89 +51,6 @@ function startending()
 		end
 	end
 end
-
-hook.Add( "EntityTakeDamage", "NextbotDamageBlockIfTeam", function( target, dmginfo )
-	local attacker = dmginfo:GetAttacker()
-	if target:IsPlayer() and target:Team() == 2 then
-		if attacker:IsNextBot() then return true end
-	end
-end )
-
-voted = false
-local difs = {'Normal', 'Hard', 'Very Hard', 'Overkill', 'Mayhem', 'Death Wish', 'Death Sentence'}
-
-hook.Add("PlayerSay", "VoteDifficultyPD2", function( ply, text )
-	if text == '/showdif' then
-		ply:ChatPrint('Difficulty: '..difs[GetConVar('padpd2'):GetInt()+1])
-	end
-	if text == '/showlevel' then
-		ply:ChatPrint("You have a "..ply:GetNWInt("pd2_level_data").." level and "..ply:pd2_get_xp().." xp.")
-	end
-	if voted == true then return end
-	if ctgang_pd2 == false then return end
-	if text == '/votedif 0' then
-		GetConVar('padpd2'):SetInt(0)
-		voted = true
-		for k, v in pairs(player.GetAll()) do
-			v:ChatPrint('Player choosed difficulty: Normal')
-			v:EmitSound('Friends/friend_online.wav', 75, 150)
-		end
-	end
-	if text == '/votedif 1' then
-		if ply:GetNWInt("pd2_level_data") < 5 then ply:ChatPrint("You don't have 5 level to play on this difficulty!") return end
-		GetConVar('padpd2'):SetInt(1)
-		voted = true
-		for k, v in pairs(player.GetAll()) do
-			v:ChatPrint('Player choosed difficulty: Hard')
-			v:EmitSound('Friends/friend_online.wav', 75, 125)
-		end
-	end
-	if text == '/votedif 2' then
-		if ply:GetNWInt("pd2_level_data") < 10 then ply:ChatPrint("You don't have 10 level to play on this difficulty!") return end
-		GetConVar('padpd2'):SetInt(2)
-		voted = true
-		for k, v in pairs(player.GetAll()) do
-			v:ChatPrint('Player choosed difficulty: Very Hard')
-			v:EmitSound('Friends/friend_online.wav', 75, 100)
-		end
-	end
-	if text == '/votedif 3' then
-		if ply:GetNWInt("pd2_level_data") < 15 then ply:ChatPrint("You don't have 15 level to play on this difficulty!") return end
-		GetConVar('padpd2'):SetInt(3)
-		voted = true
-		for k, v in pairs(player.GetAll()) do
-			v:ChatPrint('Player choosed difficulty: Overkill')
-			v:EmitSound('Friends/friend_online.wav', 75, 85)
-		end
-	end
-	if text == '/votedif 4' then
-		if ply:GetNWInt("pd2_level_data") < 20 then ply:ChatPrint("You don't have 20 level to play on this difficulty!") return end
-		GetConVar('padpd2'):SetInt(4)
-		voted = true
-		for k, v in pairs(player.GetAll()) do
-			v:ChatPrint('Player choosed difficulty: Mayhem')
-			v:EmitSound('Friends/friend_online.wav', 75, 75)
-		end
-	end
-	if text == '/votedif 5' then
-		if ply:GetNWInt("pd2_level_data") < 25 then ply:ChatPrint("You don't have 25 level to play on this difficulty!") return end
-		GetConVar('padpd2'):SetInt(5)
-		voted = true
-		for k, v in pairs(player.GetAll()) do
-			v:ChatPrint('Player choosed difficulty: Death Wish')
-			v:EmitSound('Friends/friend_online.wav', 75, 60)
-		end
-	end
-	if text == '/votedif 6' then
-		if ply:GetNWInt("pd2_level_data") < 30 then ply:ChatPrint("You don't have 30 level to play on this difficulty!") return end
-		GetConVar('padpd2'):SetInt(6)
-		voted = true
-		for k, v in pairs(player.GetAll()) do
-			v:ChatPrint('Player choosed difficulty: Death Sentence')
-			v:EmitSound('Friends/friend_online.wav', 75, 50)
-		end
-	end
-end)
 
 util.AddNetworkString( 'start_display_time'  )
 util.AddNetworkString( 'stop_display_time'  )
@@ -258,7 +124,7 @@ hook.Add( "Think", "PD2KillIfAllBleedout", function()
    end
 end )
 
-hook.Add("CanPlayerSuicide", "DisableSuicide", function(ply)
-	ply:ChatPrint("That command was disabled!")
-	return false
-end)
+
+function ent:timer_Simple(delay,f)
+	timer.Simple(delay,function() if IsValid(self) then f() end end)
+end

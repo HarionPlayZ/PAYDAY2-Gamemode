@@ -14,8 +14,10 @@ AddCSLuaFile('client/pd2_assautphases.lua')
 AddCSLuaFile('client/pd2_hud.lua')
 AddCSLuaFile('client/pd2_outline.lua')
 AddCSLuaFile('client/bleedout_client.lua')
+AddCSLuaFile('client/pd2_drawscreen.lua')
 AddCSLuaFile('shared/pd2_class_triggers.lua')
 AddCSLuaFile('cl_init.lua')
+
 
 --* Server script initialization
 --? shared.lua - is called simultaneously on both the client and the server.
@@ -29,11 +31,13 @@ include('server/custody_pd2.lua')
 include('server/armorregen.lua')
 include('server/sh_ablative_armor.lua')
 include('server/functions.lua')
+include('server/pd2_hook.lua')
 include('server/pd2_teams.lua')
 include('server/pd2_moneyshop.lua')
 include('server/pd2_xplevel.lua')
 include('server/pd2_map.lua')
 include('shared/pd2_class_triggers.lua')
+include('server/pd2_dril.lua')
 
 function GM:PlayerSetHandsModel(ply, ent)
 	local simplemodel = player_manager.TranslateToPlayerModelName(ply:GetModel())

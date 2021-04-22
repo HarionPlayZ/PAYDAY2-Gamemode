@@ -13,18 +13,12 @@ end
 if not file.Exists( fullpath, "DATA" ) then
 	file.Write( fullpath, "76561198201651767 0" )
 end
-local host_money = 0
 
-if game.SinglePlayer() then
-	if not file.Exists( singlpath, "DATA" ) then
-		file.Write( singlpath,'0' )
-	end
-else
-	if file.Exists(singlpath,"DATA") then
-		host_money = tonumber(file.Read(singlpath))
-		file.Delete(singlpath)
-	end
+if not file.Exists( singlpath, "DATA" ) then
+	file.Write( singlpath,'0' )
 end
+	
+local host_money,host_id = tonumber(file.Read(singlpath))
 
 local function getmoneytable()
 	return string.Split(file.Read( fullpath, "DATA" ), "\n")
@@ -42,41 +36,42 @@ end
 
 local function rewritemoney(id, number)
 	local tab = string.Split(file.Read( fullpath, "DATA" ), "\n")
-	local replace = string.Split(tab[id], " ")[1].." "..tostring(number)
-	tab[id] = replace
+	tab[id] = string.Split(tab[id], " ")[1].." "..tostring(number)
 	local txt = ""
 	for i, t in pairs(tab) do
 		txt = txt..t.."\n"
 	end
 	txt = string.Left(txt,string.len(txt)-1)
 	file.Write( fullpath, txt )
+	if host_id == string.Split(tab[id], " ")[1] then file.Write(singlpath,tostring(number)) end
 end
 
 if game.SinglePlayer() then
+	function ply:pd2_get_money()
+		return tonumber(file.Read(singlpath))
+	end
 	function ply:pd2_add_money(money)
-		local m = money+tonumber(file.Read(singlpath))
-		file.Write(singlpath,tostring(m))
+		file.Write(singlpath,tostring(money+tonumber(file.Read(singlpath))))
 	end
 	function ply:pd2_set_money(money)
 		file.Write(singlpath,money)
 	end
 else
+	function ply:pd2_get_money()
+		local tab = getmoneytable()
+		for k, v in pairs(tab) do
+			local txt = string.Split(v, " ")
+			if txt[1] == self:SteamID64() then
+				return tonumber(txt[2])
+			end
+		end	
+	end
 	function ply:pd2_set_money(money)
 		rewritemoney(getmoneytable_id(self), money)
 	end
 	function ply:pd2_add_money(money)
 		rewritemoney(getmoneytable_id(self), money+self:pd2_get_money())
 	end
-end
-
-function ply:pd2_get_money()
-	local tab = getmoneytable()
-	for k, v in pairs(tab) do
-		local txt = string.Split(v, " ")
-		if txt[1] == self:SteamID64() then
-			return tonumber(txt[2])
-		end
-	end	
 end
 
 hook.Add("PlayerInitialSpawn", "pd2_player_join_steamid_money", function(ply)
@@ -91,8 +86,11 @@ hook.Add("PlayerInitialSpawn", "pd2_player_join_steamid_money", function(ply)
 		end
 		if not exist then file.Append(fullpath, "\n"..ply:SteamID64().." 0") end
 	end
-	if ply:IsListenServerHost() then ply:pd2_add_money(host_money) end
-	if game.SinglePlayer() then ply:ChatPrint("Launch gamemode in multiplayer or you cant use your old progress (your new progess added if you restart in multiplayer!)") end
+	if ply:IsListenServerHost() then
+		ply:pd2_set_money(0)
+		host_id = ply:SteamID64()
+		ply:pd2_add_money(host_money) 
+	end
 	ply:ConCommand("cw_customhud 0")
 	ply:ConCommand("pd2_hud_team_custom 0")
 	ply:ConCommand("pd2_hud_enable 1")
@@ -151,24 +149,18 @@ function ply:BuyWeapon(name, slot)
 	end
 end
 
-local commandtable = {'List of all commands:', '/showmoney - show your money.', '/showlevel - show your level.', '/buy - this command buy any weapon from list.', '/helpweapon - if you want help with buying weapon.', '/helparmor - if you want help with buying armor.', '/gang - change team on gang.', '/police - change team on police.', '/spectator - change team on spectator.', '/votedif 0-6 - You can set difficulty in game.', '/showdif - Show voted difficulty in game.', 'If you write in console (bind g medkit_use_pd2) you will can use medkit on g button.'}
 hook.Add("PlayerSay", "BuyWeaponsPD2", function( ply, text )
-	if text == "/helpweapon" then
+	if text == "/weapon" or text == "!weapon" then
 		ply:ChatPrint('List:')
 		for i, w in pairs(weapon_table_price) do
 			ply:ChatPrint(w.id..' - Price:'..w.price..'$, Level: '..w.level)
 		end
 		ply:ChatPrint('Example: /buy m249 1 - slot 1 or 2')
 	end
-	if text == "/showmoney" then
+	if text == "/money" or text == "!money" then
 		ply:ChatPrint('You have: '..ply:pd2_get_money()..'$.')
 	end
-	if text == "/help" then
-		for i, c in pairs(commandtable) do
-			ply:ChatPrint(c)
-		end
-	end
-	if text == "/helparmor" then
+	if text == "/armor" or text == "!armor" then
 		ply:ChatPrint('List:')
 		for i, w in pairs(armor_table_price) do
 			ply:ChatPrint('armor'..w.name..' - Price:'..w.price..'$, Level: '..w.level)
@@ -176,7 +168,7 @@ hook.Add("PlayerSay", "BuyWeaponsPD2", function( ply, text )
 		ply:ChatPrint('Example: /buy armor200')
 	end
 	local txt = string.Split(string.lower(text), " ")
-	if txt[1] == "/buy" and txt[2] then
+	if (txt[1] == "/buy" or txt[1] == "!buy") and txt[2] then
 		if ply:Team() == 1001 then
 			ply:BuyWeapon(txt[2], tonumber(txt[3]) or 0)
 		else ply:ChatPrint("Join to team spectator to buy weapon!") end

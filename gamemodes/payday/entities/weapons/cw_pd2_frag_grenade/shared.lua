@@ -21,15 +21,19 @@ SWEP.noResupply = true -- for ground control
 
 local sounds = {{time = 0.2, sound = "CW_PINPULL"}}
 
-SWEP.Animations = {throw = {"throw"},
+SWEP.Animations = {
+	throw = {"throw"},
 	pullpin = {"pullpin", "pullpin2", "pullpin3", "pullpin4"},
 	idle = "idle",
-	draw = "deploy"}
+	draw = "deploy"
+}
 	
-SWEP.Sounds = {pullpin = sounds,
+SWEP.Sounds = {
+	pullpin = sounds,
 	pullpin2 = sounds,
 	pullpin3 = sounds,
-	pullpin4 = sounds}
+	pullpin4 = sounds
+}
 	
 SWEP.SpeedDec = 5
 
