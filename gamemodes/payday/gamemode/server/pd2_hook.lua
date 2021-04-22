@@ -102,7 +102,7 @@ hook.Add( "AcceptInput", "AcceptInputsPD2", function( ent, name, activator, call
 		pd2_start_allplayers("STEAL CASH IN SAFE")
 		playsound(player.GetAll(),'pd2_obj.mp3')
 		ents.FindByName('drill_spark')[1]:Fire('StartSpark')
-		dril_spawn(Vector(-3525, 1708, 75),Angle(0,130,0),'dril',30)
+		dril_spawn(Vector(-3525, 1708, 75),Angle(0,130,0),'dril',300)
 		ent:Remove()
 	end
 	if ent:GetName() == "gold" then
