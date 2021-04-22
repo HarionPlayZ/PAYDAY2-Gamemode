@@ -6,12 +6,14 @@ local con5 = GetConVar( "pd2_assaultphases_server_assaultbar_captainenabled" )
 local con7 = GetConVar( "pd2_assaultphases_server_controlduration" )
 
 local timer_c = math.random( 60, 240 )
+local map = game.GetMap()
 
 start_player_police = false
 
 local p_vec_table = {}
 local s_vec_table = {}
-if game.GetMap() == "pd2_jewelry_store_mission" then
+
+if map == "pd2_jewelry_store_mission" then
 	p_vec_table = {Vector(-5835.604980, 810.292603, 68.031250),Vector(-4622.043457, 3271.763184, 68.031250),Vector(-5835.604980, 810.292603, 68.031250),Vector(-4622.043457, 3271.763184, 68.031250)}
 	random_spawn_p = {Vector(-4158.414063, 3250.695801, 68.031250), Vector(-4641.425781, 468.396393, 68.031250), Vector(-5929.043457, 1284.832031, 68.031250)}
 	vec_p2 = Vector(4876.448730, -1681.583130, 68.031250)
@@ -19,7 +21,7 @@ if game.GetMap() == "pd2_jewelry_store_mission" then
 	money_dif_pd2 = {1000, 2500, 5000, 10000, 17500, 25000, 50000}
 	xp_tables = {2000, 5000, 10000, 20000, 37500, 50000, 75000}
 end
-if game.GetMap() == "pd2_warehouse_mission" then
+if map == "pd2_warehouse_mission" then
 	p_vec_table = {Vector(3457.714600, 898.945679, 64.031250),Vector(5403.900391, 1574.928101, 64.031250),Vector(3070.912598, 273.047791, 64.031250),Vector(3070.912598, 273.047791, 64.031250)}
 	random_spawn_p = {Vector(3462.708984, 202.040253, 64.031250), Vector(5462.325195, 2032.598511, 64.031250), Vector(5099.486328, 493.386292, 64.031250)}
 	vec_p2 = Vector(-250.250427, 178.540894, -121.968750)
@@ -27,7 +29,7 @@ if game.GetMap() == "pd2_warehouse_mission" then
 	money_dif_pd2 = {2000, 5000, 10000, 18750, 30000, 45000, 80000}
 	xp_tables = {4500, 10000, 17500, 35000, 65000, 87500, 150000}
 end
-if game.GetMap() == "pd2_htbank_mission" then
+if map == "pd2_htbank_mission" then
 	p_vec_table = {Vector(2993.843018, -903.920959, -1011.968750),Vector(-2020.054932, -1256.504272, -1015.977905),Vector(373.001007, 3383.392090, -1015.618347),Vector(373.001007, 3383.392090, -1015.618347)}
 	random_spawn_p = {Vector(2253.890625, 3140.556641, -1011.968750), Vector(2096.237305, -796.061829, -1011.981628), Vector(-982.990540, -749.902649, -1011.968750)}
 	vec_p2 = Vector(3849.046631, 2554.394531, -470.968750)
@@ -61,7 +63,7 @@ function police_spawners()
 		spawnpd:SetMoveType(MOVETYPE_VPHYSICS)
 		spawnpd:SetSolid(SOLID_VPHYSICS)
 		spawnpd:SetCollisionGroup(COLLISION_GROUP_WEAPON)
-		table.insert(pd2_gamemode_police_spawners,spawnpd2)
+		table.insert(pd2_gamemode_police_spawners,spawnpd)
 		
 		spawnpd:GetPhysicsObject():EnableMotion(false)
 		
@@ -83,7 +85,6 @@ function police_spawners()
 		if i == 3 then spawnpd.m_difficulty = 8 end
 		if i == 4 then spawnpd.m_difficulty = 9 end
 	end
-
 end
 
 function sniper_spawners()
@@ -95,9 +96,7 @@ for i,vec in pairs(s_vec_table) do
 	spawnsniper:SetMoveType(MOVETYPE_VPHYSICS)
 	spawnsniper:SetSolid(SOLID_VPHYSICS)
 	spawnsniper:SetCollisionGroup(COLLISION_GROUP_WEAPON)
-	-- pd2_gamemode_police_spawners[5] = spawnsniper
-	
-	spawnsniper:GetPhysicsObject():EnableMotion(false)
+	pd2_gamemode_police_spawners[5] = spawnsniper
 	
 	spawnsniper.NextSpawn = CurTime()+1
 	spawnsniper.BotsToRemove = {}
@@ -129,9 +128,7 @@ function guard_spawners()
 	spawnguard:SetMoveType(MOVETYPE_VPHYSICS)
 	spawnguard:SetSolid(SOLID_VPHYSICS)
 	spawnguard:SetCollisionGroup(COLLISION_GROUP_WEAPON)
-	-- pd2_gamemode_police_spawners[7] = spawnguard
-	
-	spawnguard:GetPhysicsObject():EnableMotion(false)
+	pd2_gamemode_police_spawners[7] = spawnguard
 	
 	spawnguard.NextSpawn = CurTime()+1
 	spawnguard.BotsToRemove = {}
@@ -159,9 +156,7 @@ function gang_spawner()
 	spawngang:SetMoveType(MOVETYPE_VPHYSICS)
 	spawngang:SetSolid(SOLID_VPHYSICS)
 	spawngang:SetCollisionGroup(COLLISION_GROUP_WEAPON)
-	-- pd2_gamemode_police_spawners[7] = spawngang
-	
-	spawngang:GetPhysicsObject():EnableMotion(false)
+	pd2_gamemode_police_spawners[7] = spawngang
 	
 	spawngang.NextSpawn = CurTime()+5
 	spawngang.BotsToRemove = {}
@@ -203,7 +198,6 @@ function pd2_assault_starting()
 		pd2_gamemode_police_spawners[2]:Enable()
 		pd2_gamemode_police_spawners[3]:Enable()
 		if GetConVar( "padpd2" ):GetInt() >= 3 then 
-			-- print("captain difficulty enabled")
 			timer_Map(timer_c, function() 
 				pd2_gamemode_police_spawners[4]:Enable()
 				con5:SetInt( 1 )

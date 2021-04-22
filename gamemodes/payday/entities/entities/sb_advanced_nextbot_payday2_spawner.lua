@@ -1,7 +1,7 @@
 AddCSLuaFile()
 
 ENT.PrintName = "SB ANB PAYDAY 2"
-ENT.Type = "anim"
+ENT.Type = "point"
 
 properties.Add("sb_anb_pd2_spawner_enable",{
 	MenuLabel = "Enable Spawner",

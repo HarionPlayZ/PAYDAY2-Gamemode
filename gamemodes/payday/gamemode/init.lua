@@ -16,6 +16,7 @@ AddCSLuaFile('client/pd2_outline.lua')
 AddCSLuaFile('client/bleedout_client.lua')
 AddCSLuaFile('client/pd2_drawscreen.lua')
 AddCSLuaFile('shared/pd2_class_triggers.lua')
+AddCSLuaFile('shared/pd2_sound.lua')
 AddCSLuaFile('cl_init.lua')
 
 

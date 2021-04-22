@@ -5,14 +5,14 @@ local text1 = "PUT DRILL ON SAFE"
 
 util.AddNetworkString("pd2_net_starters1")
 
-function ply:pd2_allbox_text()
+function ply:pd2_text()
 	net.Start("pd2_net_starters1")
 	net.Send(self)
 end
 
 function pd2_start_allplayers(txt)
 	for k, v in pairs(player.GetAll()) do
-		v:pd2_allbox_text()
+		v:pd2_text()
 		v:pd2_texts(txt)
 	end
 	text1 = txt

@@ -16,7 +16,7 @@ local function drawscreen()
 				progress = (CurTime()-prop:GetNWFloat('spawn_time'))
 			end
 			progress = progress/prop:GetNWFloat('progress')
-			cam.Start3D2D( prop:GetPos()+ang:Right()*-9.648+ang:Up()*3.05+ang:Forward()*4.207, prop:GetAngles()+Angle(0,270,60),0.01)
+			cam.Start3D2D( prop:GetPos()+ang:Right()*-9.648+ang:Up()*3.07+ang:Forward()*4.205, prop:GetAngles()+Angle(0,270,60),0.01)
 				surface.SetMaterial( mat )
 				if bool then
 					surface.SetDrawColor( 180,3,4 )

@@ -1,6 +1,6 @@
 AddCSLuaFile()
 
-ENT.Type = "anim"
+ENT.Type = "point"
 ENT.Spawnable = false
 ENT.RenderGroup = RENDERGROUP_OPAQUE
 

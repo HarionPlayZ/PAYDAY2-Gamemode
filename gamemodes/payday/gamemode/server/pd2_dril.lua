@@ -9,7 +9,7 @@ dril.id = id
 dril:SetNWFloat('time',time)
 dril:SetNWFloat('progress',time)
 dril:SetNWFloat('spawn_time',CurTime())
-dril:timer_Simple(math.random(200,450)/10,function() dril:SetNWBool('break',true) dril:SetNWFloat('break_time',CurTime()) end)
+dril:timer_Simple(math.random(300,450)/10,function() dril_break(dril) end)
 end
 
 timer.Create('Dril',1,0,function()
@@ -23,15 +23,21 @@ timer.Create('Dril',1,0,function()
 	end
 end)
 
--- hook.Add('dril_comlited','dril_comlited',function(id)
-	-- print(id)
--- end)
-
 hook.Add( "PlayerUse", "some_unique_name2", function( ply, ent )
 	if ent:GetModel()=='models/pd2_drill/drill.mdl' then
 		if ent:GetNWBool('break') then
-			ent:SetNWFloat('spawn_time',CurTime()-ent:GetNWFloat('break_time')+ent:GetNWFloat('spawn_time'))
-			ent:SetNWBool('break',false)
+			dril_repair(ent)
 		end
 	end
 end )
+
+function dril_break(dril)
+dril:SetNWBool('break',true) 
+dril:SetNWFloat('break_time',CurTime())
+end
+
+function dril_repair(dril)
+dril:SetNWFloat('spawn_time',CurTime()-dril:GetNWFloat('break_time')+dril:GetNWFloat('spawn_time'))
+dril:SetNWBool('break',false)
+dril:timer_Simple(math.random(300,450)/10,function() dril_break(dril) end)
+end

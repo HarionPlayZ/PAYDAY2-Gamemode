@@ -5,6 +5,9 @@ end)
 
 hook.Add( "EntityTakeDamage", "NextbotDamageBlockIfTeam", function( target, dmginfo )
 	local attacker = dmginfo:GetAttacker()
+	if target:GetClass()=='func_breakable' then
+		if target:Health()-dmginfo:GetDamage()<=0 then hook.Call('alarm') end
+	end
 	if target:IsPlayer() then
 		if attacker:IsNextBot() and target:Team() == 2 or attacker:IsPlayer() and target:Team() == attacker:Team() then return true end
 	end
@@ -59,16 +62,9 @@ end)
 
 hook.Add('PD2AlarmStealth', 'cam_alarm', function()
 	ents.FindByName("alarm_trigger")[1]:Fire("Trigger")
-	for k, v in pairs(ents.FindByClass("pd2_camera")) do
-		v.Active = false
-	end
+	for k, v in pairs(ents.FindByClass("pd2_camera")) do v.Active = false end
 end)
 
-local text_message = {
-["door_safe"] = "STEAL CASH IN SAFE",
-["gold"] = "WAIT ESCAPE VAN",
-["van_escape"] = "YOU CAN ESCAPE"
-}
 hook.Add( "AcceptInput", "AcceptInputsPD2", function( ent, name, activator, caller, data )
     if ent:GetName() == "button_start" and name == "Use" then
     	for k, v in pairs(player.GetAll()) do
@@ -78,18 +74,57 @@ hook.Add( "AcceptInput", "AcceptInputsPD2", function( ent, name, activator, call
     			v:EmitSound('pd2_plan_music.ogg')
     			v:ConCommand('pd2_hud_enable 0')
     			v:SelectWeapon( "cw_extrema_ratio_official" )
-    			timer_Map(60, function() v:SetNWBool("pd2brief", false) v:Freeze(false) v:ConCommand('pd2_hud_enable 1') end)
+    			timer_Map(60, function()
+					if IsValid(v) then
+						v:SetNWInt("PD2TextsOBJSize",290)
+						v:SetNWBool("pd2brief", false)
+						v:Freeze(false)
+						v:ConCommand('pd2_hud_enable 1')
+					end
+				end)
     		end
     	end
-	    timer_Map(59.9, function() pd2_start_allplayers("PLACE DRILL ON SAFE") end)
+	    timer_Map(59.9, function()
+			pd2_start_allplayers("PLACE DRILL ON SAFE") 
+		end)
 	end
 	if ent:GetName() == "alarm_trigger" then
 		timer_Map(40, function() start_player_police = true end)
 	end
-	if name == "FireUser1" and text_message[ent:GetName()] != nil then pd2_start_allplayers(text_message[ent:GetName()]) end
 	if ent:GetName() == "button_start" and name == "Use" then
 		spawn = false
 		timer_Map(60, function() start_display_time() set_start_time(CurTime()) end)
+	end
+	if ent:GetName() == "drill_button" then
+		for i,p in pairs(player.GetAll()) do
+			p:SetNWInt("PD2TextsOBJSize",270)
+		end
+		pd2_start_allplayers("STEAL CASH IN SAFE")
+		playsound(player.GetAll(),'pd2_obj.mp3')
+		ents.FindByName('drill_spark')[1]:Fire('StartSpark')
+		dril_spawn(Vector(-3525, 1708, 75),Angle(0,130,0),'dril',30)
+		ent:Remove()
+	end
+	if ent:GetName() == "gold" then
+		for i,p in pairs(player.GetAll()) do
+			p:SetNWInt("PD2TextsOBJSize",137)
+		end
+		pd2_start_allplayers("WAIT VAN")
+		playsound(player.GetAll(),'pd2_obj.mp3')
+		ents.FindByName('money')[1]:Fire('kill')
+		timer_Map(30,function() playsound(player.GetAll(),'pd2_bain_van_30.mp3') end)
+		timer_Map(60,function()
+			playsound(player.GetAll(),'pd2_obj.mp3')
+			playsound(player.GetAll(),'pd2_bain_van_0.mp3')
+			ents.FindByName('van_escape')[1]:Fire('Enable')
+			ents.FindByName('tele_trigger1')[1]:Fire('Enable')
+			for i,p in pairs(player.GetAll()) do
+				p:SetNWInt("PD2TextsOBJSize",228.5)
+			end
+			pd2_start_allplayers("YOU CAN ESCAPE")
+			
+		end)
+		ent:Remove()
 	end
 	if activator:IsPlayer() then
 		if ent:GetName() == "tele_trigger1" and activator:Team() == 2 then

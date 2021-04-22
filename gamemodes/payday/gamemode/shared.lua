@@ -8,3 +8,4 @@ GM.Author = 'HarionPlayZ & Soloveu Empty'
 --* Is called simultaneously on both the client and the server.
 --? Recommended only for generic elements
 include('shared/bleedout_init.lua')
+include('shared/pd2_sound.lua')
