@@ -92,7 +92,7 @@ hook.Add("PlayerInitialSpawn", "pd2_player_join_steamid_money", function(ply)
 		ply:pd2_add_money(host_money) 
 	end
 	ply:ConCommand("cw_customhud 0")
-	ply:ConCommand("pd2_hud_team_custom 0")
+	RunConsoleCommand("pd2_hud_team_custom", 0)
 	ply:ConCommand("pd2_hud_enable 1")
 	RunConsoleCommand("ai_serverragdolls", 0)
 end)
