@@ -281,6 +281,22 @@ local DefaultMusic = {
 		Bridge = {""},
 		Assault = {"ass"},
 	},
+	["left_in_the_cold"] = {
+		Name = "Left In The Cold",
+		Stealth = {"st"},
+		Control = {"cont"},
+		Anticipation = {"ant"},
+		Bridge = {""},
+		Assault = {"ass"},
+	},
+	["le_castle_vania"] = {
+		Name = "Le Castle Vania",
+		Stealth = {"st"},
+		Control = {"cont"},
+		Anticipation = {"ant"},
+		Bridge = {""},
+		Assault = {"ass"},
+	},
 }
 local CustomMusic = util.JSONToTable(file.Read("pd2_assaultphases_custommusic.txt","DATA") or "") or {}
 
