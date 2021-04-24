@@ -1,5 +1,5 @@
 local pl = FindMetaTable("Player")
-local changeteam = true
+local changeteam
 ctgang_pd2 = true
 start_player_police = false
 
@@ -110,7 +110,7 @@ end
 hook.Add("PlayerSay", "JoinTeams", function( ply, text )
     if text == "/police" or text == "!police" then
     	if GetConVar("policejoin"):GetInt() == 1 then ply:ChatPrint("Host disabled police team!") return end
-    	if ply:Team() == 1 and changeteam == false then ply:ChatPrint("You cant change team on police, when game started and you gangster!") return true end
+    	if ply:Team() == 1 and not changeteam then ply:ChatPrint("You cant change team on police, when game started and you gangster!") return true end
         timer.Simple(0, function() ply:Spawn() end)
         ply:PD2SetPolice()
         ply:EmitSound("pd2_player_join.ogg")
@@ -118,13 +118,13 @@ hook.Add("PlayerSay", "JoinTeams", function( ply, text )
     if text == "/gang" or text == "!gang" then
         if voted == false then ply:ChatPrint('Difficulty not choosed!') return end
         if ply:Team() == 1 then return true end
-    	if changeteam == false then ply:ChatPrint("You cant change team, when game started!") return true end
+    	if not changeteam then ply:ChatPrint("You cant change team, when game started!") return true end
         timer.Simple(0, function() ply:Spawn() end)
         ply:PD2SetGang()
         ply:EmitSound("pd2_player_join.ogg")
     end
     if text == "/spectator" or text == "!spectator" then
-    	if ply:Team() == 1 and changeteam == false or ctgang == false then return end
+    	if ply:Team() == 1 and not changeteam or ctgang == false then return end
     	ply:SetTeam(1001)
         ply:StripAmmo()
         ply:StripWeapons()
@@ -159,3 +159,7 @@ hook.Add( "AcceptInput", "AcceptInput", function( ent, name, activator, caller, 
 		timer_Map(60, function() changeteam = false end)
 	end
 end )
+
+hook.Add('pd2_map_spawned','pd2_map_spawned',function()
+	changeteam = true
+end)
