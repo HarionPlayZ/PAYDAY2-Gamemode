@@ -13,3 +13,6 @@ include('bleedout/bleedout.lua')
 include('client/pd2text.lua')
 include('client/pd2_drawscreen.lua')
 
+net.Receive('padpd2',function()
+	padpd = net.ReadInt(4)
+end)

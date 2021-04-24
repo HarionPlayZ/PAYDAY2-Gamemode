@@ -1,0 +1,79 @@
+police_vectable = {Vector(-5835.604980, 810.292603, 68.031250),Vector(-4622.043457, 3271.763184, 68.031250),Vector(-5835.604980, 810.292603, 68.031250),Vector(-4622.043457, 3271.763184, 68.031250)}
+spawner_police = {Vector(-4158.414063, 3250.695801, 68.031250), Vector(-4641.425781, 468.396393, 68.031250), Vector(-5929.043457, 1284.832031, 68.031250)}
+spawner_gang = Vector(4876.448730, -1681.583130, 68.031250)
+sniper_vectable = {Vector(),Vector()}
+money_dif_pd2 = {1000, 2500, 5000, 10000, 17500, 25000, 50000}
+xp_tables = {2000, 5000, 10000, 20000, 37500, 50000, 75000}
+
+local can_pickup_gold = false
+local alarm
+hook.Add('alarm','alarm',function()
+	if alarm then return end
+	alarm = true
+	pd2_assault_starting()
+	sound.Play( "alarm1.mp3", Vector(-3850, 1920, 120) )
+	playsound(player.GetAll(),'pd2_bain_alarm.mp3')
+	timer_Map(5,function() playsound(player.GetAll(),'pd2_bain_police_40.mp3') end)
+	timer_Map(40,function()
+		local car = ents.FindByName('police_car')[1] 
+		if IsValid(car) then car:Fire('Enable') end
+		timer.Start('police_light')
+	end)
+end)
+
+local pcb,pcr
+timer.Create('police_light',0.25,0,function()
+	timer.Stop('police_light')
+	pcb:Fire('TurnOn')
+	pcr:Fire('TurnOff')
+	timer_Map(0.25,function()
+		pcb:Fire('TurnOff')
+		pcr:Fire('TurnOn')
+		timer.Start('police_light')
+	end)
+end)
+
+hook.Add('pd2_map_spawned','pd2_jewelry_store_mission',function()
+	timer.Stop('police_light')
+	pcb = ents.FindByName('police_car_blue')[1]
+	pcr = ents.FindByName('police_car_red')[1]
+end)
+
+hook.Add('dril_comlited','pd2_jewelry_store_mission',function(id)
+	local safe = ents.FindByModel('models/payday2/otherprops/safe.mdl')[1]
+	safe:Fire('SetAnimationNoReset','opening')
+	local safe_door = ents.FindByName('safe_coll')[1]
+	safe_door:Fire('Toggle')
+	can_pickup_gold = true
+end)
+
+hook.Add( "AcceptInput", "pd2_jewelry_store_mission", function( ent, name, activator, caller, data )
+    if ent:GetName() == "button_start" then
+		timer_Map(60, function() 
+			pd2_taskbar_display_all("PLACE DRILL ON SAFE",290)  
+			start_display_time() 
+			set_start_time(CurTime()) 
+		end)
+	end
+	if ent:GetName() == "drill_button" then
+		pd2_taskbar_display_all("STEAL CASH IN SAFE",270)
+		dril_spawn(Vector(-3525, 1708, 75),Angle(0,130,0),'dril',300)
+		ent:Remove()
+	end
+	if ent:GetName() == "gold" and can_pickup_gold then
+		pd2_taskbar_display_all("WAIT VAN",137)
+		ents.FindByName('money')[1]:Fire('kill')
+		timer_Map(30,function() playsound(player.GetAll(),'pd2_bain_van_30.mp3') end)
+		timer_Map(60,function()
+			playsound(player.GetAll(),'pd2_bain_van_0.mp3')
+			ents.FindByName('van_escape')[1]:Fire('Enable')
+			ents.FindByName('tele_trigger1')[1]:Fire('Enable')
+			pd2_taskbar_display_all("YOU CAN ESCAPE",228.5)
+			
+		end)
+		ent:Remove()
+	end
+	if activator:IsPlayer() then
+		if ent:GetName() == "tele_trigger1" and activator:Team() == 2 then return true end
+	end
+end )

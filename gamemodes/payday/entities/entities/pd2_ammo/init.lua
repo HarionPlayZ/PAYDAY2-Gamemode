@@ -6,7 +6,7 @@ local coolDown = {}
 function ENT:Initialize()
     self:SetModel("models/props_lab/box01a.mdl")
     self:PhysicsInit(SOLID_VPHYSICS)
-    self:SetMoveType(MOVETYPE_NONE)
+    self:SetMoveType(MOVETYPE_VPHYSICS)
     self:SetSolid(SOLID_VPHYSICS)
     local phys = self:GetPhysicsObject()
     phys:Wake()

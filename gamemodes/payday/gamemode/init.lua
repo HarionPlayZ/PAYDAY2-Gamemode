@@ -1,5 +1,14 @@
 resource.AddFile('materials/pr1.png')
-CreateConVar('padpd2', 0)
+
+global_dif = 0
+
+pd2_path = 'gamemodes/payday/'
+map_config_path = pd2_path..'gamemode/map_config/'..game.GetMap()..'.lua'
+if file.Exists(map_config_path,'GAME') then
+	include('map_config/'..game.GetMap()..'.lua')
+else
+	timer.Simple(0,function() hook.Call('map_custom_config') end)
+end
 
 --* Global registration
 --? For subsequent call on the client side
@@ -39,6 +48,7 @@ include('server/pd2_xplevel.lua')
 include('server/pd2_map.lua')
 include('shared/pd2_class_triggers.lua')
 include('server/pd2_dril.lua')
+
 
 function GM:PlayerSetHandsModel(ply, ent)
 	local simplemodel = player_manager.TranslateToPlayerModelName(ply:GetModel())

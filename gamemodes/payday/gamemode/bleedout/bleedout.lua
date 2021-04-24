@@ -1009,8 +1009,8 @@ local function bleedoutviewmodelviewfunc(wep, vm, oldp, olda, pos, ang)
 	end
 end
 hook.Add("EntityFireBullets", "BleedOutFireBullets", function(ply, tab)
-	if ply:IsNPC() and ply.IsVJBaseSNPC != true then
-		if ply:GetEnemy():IsPlayer() and ply:GetEnemy():IsBleedOut() == true then
+	if ply:IsNPC() and not ply.IsVJBaseSNPC then
+		if ply:GetEnemy():IsPlayer() and ply:GetEnemy():IsBleedOut() then
 			tab.Dir = ( ply:GetEnemy():EyePos() - Vector(0, 0, 35) ) - ply:EyePos() + Vector(math.Rand(-10, 10), math.Rand(-10, 10), math.Rand(-10, 10))
 			return true 
 		end
@@ -1152,7 +1152,7 @@ end
 -- Other functions are set ^
 if SERVER then
 	net.Receive("bleedout_suicide", function(len, ply)
-		if IsValid(ply) and ply:IsBleedOut() == true then
+		if IsValid(ply) and ply:IsBleedOut() then
 			ply:Kill()
 		end
 	end)
