@@ -27,6 +27,7 @@ local commandtable = {
 	'/spectator or !spectator - change team on spectator.',
 	'/votedif 0-6 or !votedif 0-6 - You can set difficulty in game.',
 	'/dif or !dif - Show voted difficulty in game.',
+	'/giveup or !giveup - Kill player if him in team gang.',
 	'If you write in console (bind g medkit_use_pd2) you will can use medkit on g button.'
 }
 
@@ -59,7 +60,7 @@ hook.Add("PlayerSay", "VoteDifficultyPD2", function( ply, text )
 		voted = true
 		for k, v in pairs(player.GetAll()) do
 			v:ChatPrint('Player choosed difficulty: '..difs[arg+1])
-			v:EmitSound('Friends/friend_online.wav', 75, 150)
+			v:EmitSound('Friends/friend_online.wav')
 		end
 	end
 end)

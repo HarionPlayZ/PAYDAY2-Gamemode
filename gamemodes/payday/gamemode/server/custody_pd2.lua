@@ -34,7 +34,7 @@ hook.Add("PlayerDeath","playerdeath", function(victim, inflictor, attacker)
 	if all_death then
 		timer_Map(10, function() GetConVar( "pd2_assaultphases_server_assaultphase" ):SetInt( 0 ) game.CleanUpMap() end)
 		for k, v in pairs (player.GetAll()) do
-			timer_Map(1, function() if IsValid(v) then v:ChatPrint(langs_pd2['pd2.arrest.players.all']) v:ScreenFade( SCREENFADE.OUT, Color( 0, 0, 0, 255 ), 4, 1 ) end end)
+			timer_Map(1, function() if IsValid(v) then v:ChatPrint(langs_pd2['pd2.arrest.players.all']) end end)
 			if v:Team() == 2 then
 				v:pd2_add_money(1000)
 				v:pd2_add_xp(1000,true)

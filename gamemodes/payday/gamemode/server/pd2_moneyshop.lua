@@ -173,4 +173,10 @@ hook.Add("PlayerSay", "BuyWeaponsPD2", function( ply, text )
 			ply:BuyWeapon(txt[2], tonumber(txt[3]) or 0)
 		else ply:ChatPrint("Join to team spectator to buy weapon!") end
 	end
+	if text == "/giveup" or text == "!giveup" then
+		if ply:Team() == 1 then
+			ply:Kill()
+			ply:ChatPrint("You was arrested!")
+		end
+	end
 end)

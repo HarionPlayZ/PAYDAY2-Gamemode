@@ -1,8 +1,8 @@
-"PAYDAY 2 Alpha"
+"PAYDAY 2 Beta"
 {
-	"title"		"PAYDAY 2 Alpha"
+	"title"		"PAYDAY 2 Beta"
 	"base"		"base"
-	"version"    "0.8.9"
+	"version"    "0.9.0"
 	"maps"		"^pd2_"
 	"menusystem"    "1"
 	"category"	"pve"
