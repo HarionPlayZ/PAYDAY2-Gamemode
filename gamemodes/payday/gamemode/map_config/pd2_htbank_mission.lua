@@ -37,7 +37,7 @@ timer.Create('escape_zone',0,0.1,function()
 local ent_table = ents.FindInBox(Vector(-2120, -794, -1015),Vector(-2140, -725, -1000))
 	for i,p in pairs(ent_table) do
 		if p:IsPlayer() then
-			if p:Alive() and p:Team()==2 then
+			if p:Alive() and p:Team()==1 then
 				p:SetNWInt('escape_time',p:GetNWInt('escape_time')+1)
 				if p:GetNWInt('escape_time') >= 50 then
 					if can_escape then
