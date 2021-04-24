@@ -11,9 +11,9 @@ start_player_police = false
 
 pd2_gamemode_police_spawners = {}
 pd2_ammo = {}
-pd2_random_music = {"razormind", "tick_tock", "searchlights", "utter_chaos", "full_force_forward", "donacdum", "wanted_dead_or_alive", "iwgyma", "sirens_in_the_distance", "shadows_and_trickery", "shoutout", "the_mark", "ho_ho_ho", "dead_mans_hand", "armed_to_the_teeth", "black_yellow_moebius", "backstab", "breach_2015", "calling_all_units", "death_row", "death_wish", "gun_metal_grey_2015", "fuse_box", "locke_and_load", "wheres_the_van", "time_window", "pimped_out_getaway", "8_bits_are_scary", "code_silver_2018", "hot_pursuit", "ode_to_greed", "the_gauntlet"}
+pd2_random_music = {"razormind", "tick_tock", "searchlights", "utter_chaos", "le_castle_vania", "left_in_the_cold", "break_the_rules", "full_force_forward", "donacdum", "wanted_dead_or_alive", "iwgyma", "sirens_in_the_distance", "shadows_and_trickery", "shoutout", "the_mark", "ho_ho_ho", "dead_mans_hand", "armed_to_the_teeth", "black_yellow_moebius", "backstab", "breach_2015", "calling_all_units", "death_row", "death_wish", "gun_metal_grey_2015", "fuse_box", "locke_and_load", "wheres_the_van", "time_window", "pimped_out_getaway", "8_bits_are_scary", "code_silver_2018", "hot_pursuit", "ode_to_greed", "the_gauntlet"}
 
-con3:SetString(pd2_random_music[math.random(1,32)])
+con3:SetString(pd2_random_music[math.random(1,35)])
 
 function police_spawners()
 	con5:SetInt( 0 )
