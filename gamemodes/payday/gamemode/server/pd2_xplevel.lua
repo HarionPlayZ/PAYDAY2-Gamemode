@@ -50,9 +50,11 @@ if game.SinglePlayer() then
 	end
 	function ply:pd2_set_xp(xp)
 		file.Write(singlpath,tostring(xp+tonumber(file.Read(singlpath))))
+		self:pd2_update_level(show)
 	end
 	function ply:pd2_add_xp(xp)
 		file.Write(singlpath,xp)
+		self:pd2_update_level(show)
 	end
 else
 	function ply:pd2_get_xp()
@@ -64,18 +66,18 @@ else
 			end
 		end	
 	end
-	function ply:pd2_set_xp(xp)
+	function ply:pd2_set_xp(xp,show)
 		rewritexp(getxptable_id(self), xp)
-		self:pd2_update_level()
+		self:pd2_update_level(show)
 	end
-	function ply:pd2_add_xp(xp)
+	function ply:pd2_add_xp(xp,show)
 		rewritexp(getxptable_id(self), xp+self:pd2_get_xp())
-		self:pd2_update_level()
+		self:pd2_update_level(show)
 	end
 end
 
 
-function ply:pd2_update_level()
+function ply:pd2_update_level(show)
 	local level = self:GetNWInt("pd2_level_data")
 	local xp = math.min(math.floor(self:pd2_get_xp()/1000), 5050)
 	local i = 0
@@ -87,7 +89,7 @@ function ply:pd2_update_level()
 		i = i-1
 	end
 	self:SetNWInt("pd2_level_data", i)
-	if self:GetNWInt("pd2_level_data") != level then
+	if self:GetNWInt("pd2_level_data") != level and show then
 		self:ChatPrint("You reached a "..tostring(i).." level.")
 	end
 end
@@ -103,11 +105,11 @@ hook.Add("PlayerInitialSpawn", "pd2_player_join_steamid_xp", function(ply)
 			end
 		end
 		if not exist then file.Append(fullpath, "\n"..ply:SteamID64().." 0") end
-		ply:pd2_add_xp(0)
-		if ply:IsListenServerHost() then
-			ply:pd2_set_xp(0)
-			host_id = ply:SteamID64()
-			ply:pd2_add_money(host_xp) 
-		end
+		ply:pd2_update_level(false)
+	end
+	if ply:IsListenServerHost() then
+		ply:pd2_set_xp(0,false)
+		host_id = ply:SteamID64()
+		ply:pd2_add_xp(host_xp,false)
 	end
 end)

@@ -11,14 +11,13 @@ weapon_random_main = {"cw_mp5"}
 weapon_random_second = {"cw_m1911", "cw_makarov", "cw_mr96"}
 weapon_random_swat = {"cw_m3super90", "cw_ar15", "cw_mac11", "cw_g36c", "cw_mp5", "cw_l115"}
 local pd2gang_skins = {{model = "models/player/pd2_chains_p.mdl", exist = false}, {model = "models/player/pd2_dallas_p.mdl", exist = false}, {model = "models/player/pd2_hoxton_p.mdl", exist = false}, {model = "models/player/pd2_wolf_p.mdl", exist = false}}
-random_spawn_p = {}
 
 function pl:PD2SetPolice()
     self:StripWeapons()
     self:StripAmmo()
     self:SetTeam(2)
-	self:SetModel(models_p[GetConVar( "padpd2" ):GetInt()+1])
-	self:SetHealth(health_police[GetConVar( "padpd2" ):GetInt()+1])
+	self:SetModel(models_p[global_dif+1])
+	self:SetHealth(health_police[global_dif+1])
 	self:SetMaxHealth( self:Health() )
 	self:SetArmor(0)
 	local weapon = self:Give(table.Random(weapon_random_swat))
@@ -27,7 +26,7 @@ function pl:PD2SetPolice()
     self:SetRunSpeed(230)
     self:SetNoCollideWithTeammates( true )
     self:SetNoTarget(true)
-    self:SetPos(random_spawn_p[math.random(1,3)])
+    self:SetPos(table.Random(spawner_police))
     self:AllowFlashlight(true)
     if not start_player_police then 
         self:Freeze(true)
@@ -71,21 +70,21 @@ function pl:PD2SetGang()
     local prim_weapon = self:GetNWString('weapon_main')
 		if prim_weapon == '' then 
 			prim_weapon = self:Give(table.Random(weapon_random_main))
-			if IsValid(prim_weapon) then self:GiveAmmo(prim_weapon:Clip1() * 5, prim_weapon:GetPrimaryAmmoType(), true) end
 		else
 			prim_weapon = self:Give(prim_weapon)
 		end
+	if IsValid(prim_weapon) then self:GiveAmmo(prim_weapon:Clip1() * 5, prim_weapon:GetPrimaryAmmoType(), true) end
     local sec_weapon = self:GetNWString('weapon_sec')
 		if sec_weapon == '' then
 			sec_weapon = self:Give(table.Random(weapon_random_second))
-			if IsValid(sec_weapon) then self:GiveAmmo(sec_weapon:Clip1() * 5, sec_weapon:GetPrimaryAmmoType(), true) end
 		else
 			sec_weapon = self:Give(sec_weapon)
-		end   
+		end
+	if IsValid(sec_weapon) then self:GiveAmmo(sec_weapon:Clip1() * 5, sec_weapon:GetPrimaryAmmoType(), true) end
     self:GiveAmmo(2, 55, true)
     self:Give("cw_extrema_ratio_official")
     self:Give("cw_pd2_frag_grenade")
-    self:SetHealth(health_pd2[GetConVar( "padpd2" ):GetInt()+1])
+    self:SetHealth(health_pd2[global_dif+1])
     self:SetMaxHealth( self:Health() )
     local armor = self:GetNWInt('armor_init')
     if armor == 0 then
@@ -101,7 +100,7 @@ function pl:PD2SetGang()
     self:SetRenderMode(1)
     self:GodDisable()
     self:SetNoTarget(false)
-    self:SetPos(vec_p2)
+    self:SetPos(spawner_gang)
     self:SetNoCollideWithTeammates( true )
     self:SetNWInt("havemedkit", 1)
     self:AllowFlashlight(true)
@@ -124,11 +123,12 @@ hook.Add("PlayerSay", "JoinTeams", function( ply, text )
         ply:PD2SetGang()
         ply:EmitSound("pd2_player_join.ogg")
     end
-    if string.lower(text) == "/spectator" then
+    if text == "/spectator" or text == "!spectator" then
     	if ply:Team() == 1 and changeteam == false or ctgang == false then return end
     	ply:SetTeam(1001)
         ply:StripAmmo()
         ply:StripWeapons()
+		ply:Spawn()
     end
 end)
 
