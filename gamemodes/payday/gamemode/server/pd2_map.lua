@@ -13,6 +13,8 @@ hook.Add('pd2_map_spawned','pd2_map_spawned',function()
 	end
 	voted = false
 	ctgang_pd2 = true
+	changeteam = true
+	timer.Stop("ReCreateAssaultPhase")
 	pd2_taskbar_remove()
 end)
 

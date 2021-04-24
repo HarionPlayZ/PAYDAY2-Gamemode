@@ -153,7 +153,7 @@ function pd2_assault_starting()
 			v:SetBodyGroups( "00" )
 		end
 	end
-	RunConsoleCommand("hostname", "PAYDAY 2 ALPHA - DIFFICULTY: "..difs[global_dif+1] )
+	RunConsoleCommand("hostname", "PAYDAY 2 BETA - DIFFICULTY: "..difs[global_dif+1] )
 	con4:SetInt( global_dif )
 	police_spawners()
 	con2:SetInt( 2 )

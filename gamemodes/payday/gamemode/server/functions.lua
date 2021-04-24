@@ -1,3 +1,14 @@
+RunConsoleCommand( "bleedout_shouldtakedmg", 0)
+RunConsoleCommand( "bleedout_enable_bleeding", 0)
+RunConsoleCommand( "bleedout_death_time", 30)
+RunConsoleCommand( "bleedout_revive_time", 5)
+RunConsoleCommand( "bleedout_num_bleedouts", 3)
+RunConsoleCommand( "bleedout_notarget", 1)
+RunConsoleCommand( "bleedout_moving_enable", 0)
+RunConsoleCommand( "bleedout_view_draw_body", 0)
+RunConsoleCommand( "bleedout_sound_enable", 0)
+RunConsoleCommand( "bleedout_shouldshoot", 0)
+
 local ply = FindMetaTable("Player")
 local ent = FindMetaTable('Entity')
 
@@ -57,9 +68,6 @@ local all_escape = true
 		if v:Team() == 1 then all_escape = false end
 	end
 	if all_escape then
-		for i,p in pairs(player.GetAll()) do
-			timer_Map(25, function() p:ScreenFade( SCREENFADE.OUT, Color( 0, 0, 0, 255 ), 4, 2 ) end)
-		end
 		timer_Map(30, function() RunConsoleCommand("map", table.Random(maps)) end)
 	end
 end
@@ -82,7 +90,7 @@ function start_display_time()
 	net.Start('start_display_time')
 	net.Send(player.GetAll())
 	for k, v in pairs(player.GetAll()) do
-		timer.Simple(0, function() v:SetNWBool("pd2dif", true) v:ConCommand("pd2_hud_enable 0") end)
+		timer_Map(0, function() v:SetNWBool("pd2dif", true) v:ConCommand("pd2_hud_enable 0") RunConsoleCommand("pd2_assaultphases_server_assaultphase", 1) end)
 		timer_Map(5, function() v:SetNWBool("pd2dif", false) v:ConCommand("pd2_hud_enable 1") end)
 	end
 end
@@ -111,7 +119,7 @@ timer.Create("killteam1", 2, 1, function()
 	end
 end)
 
-timer.Create("PD2KillIfAllBleedout", 0, 1, function()
+hook.Add("PD2KillIfAllBleedout", "Think", function()
    -- Парсим всех игроков и заносим в таблицу validate_players всех игроков с тимой 1
    local all_players = player.GetAll()
    local validate_players = {}
