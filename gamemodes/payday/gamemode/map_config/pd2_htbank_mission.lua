@@ -23,12 +23,13 @@ local function start_escape(id)
 		timer_Map(30,function() playsound(player.GetAll(),'pd2_bain_van_30.mp3') end)
 		timer_Map(60,function()
 			playsound(player.GetAll(),'pd2_bain_van_0.mp3')
+			pd2_taskbar_display_all('ESCAPE WITH MONEY',277)
 			for i,ent in pairs(ents.FindByName('van_escape1')) do ent:Fire('Enable') end
 		end)	
 	end
 	if id == 2 and not can_escape then 
 		can_escape = true
-		pd2_taskbar_display_all('YOU CAN ESCAPE')
+		pd2_taskbar_display_all('YOU CAN ESCAPE',200)
 	end
 end
 
@@ -36,14 +37,13 @@ timer.Create('escape_zone',0,0.1,function()
 local ent_table = ents.FindInBox(Vector(-2120, -794, -1015),Vector(-2140, -725, -1000))
 	for i,p in pairs(ent_table) do
 		if p:IsPlayer() then
-			if p:Alive() then
+			if p:Alive() and p:Team()==2 then
 				p:SetNWInt('escape_time',p:GetNWInt('escape_time')+1)
-				if p:GetNWInt('escape_time') >= 50 and can_escape then
-					p:SetPos(Vector(3740, 2893, -471))
-					p:SetEyeAngles(Angle(0,0,0))
-					if not game_win then
-						startending()
-						game_win = true
+				if p:GetNWInt('escape_time') >= 50 then
+					if can_escape then
+						hook.Call('escape',nil,p)
+					else
+						p:ChatPrint('you need more money bags: '..tostring(money_count-4))
 					end
 				end
 				if p:GetNWBool('money') then
@@ -65,7 +65,7 @@ hook.Add( "AcceptInput", "pd2_htbank_mission", function( ent, name, activator, c
 	if ent:GetName() == "button_start" then
 		timer_Map(60,function()
 			ents.FindByName('tele_start')[1]:Fire('Enable')
-			pd2_taskbar_display_all("PLACE DRILL ON VAULT",300)  
+			pd2_taskbar_display_all("PLACE DRILL ON VAULT",304)  
 			start_display_time() 
 			set_start_time(CurTime()) 
 			guard_spawners()
@@ -80,8 +80,7 @@ hook.Add( "AcceptInput", "pd2_htbank_mission", function( ent, name, activator, c
 		pd2_assault_starting()
 		timer_Map(5,function() playsound(player.GetAll(),'pd2_bain_police_40.mp3') end)
 		timer_Map(200,function() sniper_spawners() end)
-		timer_Map(360,function() hook.Call('dril_comlited') end)
-		-- timer_Map(5,function() hook.Call('dril_comlited') end)
+		timer_Map(360+global_dif*30,function() hook.Call('dril_comlited') end)
 		ent:Remove()
 	end
 	if ent:GetName() == "money_button" then
@@ -102,3 +101,8 @@ hook.Add('dril_comlited','pd2_htbank_mission',function(id)
 	dril:StopSound('pd2_td.wav')
 	dril:Remove()
 end)
+
+hook.Add('escape','pd2_warehouse_mission',function(ply)
+	ply:SetPos(Vector(3740, 2893, -471))
+	ply:SetEyeAngles(Angle(0,0,0))
+end)				

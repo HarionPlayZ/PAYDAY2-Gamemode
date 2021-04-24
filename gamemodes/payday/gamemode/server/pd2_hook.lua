@@ -32,6 +32,7 @@ local commandtable = {
 
 util.AddNetworkString('padpd2')
 hook.Add("PlayerSay", "VoteDifficultyPD2", function( ply, text )
+	local txt = string.Split(text,' ')
 	if text == '/dif' or text == '!dif' then
 		ply:ChatPrint('Difficulty: '..difs[global_dif+1])
 	end
@@ -43,10 +44,9 @@ hook.Add("PlayerSay", "VoteDifficultyPD2", function( ply, text )
 			ply:ChatPrint(c)
 		end
 	end
+	if txt[1] == '/votedif' or txt[1] == '!votedif' then
 	if voted then ply:ChatPrint('voted complited') return end
 	if not ctgang_pd2 then ply:ChatPrint('voted complited') return end
-	local txt = string.Split(text,' ')
-	if txt[1] == '/votedif' or txt[1] == '!votedif' then
 		local arg = tonumber(txt[2])
 		if not isnumber(arg) then arg = 0 end
 		if arg < 0 then arg = 0 end
@@ -66,4 +66,14 @@ end)
 
 hook.Add('PD2AlarmStealth', 'cam_alarm', function()
 	for k, v in pairs(ents.FindByClass("pd2_camera")) do v.Active = false end
+end)
+
+hook.Add('escape','escape',function(ply)
+	ply:pd2_taskbar_remove()
+	ply:stop_display_time()
+	ply:SetNWBool('escape',true)
+	ply:SetTeam(1001)
+	ply:StripAmmo()
+    ply:StripWeapons()
+	startending()
 end)

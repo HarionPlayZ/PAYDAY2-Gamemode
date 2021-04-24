@@ -147,6 +147,9 @@ hook.Add("PlayerSpawn", "PD2PoliceGiver", function(ply)
 	if ply:Team() == 1 then
 		ply:PD2SetGang()
     end
+	net.Start('padpd2')
+	net.WriteInt(global_dif,4)
+	net.Send(ply)
     return false
 end)
 

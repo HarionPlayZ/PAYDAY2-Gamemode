@@ -39,8 +39,8 @@ hook.Add("HUDPaint", "IconOfPrisonpd2", function()
 		surface.SetDrawColor( 0, 0, 0, 255 ) -- Set the drawing color
 		surface.DrawRect( 0, 0, ScrW(), ScrH() ) -- Actually draw the rectangle
 		
-		draw.SimpleText( dif1[padpd], "pd2", ScrW() * 0.5, ScrH() * 0.45, color1[padpd], TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
-		draw.SimpleText( dif2[padpd], "pd2", ScrW() * 0.5, ScrH() * 0.45+50, Color( 255, 215, 0, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
+		draw.SimpleText( dif1[padpd+1], "pd2", ScrW() * 0.5, ScrH() * 0.45, color1[padpd+1], TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
+		draw.SimpleText( dif2[padpd+1], "pd2", ScrW() * 0.5, ScrH() * 0.45+50, Color( 255, 215, 0, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
 	end
 end)
 

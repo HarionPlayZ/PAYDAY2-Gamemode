@@ -33,6 +33,24 @@ timer.Create('police_light',0.25,0,function()
 	end)
 end)
 
+timer.Create('escape_zone',0,0.1,function()
+local ent_table = ents.FindInBox(Vector(-5185, 2368, 68),Vector(-5345, 2272, 75))
+	for i,p in pairs(ent_table) do
+		if p:IsPlayer() then
+			if p:Alive() and p:Team()==1 then
+				p:SetNWInt('escape_time',p:GetNWInt('escape_time')+1)
+				if p:GetNWInt('escape_time') >= 50 then
+					hook.Call('escape',nil,p)
+				end
+			end
+		end
+	end
+	for i,p in pairs(player.GetAll()) do
+		if not table.HasValue(ent_table,p) and p:Team()==1 then p:SetNWInt('escape_time',0) end
+	end
+end)
+timer.Stop('escape_zone')
+
 hook.Add('pd2_map_spawned','pd2_jewelry_store_mission',function()
 	timer.Stop('police_light')
 	pcb = ents.FindByName('police_car_blue')[1]
@@ -53,6 +71,9 @@ hook.Add( "AcceptInput", "pd2_jewelry_store_mission", function( ent, name, activ
 			pd2_taskbar_display_all("PLACE DRILL ON SAFE",290)  
 			start_display_time() 
 			set_start_time(CurTime()) 
+			for i,p in pairs(player.GetAll()) do
+				p:SetPos(Vector(-5290, 2315, 67))
+			end
 		end)
 	end
 	if ent:GetName() == "drill_button" then
@@ -67,13 +88,14 @@ hook.Add( "AcceptInput", "pd2_jewelry_store_mission", function( ent, name, activ
 		timer_Map(60,function()
 			playsound(player.GetAll(),'pd2_bain_van_0.mp3')
 			ents.FindByName('van_escape')[1]:Fire('Enable')
-			ents.FindByName('tele_trigger1')[1]:Fire('Enable')
 			pd2_taskbar_display_all("YOU CAN ESCAPE",228.5)
-			
+			timer.Start('escape_zone')
 		end)
 		ent:Remove()
 	end
-	if activator:IsPlayer() then
-		if ent:GetName() == "tele_trigger1" and activator:Team() == 2 then return true end
-	end
 end )
+
+hook.Add('escape','pd2_jewelry_store_mission',function(ply)
+	ply:SetPos(Vector(4855, -1345, 60))
+	ply:SetEyeAngles(Angle(0,0,0))
+end)

@@ -367,10 +367,12 @@ CacheAllMusic()
 
 local function StopMusic()
 	if CurrentMusicData then
-		CurrentMusicData.sound:Pause()
-		CurrentMusicData.sound:SetTime(0)
-		
-		CurrentMusicData = nil
+		if CurrentMusicData.sound then
+			CurrentMusicData.sound:Pause()
+			CurrentMusicData.sound:SetTime(0)
+			
+			CurrentMusicData = nil
+		end
 	end
 end
 
@@ -638,7 +640,7 @@ hook.Add("Think","pd2_assaultphases",function()
 			
 			local difficulty = serverphases:GetBool() and sv_asbar_difficulty:GetInt() or asbar_difficulty:GetInt()
 		
-			if difficulty>0 then
+			if 	difficulty>0 then
 				if difficulty>=1 then text = text.."Å " end
 				if difficulty>=2 then text = text.."Å " end
 				if difficulty>=3 then text = text.."Å " end

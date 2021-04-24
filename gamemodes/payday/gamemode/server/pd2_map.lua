@@ -34,5 +34,6 @@ hook.Add( "AcceptInput", "pd2_map", function( ent, name )
 		end
 		spawn = false
 		ent:Remove()
+		ents.FindByName('door_start')[1]:Fire('Toggle')
 	end
 end)

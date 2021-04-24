@@ -20,11 +20,12 @@ hook.Add("PlayerSpawn", "falseifspawnedicon", function(ply)
 end)
 
 hook.Add("PlayerDeath","playerdeath", function(victim, inflictor, attacker)
-	for k, v in pairs (player.GetAll()) do
-		v:ChatPrint(victim:Name() .. langs_pd2['pd2.arrest.player'])
+	for i,p in pairs (player.GetAll()) do
+		p:ChatPrint(victim:Name() .. langs_pd2['pd2.arrest.player'])
 	end
 	local all_death = true
 	local maps = {"pd2_warehouse_mission", "pd2_htbank_mission", "pd2_jewelry_store_mission"}
+	if victim:Team() == 2 then return end
 	for i,p in pairs(player:GetAll())do
 		if p:Team() == 1 then
 			if p:Alive() and p!=victim then all_death = false end
