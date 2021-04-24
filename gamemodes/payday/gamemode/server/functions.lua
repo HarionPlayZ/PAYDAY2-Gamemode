@@ -3,23 +3,30 @@ local ent = FindMetaTable('Entity')
 
 local text1 = "PUT DRILL ON SAFE"
 
-util.AddNetworkString("pd2_net_starters1")
+util.AddNetworkString("pd2_taskbar_display")
+util.AddNetworkString("pd2_taskbar_remove")
 
-function ply:pd2_text()
-	net.Start("pd2_net_starters1")
+function ply:pd2_taskbar_display(txt,size)
+	net.Start("pd2_taskbar_display")
+	net.WriteString(txt)
+	net.WriteInt(size,32)
 	net.Send(self)
 end
 
-function pd2_start_allplayers(txt)
-	for k, v in pairs(player.GetAll()) do
-		v:pd2_text()
-		v:pd2_texts(txt)
+function pd2_taskbar_display_all(txt,size)
+	for i,p in pairs(player.GetAll()) do
+		if p:Team() == 1 then
+			net.Start("pd2_taskbar_display")
+			net.WriteString(txt)
+			net.WriteInt(size,32)
+			net.Send(p)
+		end
 	end
-	text1 = txt
 end
 
-function ply:pd2_texts(txt)
-	self:SetNWString("PD2TextsOBJ", txt)
+function pd2_taskbar_remove()
+	net.Start("pd2_taskbar_remove")
+	net.Send(player.GetAll())
 end
 
 concommand.Add("medkit_use_pd2", function(ply)
@@ -41,12 +48,12 @@ local maps = {"pd2_warehouse_mission", "pd2_htbank_mission", "pd2_jewelry_store_
 function startending()
 	for k, v in pairs(player.GetAll()) do
 		if v:Team() == 1 then
-			local dif = GetConVar('padpd2'):GetInt()+1
+			local dif = global_dif+1
 			v:ChatPrint("Gang escaped! Restart after 30 sec...")
 			timer_Map(25, function() v:ScreenFade( SCREENFADE.OUT, Color( 0, 0, 0, 255 ), 4, 2 ) end)
 			timer_Map(30, function() RunConsoleCommand("map", table.Random(maps)) end)
 			v:pd2_add_money(money_dif_pd2[dif])
-			v:pd2_add_xp(xp_tables[dif])
+			v:pd2_add_xp(xp_tables[dif],true)
 			v:ChatPrint('You earned '..money_dif_pd2[dif]..'$ money.')
 		end
 	end
@@ -84,7 +91,7 @@ timer.Create("killteam1", 2, 1, function()
 	end
 end)
 
-hook.Add( "Think", "PD2KillIfAllBleedout", function()
+timer.Create("PD2KillIfAllBleedout", 0, 1, function()
    -- Парсим всех игроков и заносим в таблицу validate_players всех игроков с тимой 1
    local all_players = player.GetAll()
    local validate_players = {}

@@ -6,46 +6,8 @@ local con5 = GetConVar( "pd2_assaultphases_server_assaultbar_captainenabled" )
 local con7 = GetConVar( "pd2_assaultphases_server_controlduration" )
 
 local timer_c = math.random( 60, 240 )
-local map = game.GetMap()
 
 start_player_police = false
-
-local p_vec_table = {}
-local s_vec_table = {}
-
-if map == "pd2_jewelry_store_mission" then
-	p_vec_table = {Vector(-5835.604980, 810.292603, 68.031250),Vector(-4622.043457, 3271.763184, 68.031250),Vector(-5835.604980, 810.292603, 68.031250),Vector(-4622.043457, 3271.763184, 68.031250)}
-	random_spawn_p = {Vector(-4158.414063, 3250.695801, 68.031250), Vector(-4641.425781, 468.396393, 68.031250), Vector(-5929.043457, 1284.832031, 68.031250)}
-	vec_p2 = Vector(4876.448730, -1681.583130, 68.031250)
-	s_vec_table = {Vector(),Vector()}
-	money_dif_pd2 = {1000, 2500, 5000, 10000, 17500, 25000, 50000}
-	xp_tables = {2000, 5000, 10000, 20000, 37500, 50000, 75000}
-end
-if map == "pd2_warehouse_mission" then
-	p_vec_table = {Vector(3457.714600, 898.945679, 64.031250),Vector(5403.900391, 1574.928101, 64.031250),Vector(3070.912598, 273.047791, 64.031250),Vector(3070.912598, 273.047791, 64.031250)}
-	random_spawn_p = {Vector(3462.708984, 202.040253, 64.031250), Vector(5462.325195, 2032.598511, 64.031250), Vector(5099.486328, 493.386292, 64.031250)}
-	vec_p2 = Vector(-250.250427, 178.540894, -121.968750)
-	s_vec_table = {Vector(),Vector()}
-	money_dif_pd2 = {2000, 5000, 10000, 18750, 30000, 45000, 80000}
-	xp_tables = {4500, 10000, 17500, 35000, 65000, 87500, 150000}
-end
-if map == "pd2_htbank_mission" then
-	p_vec_table = {Vector(2993.843018, -903.920959, -1011.968750),Vector(-2020.054932, -1256.504272, -1015.977905),Vector(373.001007, 3383.392090, -1015.618347),Vector(373.001007, 3383.392090, -1015.618347)}
-	random_spawn_p = {Vector(2253.890625, 3140.556641, -1011.968750), Vector(2096.237305, -796.061829, -1011.981628), Vector(-982.990540, -749.902649, -1011.968750)}
-	vec_p2 = Vector(3849.046631, 2554.394531, -470.968750)
-	s_vec_table = {Vector(-481.048065, -439.249176, -559.968750),Vector(-857.031250, 281.031250, -735.968750)}
-	money_dif_pd2 = {1500, 4000, 7500, 17500, 30000, 42500, 75000}
-	xp_tables = {3000, 7500, 15000, 30000, 55000, 75500, 125000}
-	timer.Simple(0, function()
-		local box = ents.Create('prop_dynamic')
-		box:SetPos(Vector(261.842041, 671.552307, -678.417603))
-		box:SetModel("models/props_wasteland/cargo_container01.mdl")
-		box:SetSolid(SOLID_VPHYSICS)
-		box:SetRenderMode(10)
-		box:SetAngles(Angle(0, 0, 90))
-		box:Spawn()
-	end)
-end
 
 pd2_gamemode_police_spawners = {}
 pd2_ammo = {}
@@ -55,7 +17,7 @@ con3:SetString(pd2_random_music[math.random(1,32)])
 
 function police_spawners()
 	con5:SetInt( 0 )
-	for i,vec in pairs(p_vec_table) do
+	for i,vec in pairs(police_vectable) do
 		local spawnpd = ents.Create("sb_advanced_nextbot_payday2_spawner")
 		spawnpd:SetModel("models/props_junk/sawblade001a.mdl")
 		spawnpd:SetPos( vec )
@@ -71,7 +33,7 @@ function police_spawners()
 		spawnpd.BotsToRemove = {}
 		spawnpd.GroupsToRemove = {}
 		spawnpd.GCTime = 0
-		spawnpd.m_difficulty = GetConVar( "padpd2" ):GetInt()+1
+		spawnpd.m_difficulty = global_dif+1
 		spawnpd.m_maxonmap = maxonmap or 0
 		spawnpd.m_hpdiff = hpdiff or 0
 		spawnpd.m_prof = prof or 0
@@ -88,7 +50,7 @@ function police_spawners()
 end
 
 function sniper_spawners()
-for i,vec in pairs(s_vec_table) do
+for i,vec in pairs(sniper_vectable) do
 	local spawnsniper = ents.Create("sb_advanced_nextbot_payday2_spawner")
 	spawnsniper:SetModel("models/props_junk/sawblade001a.mdl")
 	spawnsniper:SetPos( vec )
@@ -97,6 +59,8 @@ for i,vec in pairs(s_vec_table) do
 	spawnsniper:SetSolid(SOLID_VPHYSICS)
 	spawnsniper:SetCollisionGroup(COLLISION_GROUP_WEAPON)
 	pd2_gamemode_police_spawners[5] = spawnsniper
+	
+	spawnsniper:GetPhysicsObject():EnableMotion(false)
 	
 	spawnsniper.NextSpawn = CurTime()+1
 	spawnsniper.BotsToRemove = {}
@@ -129,6 +93,8 @@ function guard_spawners()
 	spawnguard:SetSolid(SOLID_VPHYSICS)
 	spawnguard:SetCollisionGroup(COLLISION_GROUP_WEAPON)
 	pd2_gamemode_police_spawners[7] = spawnguard
+	
+	spawnguard:GetPhysicsObject():EnableMotion(false)
 	
 	spawnguard.NextSpawn = CurTime()+1
 	spawnguard.BotsToRemove = {}
@@ -187,17 +153,28 @@ function pd2_assault_starting()
 			v:SetBodyGroups( "00" )
 		end
 	end
-	RunConsoleCommand("hostname", "PAYDAY 2 ALPHA - DIFFICULTY: "..difs[GetConVar( "padpd2" ):GetInt()+1] )
-	con4:SetInt( GetConVar( "padpd2" ):GetInt() )
+	RunConsoleCommand("hostname", "PAYDAY 2 ALPHA - DIFFICULTY: "..difs[global_dif+1] )
+	con4:SetInt( global_dif )
 	police_spawners()
 	con2:SetInt( 2 )
-	timer_Map(40, function() pd2_gamemode_police_spawners[1]:Enable() start_player_police = true for k, v in pairs(player.GetAll()) do if v:Team() == 2 then v:Spawn() v:SetNWBool("pd2policestop", false) v:SetRenderMode(1) end end timer.Start("ReCreateAssaultPhase") end)
+	timer_Map(40, function() 
+		pd2_gamemode_police_spawners[3]:Enable() 
+		start_player_police = true 
+			for k, v in pairs(player.GetAll()) do
+				if v:Team() == 2 then 
+					v:Spawn()
+					v:SetNWBool("pd2policestop", false) 
+					v:SetRenderMode(1) 
+				end 
+			end 
+		timer.Start("ReCreateAssaultPhase") 
+	end)
 	timer_Map(110, function() 
 		timer_Map(10, function() con2:SetInt( 3 ) end)
 		for k, v in pairs(player.GetAll()) do v:EmitSound("pd2_bain_armor.mp3") end
+		pd2_gamemode_police_spawners[1]:Enable()
 		pd2_gamemode_police_spawners[2]:Enable()
-		pd2_gamemode_police_spawners[3]:Enable()
-		if GetConVar( "padpd2" ):GetInt() >= 3 then 
+		if global_dif >= 3 then 
 			timer_Map(timer_c, function() 
 				pd2_gamemode_police_spawners[4]:Enable()
 				con5:SetInt( 1 )
@@ -210,16 +187,16 @@ end
 
 timer.Create("ReCreateAssaultPhase", 150, 2, function()
 	con2:SetInt(2)
+	pd2_gamemode_police_spawners[1]:Disable()
 	pd2_gamemode_police_spawners[2]:Disable()
-	pd2_gamemode_police_spawners[3]:Disable()
 	for k, v in pairs(player.GetAll()) do
 		v:EmitSound('pd2_bain_stop_assault.wav')
 		timer_Map(25, function() v:EmitSound('pd2_bain_giveemhell.mp3') end)
 		timer_Map(10, function() v:EmitSound('pd2_bain_morepolice.wav') end)
 		timer_Map(30, function()
 			con2:SetInt(3)
+			pd2_gamemode_police_spawners[1]:Enable()
 			pd2_gamemode_police_spawners[2]:Enable()
-			pd2_gamemode_police_spawners[3]:Enable()
 		end)
 	end
 end)
@@ -230,49 +207,49 @@ function GM:OnNPCKilled(npc, attacker, inflictor)
 	if attacker:IsPlayer() then
 	if npc:GetModel() == "models/payday2/units/captain_player_pd2anim_shield.mdl" then
 		con5:SetInt( 0 )
-		attacker:pd2_add_xp(1000)
+		attacker:pd2_add_xp(1000,true)
 		attacker:ChatPrint("You earned 1000 xp for killing captain!")
 		timer_Map(1, function() attacker:EmitSound("pd2_voice/shield.mp3") end)
 	end
 	if npc:GetModel():match("models/sb_anb_payday2/bulldozer_") then
 		if attacker:Team() == 2 then return true end
-		attacker:pd2_add_xp(200)
+		attacker:pd2_add_xp(200,true)
 		attacker:ChatPrint("You earned 200 xp for killing bulldozer!")
 		timer_Map(1, function() attacker:EmitSound("pd2_voice/bulldozer.mp3") end)
 	end
 	if npc:GetModel():match("models/sb_anb_payday2/cloaker_")then
 		if attacker:Team() == 2 then return true end
-		attacker:pd2_add_xp(250)
+		attacker:pd2_add_xp(250,true)
 		attacker:ChatPrint("You earned 250 xp for killing cloaker!")
 		timer_Map(1, function() attacker:EmitSound("pd2_voice/clocker.mp3") end)
 	end
 	if npc:GetModel():match("taser_player_pd2anim.mdl") then
 		if attacker:Team() == 2 then return true end
-		attacker:pd2_add_xp(75)
+		attacker:pd2_add_xp(75,true)
 		attacker:ChatPrint("You earned 75 xp for killing taser!")
 		timer_Map(1, function() attacker:EmitSound("pd2_voice/taser.mp3") end)
 	end
 	if npc:GetModel() == "models/payday2/units/medic_player_pd2anim.mdl" then
 		if attacker:Team() == 2 then return true end
-		attacker:pd2_add_xp(125)
+		attacker:pd2_add_xp(125,true)
 		attacker:ChatPrint("You earned 125 xp for killing medic!")
 		timer_Map(1, function() attacker:EmitSound("pd2_voice/medic.mp3") end)
 	end
 	if npc:GetModel():match("_player_pd2anim_shield.mdl") then
 		if attacker:Team() == 2 then return true end
-		attacker:pd2_add_xp(25)
+		attacker:pd2_add_xp(25,true)
 		attacker:ChatPrint("You earned 25 xp for killing shield!")
 		timer_Map(1, function() attacker:EmitSound("pd2_voice/shield.mp3") end)
 	end
 	if npc:GetModel() == "models/payday2/units/sniper_swat_player_pd2anim.mdl" then
 		if attacker:Team() == 2 then return true end
-		attacker:pd2_add_xp(500)
+		attacker:pd2_add_xp(500,true)
 		attacker:ChatPrint("You earned 500 xp for killing sniper!")
 		timer_Map(1, function() attacker:EmitSound("pd2_voice/sniper.mp3") end)
 	end	
 	end
 	local ammo_enemy = ents.Create("pd2_ammo")
 	pd2_ammo[1] = ammo_enemy
-	pd2_ammo[1]:SetPos(npc:GetPos())
+	pd2_ammo[1]:SetPos(npc:GetPos()+Vector(0,0,10))
 	pd2_ammo[1]:Spawn()
 end

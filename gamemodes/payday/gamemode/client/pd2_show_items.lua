@@ -1,6 +1,11 @@
 hook.Add("PreDrawOutlines", "PD2_AMMOS_outline", function()
-    local ents = ents.FindByClass("pd2_ammo")
-    outline.Add(ents, Color(255,255,255), 0)
+    local tab = {}
+	for i,ent in pairs(ents.FindByClass("pd2_ammo")) do
+		if LocalPlayer():GetPos():Distance(ent:GetPos())<=500 then
+			table.insert(tab,ent)
+		end
+	end
+    outline.Add(tab, Color(255,255,255), 0)
 end)
 
 hook.Add("PreDrawOutlines", "PD2_PLAYERS_outline", function()
