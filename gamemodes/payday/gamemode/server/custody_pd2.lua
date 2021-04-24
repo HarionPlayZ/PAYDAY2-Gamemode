@@ -20,8 +20,8 @@ hook.Add("PlayerSpawn", "falseifspawnedicon", function(ply)
 end)
 
 hook.Add("PlayerDeath","playerdeath", function(victim, inflictor, attacker)
-	for i,p in pairs (player.GetAll()) do
-		p:ChatPrint(victim:Name() .. langs_pd2['pd2.arrest.player'])
+	for k, v in pairs (player.GetAll()) do
+		v:ChatPrint(victim:Name() .. langs_pd2['pd2.arrest.player'])
 	end
 	local all_death = true
 	local maps = {"pd2_warehouse_mission", "pd2_htbank_mission", "pd2_jewelry_store_mission"}
@@ -34,7 +34,7 @@ hook.Add("PlayerDeath","playerdeath", function(victim, inflictor, attacker)
 	if all_death then
 		timer_Map(10, function() GetConVar( "pd2_assaultphases_server_assaultphase" ):SetInt( 0 ) game.CleanUpMap() end)
 		for k, v in pairs (player.GetAll()) do
-			timer_Map(1, function() if IsValid(v) then v:ChatPrint(langs_pd2['pd2.arrest.players.all']) end end)
+			timer_Map(1, function() if IsValid(v) then v:ChatPrint(langs_pd2['pd2.arrest.players.all']) v:ScreenFade( SCREENFADE.OUT, Color( 0, 0, 0, 255 ), 4, 1 ) end end)
 			if v:Team() == 2 then
 				v:pd2_add_money(1000)
 				v:pd2_add_xp(1000,true)
@@ -60,15 +60,6 @@ hook.Add("PlayerDeathThink","no_respawn", function(ply)
 	if ply:Team() == 2 then return true end
 	if not ply:GetNWBool("cant_respawn") then ply:RemoveAllAmmo() end
 return false end)
-
-concommand.Add("pd2_spawnplayers", function(ply)
-	for i,p in pairs(player.GetAll()) do
-		if not p:Alive() then
-			p:SetNWBool("pd2prison", false)
-		end
-		p:Spawn()
-	end
-end)
 
 hook.Add( "KeyPress", "keypress_spectatepd2", function( ply, key )
 	if ply:Alive() then return end
