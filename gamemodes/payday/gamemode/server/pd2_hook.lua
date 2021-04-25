@@ -69,6 +69,10 @@ hook.Add('PD2AlarmStealth', 'cam_alarm', function()
 	for k, v in pairs(ents.FindByClass("pd2_camera")) do v.Active = false end
 end)
 
+hook.Add( "ShouldCollide", "FNAPC", function( ent1, ent2 )
+    if ( ent1:IsNextBot() and ent2:IsPlayer() and ent2:Team() == 2 ) then return false end
+end )
+
 hook.Add('escape','escape',function(ply)
 	ply:pd2_taskbar_remove()
 	ply:stop_display_time()
