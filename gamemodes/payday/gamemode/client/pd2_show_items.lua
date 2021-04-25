@@ -46,6 +46,18 @@ local function text_3d()
         end
     end
     if LocalPlayer():Team() == 2 then
+        for i,p in pairs(ents.FindByClass("sb_advanced_nextbot_payday2")) do
+            if p:IsNextBot() then
+                local point = p:GetPos() + p:OBBCenter() + Vector(0,0,40)
+                local data2D = point:ToScreen()
+        
+                if not data2D.visible then return end
+
+                draw.SimpleText( "BOT", "nickfont", data2D.x, data2D.y, Color( 0, 0, 205 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
+            end
+        end
+    end
+    if LocalPlayer():Team() == 2 then
         for i,p in pairs(player.GetAll()) do
             if p:Alive() then
                 if p:Team() == 2 and p != LocalPlayer() then

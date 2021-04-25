@@ -1,5 +1,5 @@
 local pl = FindMetaTable("Player")
-local changeteam
+local changeteam = true
 ctgang_pd2 = true
 start_player_police = false
 
@@ -160,6 +160,6 @@ hook.Add( "AcceptInput", "AcceptInput", function( ent, name, activator, caller, 
 	end
 end )
 
-hook.Add('pd2_map_spawned','pd2_map_spawned',function()
+hook.Add('pd2_map_spawned_t','pd2_map_spawned',function()
 	changeteam = true
 end)
