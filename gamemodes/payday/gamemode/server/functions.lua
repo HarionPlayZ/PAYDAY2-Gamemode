@@ -63,18 +63,17 @@ local maps = {"pd2_warehouse_mission", "pd2_htbank_mission", "pd2_jewelry_store_
 
 function startending()
 local all_escape = true
-	for k, v in pairs(player.GetAll()) do
-		if v:GetNWBool('escape') then v:escape() end
-		if v:Team() == 1 then all_escape = false end
+	for i,p in pairs(player.GetAll()) do
+		if p:GetNWBool('escape') then p:escape() end
+		if p:Team() == 1 then all_escape = false end
 	end
 	if all_escape then
-		timer_Map(30, function() RunConsoleCommand("map", table.Random(maps)) end)
+		timer_Map(5, function() RunConsoleCommand("map", table.Random(maps)) end)
 	end
 end
 
 function ply:escape()
 	local dif = global_dif+1
-	self:ChatPrint("Gang escaped! Restart after 30 sec...")
 	self:pd2_add_money(money_dif_pd2[dif])
 	self:pd2_add_xp(xp_tables[dif],true)
 	self:ChatPrint('You earned '..money_dif_pd2[dif]..'$ money.')
@@ -89,9 +88,10 @@ util.AddNetworkString( 'set_start_time'  )
 function start_display_time()
 	net.Start('start_display_time')
 	net.Send(player.GetAll())
-	for k, v in pairs(player.GetAll()) do
-		timer_Map(0, function() v:SetNWBool("pd2dif", true) v:ConCommand("pd2_hud_enable 0") RunConsoleCommand("pd2_assaultphases_server_assaultphase", 1) end)
-		timer_Map(5, function() v:SetNWBool("pd2dif", false) v:ConCommand("pd2_hud_enable 1") end)
+	timer_Map(0, function() RunConsoleCommand("pd2_assaultphases_server_assaultphase", 1) end)
+	for i,p in pairs(player.GetAll()) do
+		timer_Map(0, function() p:SetNWBool("pd2dif", true) p:ConCommand("pd2_hud_enable 0") end)
+		timer_Map(5, function() p:SetNWBool("pd2dif", false) p:ConCommand("pd2_hud_enable 1") end)
 	end
 end
 
@@ -103,12 +103,6 @@ end
 function ply:stop_display_time()
 	net.Start('stop_display_time')
 	net.Send(self)
-end
-
-function set_start_time(time)
-	net.Start('set_start_time')
-	net.WriteInt(time, 32)
-	net.Send(player.GetAll())
 end
 
 timer.Create("killteam1", 2, 1, function()

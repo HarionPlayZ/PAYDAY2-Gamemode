@@ -9,17 +9,12 @@ local function TimerDisplay()
     draw.SimpleText( timer_t, "timer_font", ScrW() * 0.51, ScrH() * 0.025 -offset, Color(255,255,255,255),TEXT_ALIGN_CENTER,TEXT_ALIGN_TOP)
 end
 
-function start_display_time()
-	hook.Add("HUDPaint","TimerPD2",TimerDisplay)
-end
-net.Receive( 'start_display_time', start_display_time )
+net.Receive( 'start_display_time', function()
+timertime = CurTime()
+hook.Add("HUDPaint","TimerPD2",TimerDisplay)
+end )
 
 function stop_display_time()
 	hook.Remove("HUDPaint","TimerPD2")
 end
 net.Receive( 'stop_display_time', stop_display_time )
-
-net.Receive( 'set_start_time', function()
-	local time = net.ReadInt(32)
-	timertime = time
-end )

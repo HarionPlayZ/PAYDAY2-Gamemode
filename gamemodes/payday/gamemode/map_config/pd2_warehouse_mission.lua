@@ -5,12 +5,11 @@ sniper_vectable = {Vector(),Vector()}
 money_dif_pd2 = {2000, 5000, 10000, 18750, 30000, 45000, 80000}
 xp_tables = {4500, 10000, 17500, 35000, 65000, 87500, 150000}
 
-hook.Add('dril_comlited','pd2_warehouse_mission',function(id)
-	ents.FindByName('door_vault')[1]:Fire('Open')
-	pd2_taskbar_display_all('TAKE CASES',168)
+local case,case2
+hook.Add('pd2_map_spawned','pd2_htbank_mission',function()
+	case = false
+	timer.Stop('escape_zone')
 end)
-
-local case
 
 timer.Create('escape_zone',0,0.1,function()
 local ent_table = ents.FindInBox(Vector(3855,2565,-64),Vector(4050, 2280, -46))
@@ -18,8 +17,12 @@ local ent_table = ents.FindInBox(Vector(3855,2565,-64),Vector(4050, 2280, -46))
 		if p:IsPlayer() then
 			if p:Alive() and p:Team()==1 then
 				p:SetNWInt('escape_time',p:GetNWInt('escape_time')+1)
-				if p:GetNWInt('escape_time') >= 50 then
-					hook.Call('escape',nil,p)
+				if p:GetNWInt('escape_time') >= 50 and case then
+					if case2 then 
+						hook.Call('escape',nil,p)
+					else
+						hook.Call('escape',nil,p,(global_dif+1)*300)
+					end
 				end
 				if p:GetNWBool('case') then
 					p:SetNWBool('case',false)
@@ -33,25 +36,24 @@ local ent_table = ents.FindInBox(Vector(3855,2565,-64),Vector(4050, 2280, -46))
 end)
 timer.Stop('escape_zone')
 
+hook.Add('dril_comlited','pd2_warehouse_mission',function(id)
+	ents.FindByName('door_vault')[1]:Fire('Open')
+	pd2_taskbar_display_all('TAKE CASES',168)
+end)
+
 hook.Add( "AcceptInput", "pd2_warehouse_mission", function( ent, name, activator, caller, data )
-    if ent:GetName() == "button_start" then
-		timer_Map(60, function() 
-			gang_spawner()
-			pd2_taskbar_display_all('HACK THE DOOR',212)
-			start_display_time() 
-			set_start_time(CurTime()) 
-		end)
-	end
+	if not activator:IsPlayer() then return end
+	if activator:Team()!=1 then return end
 	if ent:GetName() == "drill_button" then
 		pd2_taskbar_display_all("WAIT AND DEFEND",240)
-		dril_spawn(Vector(3540, -794, 104),Angle(0,0,0),'dril',300+global_dif*60)
+		dril_spawn(Vector(3540, -794, 104),Angle(0,0,0),'dril',300)
 		ent:Remove()
 	end
 	if ent:GetName() == "case_button" then
 		if not activator:GetNWBool('case') then
 			ents.FindByName('case')[1]:Fire('Kill')
 			activator:SetNWBool('case',true)
-			if case then ent:Remove() end
+			if case then ent:Remove() case2 = true end
 			case = true
 			timer.Start('escape_zone')
 			pd2_taskbar_display_all('YOU CAN ESCAPE',228)
@@ -87,6 +89,17 @@ hook.Add( "AcceptInput", "pd2_warehouse_mission", function( ent, name, activator
 	end
 end )
 
+hook.Add('game_start','pd2_warehouse_mission',function()
+	timer_Map(60,function()
+		for i,p in pairs(gang_table) do	
+			p:SetPos(Vector(3780, 2450, -63) + Vector( math.Rand( -1, 1 ), math.Rand( -1, 1 ), 0 ) * 60)
+			p:SetEyeAngles(Angle(0,0,0))
+		end
+		pd2_taskbar_display_all('HACK THE DOOR',212)
+		start_display_time()
+		gang_spawner()
+	end)
+end)
 
 hook.Add('escape','pd2_warehouse_mission',function(ply)
 	ply:SetPos(Vector(-330, 505, -122))

@@ -30,15 +30,6 @@ timer.Create('Dril',1,0,function()
 	end
 end)
 
-hook.Add( "PlayerUse", "some_unique_name2", function( ply, dril )
-	if dril:GetModel()=='models/pd2_drill/drill.mdl' then
-		if dril:GetNWBool('break') then
-			dril.repair = dril.repair + 1
-			if dril.repair > 300 then dril_repair(dril) end
-		end
-	end
-end )
-
 function dril_break(dril)
 dril:SetNWBool('break',true) 
 dril:SetNWFloat('break_time',CurTime())
@@ -61,3 +52,13 @@ dril:Remove()
 hook.Call('dril_comlited',nil,dril.id)
 if IsValid(spark) then spark:Remove() end
 end
+
+hook.Add( "PlayerUse", "dril", function( ply, dril )
+	if dril:GetModel()=='models/pd2_drill/drill.mdl' then
+		if dril:GetNWBool('break') then	
+			ply:ChatPrint(math.floor(dril.repair/300*100))
+			dril.repair = dril.repair + 1
+			if dril.repair > 300 then dril_repair(dril) end
+		end
+	end
+end )

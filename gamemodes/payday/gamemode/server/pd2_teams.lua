@@ -105,31 +105,34 @@ function pl:PD2SetGang()
     self:SetNWInt("havemedkit", 1)
     self:AllowFlashlight(true)
 end
-
+function pl:PD2SetSpectator()
+	self:SetTeam(1001)
+	self:StripAmmo()
+	self:StripWeapons()
+	self:Spawn()
+end
 
 hook.Add("PlayerSay", "JoinTeams", function( ply, text )
-    if text == "/police" or text == "!police" then
-    	if GetConVar("policejoin"):GetInt() == 1 then ply:ChatPrint("Host disabled police team!") return end
-    	if ply:Team() == 1 and not changeteam then ply:ChatPrint("You cant change team on police, when game started and you gangster!") return true end
-        timer.Simple(0, function() ply:Spawn() end)
-        ply:PD2SetPolice()
-        ply:EmitSound("pd2_player_join.ogg")
-    end
-    if text == "/gang" or text == "!gang" then
-        if voted == false then ply:ChatPrint('Difficulty not choosed!') return end
-        if ply:Team() == 1 then return true end
-    	if not changeteam then ply:ChatPrint("You cant change team, when game started!") return true end
-        timer.Simple(0, function() ply:Spawn() end)
-        ply:PD2SetGang()
-        ply:EmitSound("pd2_player_join.ogg")
-    end
-    if text == "/spectator" or text == "!spectator" then
-    	if ply:Team() == 1 and not changeteam or ctgang == false then return end
-    	ply:SetTeam(1001)
-        ply:StripAmmo()
-        ply:StripWeapons()
-		ply:Spawn()
-    end
+	if text == "/police" or text == "!police" then
+		if GetConVar("policejoin"):GetInt() == 1 then ply:ChatPrint("Host disabled police team!") return end
+		if ply:Team() == 1 and not changeteam then ply:ChatPrint("You cant change team on police, when game started and you gangster!") return true end
+		timer.Simple(0, function() ply:Spawn() end)
+		ply:PD2SetPolice()
+		ply:EmitSound("pd2_player_join.ogg")
+	end
+	if text == "/gang" or text == "!gang" then
+		if voted == false then ply:ChatPrint('Difficulty not choosed!') return end
+		if ply:Team() == 1 then return true end
+		if not changeteam then ply:ChatPrint("You cant change team, when game started!") return true end
+		timer.Simple(0, function() ply:Spawn() end)
+		ply:PD2SetGang()
+		ply:EmitSound("pd2_player_join.ogg")
+	end
+	if text == "/spectator" or text == "!spectator" then
+		if changeteam or ctgang then
+			ply:PD2SetSpectator()
+		end
+	end
 end)
 
 hook.Add("PlayerSpawn", "PD2PoliceGiver", function(ply)
@@ -153,13 +156,11 @@ hook.Add("PlayerSpawn", "PD2PoliceGiver", function(ply)
     return false
 end)
 
-hook.Add( "AcceptInput", "AcceptInput", function( ent, name, activator, caller, data )
-	if ent:GetName() == "button_start" and name == "Use" then
-		ctgang_pd2 = false
-		timer_Map(60, function() changeteam = false end)
-	end
+hook.Add( "game_start", "teams", function()
+	ctgang_pd2 = false
+	timer_Map(60, function() changeteam = false end)
 end )
 
-hook.Add('pd2_map_spawned_t','pd2_map_spawned',function()
+hook.Add('pd2_map_spawned','team',function()
 	changeteam = true
 end)

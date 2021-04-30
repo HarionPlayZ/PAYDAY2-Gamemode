@@ -58,27 +58,29 @@ hook.Add("PlayerSay", "VoteDifficultyPD2", function( ply, text )
 		net.WriteInt(arg,4)
 		net.Send(player.GetAll())
 		voted = true
-		for k, v in pairs(player.GetAll()) do
-			v:ChatPrint('Player choosed difficulty: '..difs[arg+1])
-			v:EmitSound('Friends/friend_online.wav')
+		for i,p in pairs(player.GetAll()) do
+			p:ChatPrint('Player choosed difficulty: '..difs[arg+1])
+			p:EmitSound('Friends/friend_online.wav')
 		end
 	end
 end)
 
 hook.Add('PD2AlarmStealth', 'cam_alarm', function()
-	for k, v in pairs(ents.FindByClass("pd2_camera")) do v.Active = false end
+	for i,cam in pairs(ents.FindByClass("pd2_camera")) do cam.Active = false end
 end)
 
 hook.Add( "ShouldCollide", "FNAPC", function( ent1, ent2 )
     if ( ent1:IsNextBot() and ent2:IsPlayer() and ent2:Team() == 2 ) then return false end
 end )
 
-hook.Add('escape','escape',function(ply)
+hook.Add('escape','escape',function(ply,money)
 	ply:pd2_taskbar_remove()
 	ply:stop_display_time()
 	ply:SetNWBool('escape',true)
 	ply:SetTeam(1001)
 	ply:StripAmmo()
     ply:StripWeapons()
+	ply:ConCommand('pd2_hud_enable 0')
+	ply:pd2_add_money(money or 0)
 	startending()
 end)

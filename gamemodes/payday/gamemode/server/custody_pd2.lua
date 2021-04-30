@@ -6,7 +6,6 @@ langs_pd2 = {}
 local ru_lang = {}
 local en_lang = {}
 
-
 ru_lang['pd2.arrest.player'] = ' под стражей!'
 en_lang['pd2.arrest.player'] = ' in custody!'
 
@@ -20,45 +19,51 @@ hook.Add("PlayerSpawn", "falseifspawnedicon", function(ply)
 end)
 
 hook.Add("PlayerDeath","playerdeath", function(victim, inflictor, attacker)
-	for k, v in pairs (player.GetAll()) do
-		v:ChatPrint(victim:Name() .. langs_pd2['pd2.arrest.player'])
+	for i,p in pairs (player.GetAll()) do
+		p:ChatPrint(victim:Name() .. langs_pd2['pd2.arrest.player'])
 	end
-	local all_death = true
-	local maps = {"pd2_warehouse_mission", "pd2_htbank_mission", "pd2_jewelry_store_mission"}
-	if victim:Team() == 2 then return end
-	for i,p in pairs(player:GetAll())do
-		if p:Team() == 1 then
-			if p:Alive() and p!=victim then all_death = false end
-		end
-	end
-	if all_death then
-		timer_Map(10, function() GetConVar( "pd2_assaultphases_server_assaultphase" ):SetInt( 0 ) game.CleanUpMap() end)
-		for k, v in pairs (player.GetAll()) do
-			timer_Map(1, function() if IsValid(v) then v:ChatPrint(langs_pd2['pd2.arrest.players.all']) v:ScreenFade( SCREENFADE.OUT, Color( 0, 0, 0, 255 ), 4, 1 ) end end)
-			if v:Team() == 2 then
-				v:pd2_add_money(1000)
-				v:pd2_add_xp(1000,true)
-				v:ChatPrint('Good job! You earned 1000$ and 1000 xp.')
+	if victim:Team() == 1 then
+		-- local maps = {"pd2_warehouse_mission", "pd2_htbank_mission", "pd2_jewelry_store_mission"}
+		local all_death = true
+		for i,p in pairs(player:GetAll())do
+			if p:Team() == 1 then
+				if p:Alive() and p!=victim then all_death = false break end
 			end
-		v:UnSpectate()
 		end
-	end
-	if IsValid(victim) then
-		if victim:Team() == 2 then timer_Map(10, function() victim:Spawn() end) return true end
-		if victim:Team() == 1001 then timer_Map(1, function() victim:Spawn() end) return true end
-		victim:SetNWBool("cant_respawn", true)
-		victim:Spectate(5)
-		victim:SetObserverMode(5)
-		victim:SetNWBool("pd2prison", true)
-		victim:EmitSound("custody.mp3")
-		victim:SetTeam(1001)
+		if all_death then
+			timer_Map(5, function() GetConVar( "pd2_assaultphases_server_assaultphase" ):SetInt( 0 ) game.CleanUpMap() end)
+			for i,p in pairs (player.GetAll()) do
+				if p:Team() == 2 then
+					p:pd2_add_money(1000)
+					p:pd2_add_xp(1000,true)
+					p:ChatPrint('Good job! You earned 1000$ and 1000 xp.')
+				end
+			p:UnSpectate()
+			end
+			timer_Map(1, function() 
+				for i,p in pairs (player.GetAll()) do
+					p:ChatPrint(langs_pd2['pd2.arrest.players.all']) 
+					p:ScreenFade( SCREENFADE.OUT, Color( 0, 0, 0, 255 ), 4, 1 ) 
+				end
+			end)
+		end
+		if IsValid(victim) then
+			if victim:Team() == 2 then timer_Map(10, function() victim:Spawn() end) end
+			if victim:Team() == 1001 then timer_Map(0, function() victim:Spawn() end) end
+			if victim:Team() == 1 then
+				victim:SetNWBool("cant_respawn", true)
+				victim:Spectate(5)
+				victim:SetObserverMode(5)
+				victim:SetNWBool("pd2prison", true)
+				victim:EmitSound("custody.mp3")
+				victim:SetTeam(1001)
+			end
+		end
 	end
 end)
 
-hook.Add("PlayerDeathThink","no_respawn", function(ply)
-	if not IsFirstTimePredicted() then return end
-	if ply:Team() == 2 then return true end
-	if not ply:GetNWBool("cant_respawn") then ply:RemoveAllAmmo() end
+hook.Add("PlayerDeathThink","no_respawn", function()
+	-- if not ply:GetNWBool("cant_respawn") then ply:RemoveAllAmmo() end
 return false end)
 
 hook.Add( "KeyPress", "keypress_spectatepd2", function( ply, key )

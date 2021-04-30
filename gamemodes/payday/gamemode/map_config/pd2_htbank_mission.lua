@@ -14,8 +14,14 @@ timer.Simple(0, function()
 	box:Spawn()
 end)
 
-local dril,can_escape,game_win
-local money_count = 6
+local dril,can_escape,money_count,door_safe2
+hook.Add('pd2_map_spawned','pd2_htbank_mission',function()
+	door_safe2 = false
+	can_escape = false
+	money_count = 6
+	timer.Stop('escape_zone')
+end)
+
 local function start_escape(id)
 	if id == 1 then
 		timer.Start('escape_zone')
@@ -41,7 +47,7 @@ local ent_table = ents.FindInBox(Vector(-2120, -794, -1015),Vector(-2140, -725, 
 				p:SetNWInt('escape_time',p:GetNWInt('escape_time')+1)
 				if p:GetNWInt('escape_time') >= 50 then
 					if can_escape then
-						hook.Call('escape',nil,p)
+						hook.Call('escape',nil,p,(global_dif+1)*100*(4-money_count))
 					else
 						p:ChatPrint('you need more money bags: '..tostring(money_count-4))
 					end
@@ -61,48 +67,80 @@ local ent_table = ents.FindInBox(Vector(-2120, -794, -1015),Vector(-2140, -725, 
 end)
 timer.Stop('escape_zone')
 
-hook.Add( "AcceptInput", "pd2_htbank_mission", function( ent, name, activator, caller, data )
-	if ent:GetName() == "button_start" then
-		timer_Map(60,function()
-			ents.FindByName('tele_start')[1]:Fire('Enable')
-			pd2_taskbar_display_all("PLACE DRILL ON VAULT",304)  
-			start_display_time() 
-			set_start_time(CurTime()) 
-			guard_spawners()
-		end)
+hook.Add('dril_comlited','pd2_htbank_mission',function(id)
+	if id == 'dril' then
+		door_safe2 = true
+		ents.FindByName('drill_spark')[1]:Fire('StopSpark')
+		ents.FindByName('door_safe1')[1]:Fire('Open')
+		dril:StopSound('pd2_td.wav')
+		dril:Remove()
+		ents.FindByName('drill_spark')[1]:Remove()
+	else
+		pd2_taskbar_display_all('TAKE MONEY',175)
+		local door = ents.FindByName('door_safe2')[1]
+		door:Fire('Unlock')
 	end
+end)
+
+hook.Add( "AcceptInput", "pd2_htbank_mission", function( ent, name, activator )
+	if not activator:IsPlayer() then return end
+	if activator:Team()!=1 then return end
 	if ent:GetName() == "drill_button" then
-		dril = ents.FindByName('thermadrill_model')[1]
+		dril = ents.Create( "prop_dynamic" )
+		dril:SetModel( "models/payday2/equipments/thermadrill.mdl" )
+		dril:SetPos( Vector( 664, 1221, -979 ) )
+		dril:SetAngles( Angle( 0, 0, 0 ) )
+		dril:Spawn()
 		dril:EmitSound("pd2_td.wav")
-		dril:Fire('Enable')
-		pd2_taskbar_display_all('WAIT AND DEFEND',242)
 		ents.FindByName('drill_spark')[1]:Fire('StartSpark')
+		pd2_taskbar_display_all('WAIT AND DEFEND',242)
 		pd2_assault_starting()
 		timer_Map(5,function() playsound(player.GetAll(),'pd2_bain_police_40.mp3') end)
 		timer_Map(200,function() sniper_spawners() end)
-		timer_Map(360+global_dif*30,function() hook.Call('dril_comlited') end)
+		timer_Map(360,function() hook.Call('dril_comlited',nil,'dril') end)
 		ent:Remove()
-	end
+	return end
 	if ent:GetName() == "money_button" then
 		if not activator:GetNWBool('money') then
 			ents.FindByName('moneys')[1]:Fire('Kill')
 			activator:SetNWBool('money',true)
 			if money_count == 1 then ent:Remove() end
 			if money_count == 6 then start_escape(1) end
-			money_count =  money_count - 1
+			money_count = money_count - 1
 		end
+	return end
+	if ent:GetName() == "door_safe2" and door_safe2 then
+		dril_spawn(Vector(565, 1195, -970),Angle(0,180,0),'dril2',180)
+		door_safe2 = false
 	end
+	if ent:GetName() == "wall_trigger" and activator:Team()==1 then
+		local wall
+		for i,ent2 in pairs(ents.FindInSphere(ent:GetPos(),10)) do
+			if ent2:GetClass()=='func_brush' then wall = ent2 end
+		end
+		if IsValid(wall) then
+			if name=='FireUser1' then
+				wall:Fire('Enable')
+			else
+				wall:Fire('Disable')
+			end
+		end
+	return end
+end)				
+
+hook.Add('game_start','pd2_htbank_mission',function()
+	timer_Map(60,function()
+		for i,p in pairs(gang_table) do	
+			p:SetPos(Vector(-2055, -590, -1014) + Vector( math.Rand( -1, 1 ), math.Rand( -1, 1 ), 0 ) * 100)
+			p:SetEyeAngles(Angle(0,0,0))
+		end
+		pd2_taskbar_display_all("PLACE DRILL ON VAULT",304)  
+		start_display_time() 
+		guard_spawners()
+	end)
 end)
 
-hook.Add('dril_comlited','pd2_htbank_mission',function(id)
-	pd2_taskbar_display_all('TAKE MONEY',175)
-	ents.FindByName('drill_spark')[1]:Fire('StopSpark')
-	ents.FindByName('door_safe1')[1]:Fire('Open')
-	dril:StopSound('pd2_td.wav')
-	dril:Remove()
-end)
-
-hook.Add('escape','pd2_warehouse_mission',function(ply)
+hook.Add('escape','pd2_htbank_mission',function(ply)
 	ply:SetPos(Vector(3740, 2893, -471))
 	ply:SetEyeAngles(Angle(0,0,0))
-end)				
+end)

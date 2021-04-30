@@ -253,3 +253,7 @@ function GM:OnNPCKilled(npc, attacker, inflictor)
 	pd2_ammo[1]:SetPos(npc:GetPos()+Vector(0,0,10))
 	pd2_ammo[1]:Spawn()
 end
+
+hook.Add('pd2_map_spawned','pd2_assault_settings',function()
+	pd2_gamemode_police_spawners = {}
+end)
