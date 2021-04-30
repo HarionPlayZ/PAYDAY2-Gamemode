@@ -74,7 +74,7 @@ hook.Add('dril_comlited','pd2_htbank_mission',function(id)
 		ents.FindByName('door_safe1')[1]:Fire('Open')
 		dril:StopSound('pd2_td.wav')
 		dril:Remove()
-		ents.FindByName('drill_spark')[1]:Remove()
+		ents.FindByName('drill_spark')[1]:Remove()	
 	else
 		pd2_taskbar_display_all('TAKE MONEY',175)
 		local door = ents.FindByName('door_safe2')[1]
