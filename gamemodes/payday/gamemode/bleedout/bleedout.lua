@@ -601,11 +601,9 @@ if SERVER then
 			if time1 != 0 and v:IsBeingReviving() == false then
 				local time2 = time1 + convar5:GetInt()
 				if time >= time2 then
-					if !IsValid(v:GetAttacker()) then
-						v:Kill()
-						v:GodDisable()
-						v:Revive()
-					end
+					v:Kill()
+					v:GodDisable()
+					v:Revive()
 				end
 			end
 		end
