@@ -24,8 +24,8 @@ SWEP.NPCSpreadDegrees = 2
 SWEP.NPCBurstMin = 1
 SWEP.NPCBurstMax = 1
 SWEP.NPCBurstDelay = 0
-SWEP.NPCRestMin = 2
-SWEP.NPCRestMax = 3
+SWEP.NPCRestMin = 5
+SWEP.NPCRestMax = 5
 
 if SERVER then return end
 

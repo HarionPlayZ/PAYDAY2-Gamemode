@@ -12,6 +12,8 @@ local team_max = CreateConVar("pd2_hud_team_max","3",bit.bor(FCVAR_ARCHIVE,FCVAR
 local team_offset = CreateConVar("pd2_hud_team_offset","50 -50",FCVAR_ARCHIVE,"Offset of teammates HUD. Format same as in pd2_hud_offset.")
 local team_scale = CreateConVar("pd2_hud_team_scale","0.5",bit.bor(FCVAR_ARCHIVE,FCVAR_NEVER_AS_STRING),"Scale of teammates HUD.",0)
 
+local pd2_dmgsys_armorres_sound = CreateConVar("pd2_dmgsys_armorres_sound","1",FCVAR_ARCHIVE,"Enables/Disables armor restore sound in PAYDAY 2 Damage System.",0,1)
+
 local team_custom = CreateConVar("pd2_hud_team_custom","1",FCVAR_REPLICATED,"Enables teammates from pd2_hud_teammates menu. Disable this and overwrite pd2_hud_GetTeammates function to make custom behaviour.",0,1)
 local allow_hitmarker = CreateConVar("pd2_hud_allow_hitmarker","1",FCVAR_REPLICATED,"Allows hit markers.",0,1)
 local allow_damageind = CreateConVar("pd2_hud_allow_damageind","1",FCVAR_REPLICATED,"Allows damage indicators.",0,1)
@@ -766,4 +768,10 @@ concommand.Add("pd2_hud_teammates",function(ply,cmd,args,argstr)
 	end
 	
 	
+end)
+
+net.Receive("pd2_dmgsys",function(len)
+	if pd2_dmgsys_armorres_sound:GetBool() then
+		surface.PlaySound("pd2_dmgsys/1d0bc9a4.mp3")
+	end
 end)
