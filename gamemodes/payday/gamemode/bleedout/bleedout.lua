@@ -480,7 +480,7 @@ function PLAYER:SetBleedOut(bool) -- bool - да или нет. Упал или 
 		curtime = RealTime() --11
 	end
 	self:SetNWBool("BleedOut", bool)
-	if bool == true then
+	if bool  then
 		self:SetNWFloat("BleedOutTime", curtime)
 	else
 		self:SetNWFloat("BleedOutTime", 0)
@@ -530,11 +530,11 @@ if SERVER then
 		local vectors
 		for k, v in ipairs(player.GetBleedOuts()) do
 			local time1 = v:GetBleedOutTime()
-			if convar27:GetBool() == true and time > v:GetBloodDelay() then
+			if convar27:GetBool()  and time > v:GetBloodDelay() then
 				util.Decal( "Blood", v:EyePos(), v:GetPos() - Vector(0, 0, 10), v )
 				v:SetBloodDelay(CurTime() + 3)
 			end
-			if convar25:GetBool() == true then
+			if convar25:GetBool()  then
 				if v:IsNPCReviving() == false then -- Снизу идет поиск нпс ревайвора.
 					local rebels = ents.FindByClass("npc_citizen")
 					--table.sort(rebels, function(a, b) return a:GetPos():Distance(v:EyePos()) < b:GetPos():Distance(v:EyePos()) end)
@@ -551,7 +551,7 @@ if SERVER then
 					end
 				else
 					local revivour = v:GetNPCRevivour()
-					if IsValid(revivour) == false or revivour:GetPos():Distance(v:GetPos() + Vector(0, 0, 36)) > 512 or v:IsBleedOut() == false or v:IsBeingReviving() == true and !IsValid(v:GetNPCRevivour()) then 
+					if IsValid(revivour) == false or revivour:GetPos():Distance(v:GetPos() + Vector(0, 0, 36)) > 512 or v:IsBleedOut() == false or v:IsBeingReviving()  and !IsValid(v:GetNPCRevivour()) then 
 						v:SetNPCRevivour(Entity(0))
 						if IsValid(revivour) then 
 							revivour:SetReviving(false)
@@ -561,7 +561,7 @@ if SERVER then
 						end
 						revivour = Entity(0)
 						v:SetNPCReviving(false)
-						if v:IsBeingNPCReviving() == true then
+						if v:IsBeingNPCReviving()  then
 							v:SetBeingNPCReviving(false)
 							v:StopReviving()
 						end
@@ -571,14 +571,14 @@ if SERVER then
 						revivour:SetSchedule(SCHED_FORCED_GO_RUN)
 					end
 					if revivour != Entity(0) then
-						if revivour:GetPos():Distance(v:GetPos() + Vector(0, 0, 36)) <= 128 and revivour:IsReviving() == false and !revivour:IsMoving() and v:IsBleedOut() == true and v:IsBeingReviving() == false then
+						if revivour:GetPos():Distance(v:GetPos() + Vector(0, 0, 36)) <= 128 and revivour:IsReviving() == false and !revivour:IsMoving() and v:IsBleedOut()  and v:IsBeingReviving() == false then
 							revivour:SetSequence("Crouch_idleD")
 							revivour:SetReviving(true)
 							revivour:SetReviveTime(CurTime())
 							v:SetBeingReviving(true)
 							v:SetBeingNPCReviving(true)
 							v:StartReviving()
-						elseif revivour:IsReviving() == true then
+						elseif revivour:IsReviving()  then
 							revivour:SetSequence("Crouch_idleD")
 							local npctime1 = CurTime()
 							local npctime2 = revivour:GetReviveTime() + convar6:GetInt()
@@ -613,7 +613,7 @@ if SERVER then
 		if ply:Team() == 2 then return true end
 		if key == 32 and ply:IsBleedOut() == false and ply:IsReviving() == false then
 			ply:TryRevive()
-		elseif key == 32 and ply:IsBleedOut() == false and ply:IsReviving() == true then
+		elseif key == 32 and ply:IsBleedOut() == false and ply:IsReviving()  then
 			ply:SetReviving(false)
 			ply:GetRevivingEntity():StopReviving()
 			ply:GetRevivingEntity():SetBleedOutTime(CurTime() - ply:GetReviveTimeFromEntity())
@@ -639,7 +639,7 @@ if CLIENT then
 	local circle = BuildCircle(centre, centrey, 64)
 	local circle2 = BuildCircle(centre, centrey, 42)
 	hook.Add("HUDPaint", "BleedOutHudPrint", function()
-		if LocalPlayer():IsBleedOut() == true and convar15:GetBool() == true then
+		if LocalPlayer():IsBleedOut()  and convar15:GetBool()  then
 			surface.SetMaterial(mator1)
 			local time = CurTime()
 			local time1 = LocalPlayer():GetBleedOutTime() + convar5:GetInt()
@@ -649,10 +649,10 @@ if CLIENT then
 			surface.SetDrawColor(255, 255, 255, Lerp(percenttime, 255, 0) / 6 )
 			surface.DrawTexturedRect(0, 0, ScrW(), ScrH())
 		end
-		if LocalPlayer():IsBleedOut() == true and LocalPlayer():GetBleedOutTime() == 0 then
+		if LocalPlayer():IsBleedOut()  and LocalPlayer():GetBleedOutTime() == 0 then
 			draw.DrawText("You are being lifted up.", "Trebuchet24", ScrW() * 0.5, ScrH() * 0.8, Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER)
 		end
-		if LocalPlayer():IsReviving() == true and convar21:GetBool() == true and convar19:GetInt() == 0 then
+		if LocalPlayer():IsReviving()  and convar21:GetBool()  and convar19:GetInt() == 0 then
 			local time = CurTime()
 			local time1 = LocalPlayer():GetReviveTime() + convar6:GetFloat()
 			local time2 = time1 - time
@@ -663,7 +663,7 @@ if CLIENT then
 			surface.SetMaterial(syrmat)
 			surface.SetDrawColor(255, 255, 255)
 			surface.DrawTexturedRect(centre - 32, centrey - 32, 64, 64)
-		elseif LocalPlayer():IsReviving() == true and convar21:GetBool() == true and convar19:GetInt() == 1 then
+		elseif LocalPlayer():IsReviving()  and convar21:GetBool()  and convar19:GetInt() == 1 then
 			local time = CurTime()
 			local time1 = LocalPlayer():GetReviveTime() + convar6:GetFloat()
 			local time2 = time1 - time
@@ -677,12 +677,12 @@ if CLIENT then
 			surface.DrawRect(ScrW() * 0.4, ScrH() * 0.7, ScrW() * 0.6 - ScrW() * 0.4, ScrH() * 0.75 - ScrH() * 0.7)
 			surface.SetDrawColor(greenred.r, greenred.g, greenred.b)
 			surface.DrawRect(ScrW() * 0.4, ScrH() * 0.7, greenboxmetr, ScrH() * 0.75 - ScrH() * 0.7)
-		elseif LocalPlayer():IsReviving() == true and convar21:GetBool() == true and convar19:GetInt() == 2 then
+		elseif LocalPlayer():IsReviving()  and convar21:GetBool()  and convar19:GetInt() == 2 then
 			local time = CurTime()
 			local time1 = LocalPlayer():GetReviveTime() + convar6:GetFloat()
 			local time2 = math.ceil(time1 - time)
 			draw.DrawText("Reviving.", "Trebuchet24", ScrW() * 0.5, ScrH() * 0.8, Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER)
-		elseif LocalPlayer():IsReviving() == true and convar21:GetBool() == true and convar19:GetInt() == 3 then
+		elseif LocalPlayer():IsReviving()  and convar21:GetBool()  and convar19:GetInt() == 3 then
 			local time = CurTime()
 			local time1 = LocalPlayer():GetReviveTime() + convar6:GetFloat()
 			local time2 = time1 - time
@@ -698,7 +698,7 @@ if CLIENT then
 			surface.DrawCircle(centre, centrey, 64, 0, 0, 0)
 		end
 
-		if LocalPlayer():GetBleedOutTime() != 0 and convar18:GetBool() == true and convar19:GetInt() == 0 then
+		if LocalPlayer():GetBleedOutTime() != 0 and convar18:GetBool()  and convar19:GetInt() == 0 then
 			local time = CurTime()
 			local time1 = LocalPlayer():GetBleedOutTime() + convar5:GetInt()
 			local time2 = time1 - time
@@ -708,7 +708,7 @@ if CLIENT then
 			surface.SetMaterial(skullmat)
 			surface.SetDrawColor(255, 255, 255)
 			surface.DrawTexturedRect(centre - 32, centrey - 32, 64, 64)
-		elseif LocalPlayer():GetBleedOutTime() != 0 and convar18:GetBool() == true and convar19:GetInt() == 1 then
+		elseif LocalPlayer():GetBleedOutTime() != 0 and convar18:GetBool()  and convar19:GetInt() == 1 then
 			local time = CurTime()
 			local time1 = LocalPlayer():GetBleedOutTime() + convar5:GetInt()
 			local time2 = time1 - time
@@ -723,13 +723,13 @@ if CLIENT then
 			surface.DrawRect(ScrW() * 0.7, ScrH() * 0.8, ScrW() * 0.85 - ScrW() * 0.7, ScrH() * 0.825 - ScrH() * 0.8)
 			surface.SetDrawColor(greenred.r, greenred.g, greenred.b)
 			surface.DrawRect(ScrW() * 0.7, ScrH() * 0.8, greenboxmetr1, ScrH() * 0.825 - ScrH() * 0.8)
-		elseif LocalPlayer():GetBleedOutTime() != 0 and convar18:GetBool() == true and convar19:GetInt() == 2 then -- Legacy UI
+		elseif LocalPlayer():GetBleedOutTime() != 0 and convar18:GetBool()  and convar19:GetInt() == 2 then -- Legacy UI
 			local time = CurTime()
 			local time1 = LocalPlayer():GetBleedOutTime() + convar5:GetInt()
 			local time2 = math.ceil(time1 - time)
 			draw.DrawText("Arrest after:", "Trebuchet24", ScrW() - 200, ScrH() - 300, Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER)
 			draw.DrawText(tostring(time2), "Trebuchet24", ScrW() - 200, ScrH() - 265, Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER)
-		elseif LocalPlayer():GetBleedOutTime() != 0 and convar18:GetBool() == true and convar19:GetInt() == 3 then
+		elseif LocalPlayer():GetBleedOutTime() != 0 and convar18:GetBool()  and convar19:GetInt() == 3 then
 			local time = CurTime()
 			local time1 = LocalPlayer():GetBleedOutTime() + convar5:GetInt()
 			local time2 = time1 - time
@@ -745,7 +745,7 @@ if CLIENT then
 		end
 	end)
 	hook.Add("PostPlayerDraw", "BleedoutIconDraw", function(ply)
-		if ply:IsBleedOut() == true and convar3:GetBool() == true then
+		if ply:IsBleedOut()  then
 			if convar7:GetBool() == false then
 				if convar13:GetString() != "bleedout/REVIVEICON.png" and convar13:GetString() != "bleedout/REVIVESKULL.png" then
 					cam.Start2D()
@@ -755,7 +755,7 @@ if CLIENT then
 					local vpos = ply:GetPos() + Vector(0, 0, 72)
 					local pos = vpos:ToScreen() -- Для оптимизации, если не видно - значит хер с ним.
 					surface.SetDrawColor( 255,255,255 )
-					if pos.visible == true then
+					if pos.visible  then
 						surface.DrawTexturedRect( pos.x - convar14:GetInt() * 0.5 , pos.y - convar14:GetInt() * 0.5, convar14:GetInt() * 2, convar14:GetInt() * 2 )
 					end
 					cam.End2D()
@@ -772,7 +772,7 @@ if CLIENT then
 					else
 						surface.SetDrawColor(255, 255, 255)
 					end
-					if pos.visible == true then
+					if pos.visible  then
 						surface.DrawTexturedRect( pos.x - convar14:GetInt() , pos.y - convar14:GetInt(), convar14:GetInt() * 2, convar14:GetInt() * 2 )
 					end
 					cam.End2D()
@@ -789,7 +789,7 @@ if CLIENT then
 					else
 						surface.SetDrawColor(255, 255, 255)
 					end	
-					if pos.visible == true then
+					if pos.visible  then
 						surface.DrawTexturedRect( pos.x - convar14:GetInt() , pos.y - convar14:GetInt(), convar14:GetInt() * 2, convar14:GetInt() * 2 )
 					end
 					cam.End2D()
@@ -833,7 +833,7 @@ if CLIENT then
 		end
 	end)
 	hook.Add("PlayerBindPress", "DisableJumpingAndCrouching", function(ply, bind, bool) -- Если игрок упал, то он не сможет нажать прыжок и присед
-		if bind == "+jump" and ply:IsBleedOut() == true or bind == "+duck" and ply:IsBleedOut() == true then
+		if bind == "+jump" and ply:IsBleedOut() or bind == "+duck" and ply:IsBleedOut()  then
 			return true
 		end
 	end)
@@ -878,7 +878,7 @@ if CLIENT then
 	}
 end
 hook.Add("CalcMainActivity", "BleedOutActivity", function(ply, vel)
-	if ply:IsBleedOut() == true then
+	if ply:IsBleedOut()  then
 		if vel:Length2D() > 1 or ply:GetActiveWeapon() == NULL then
 			ply.CalcIdeal = ACT_HL2MP_SWIM_PISTOL
 		elseif ply:GetActiveWeapon():GetHoldType() == "pistol" or ply:GetActiveWeapon():GetHoldType() == "revolver" then
@@ -924,7 +924,7 @@ hook.Add("CalcMainActivity", "BleedOutActivity", function(ply, vel)
 	end
 end)
 hook.Add("UpdateAnimation", "BleedOutAnims", function(ply, vel, seqspeed)-- Своровано с nzombies, обьяснить не смогу. Не бейте тапками пж
-	if ply:IsBleedOut() == true then
+	if ply:IsBleedOut()  then
 		local movement = 0
 		--! Разработчикам: Эта переменная нигде не используется
 		local len = vel:Length2D()
@@ -938,23 +938,23 @@ hook.Add("UpdateAnimation", "BleedOutAnims", function(ply, vel, seqspeed)-- Св
 	end
 end)
 hook.Add("SetupMove", "BleedOutSetupMove", function(ply, move, cmd)
-	if ply:IsBleedOut() == true and convar24:GetBool() == true and ply:IsReviving() == false and ply:IsBeingReviving() == false then
+	if ply:IsBleedOut() and convar24:GetBool() and not ply:IsReviving() and not ply:IsBeingReviving() then
 		move:SetMaxSpeed(50)
 		move:SetMaxClientSpeed(50)
-	elseif ply:IsBleedOut() == true and convar24:GetBool() == false or ply:IsReviving() == true or ply:IsBeingReviving() == true then
+	elseif ply:IsBleedOut() and convar24:GetBool() == false or ply:IsReviving()  or ply:IsBeingReviving()  then
 		move:SetMaxSpeed(1)
 		move:SetMaxClientSpeed(1)
 	end
 	if SERVER then
 		if ply:GetActiveWeapon() != NULL then ply.OldWeap = ply:GetActiveWeapon() end
-		if ply:IsBleedOut() == true and convar12:GetBool() == false and ply:Alive() == true then
+		if ply:IsBleedOut()  and convar12:GetBool() == false and ply:Alive()  then
 			if SearchForClassInTable(ply:GetWeapons(), "bleedout_pist") == nil then
 				ply:SetActiveWeapon(NULL)
 			else
 				ply:SelectWeapon( "bleedout_pist" )
 			end
 			ply:DrawViewModel( SearchForClassInTable(ply:GetWeapons(), "bleedout_pist") and true or false)
-		elseif ply:Alive() == true then
+		elseif ply:Alive()  then
 			ply:SetActiveWeapon(ply.OldWeap)
 			ply:DrawViewModel(true)
 		else
@@ -979,15 +979,15 @@ local function bleedoutviewfunc(ply, pos, angles, fov) -- view - столбик,
 	local head = ply:LookupAttachment("eyes")
 	local headpos = ply:GetAttachment(head)
 	view.origin = pos - loweredview
-	if ply:Crouching() == true then -- Если игрок приседает - убираем это в корне
+	if ply:Crouching()  then -- Если игрок приседает - убираем это в корне
 		view.origin = pos - loweredview + Vector(0,0, 36)
 	end
-	if convar20:GetBool() == true then
+	if convar20:GetBool()  then
 		view.angles = angles + Angle(0, 0, 25)
 	else
 		view.angles = angles
 	end
-	if convar26:GetBool() == true then
+	if convar26:GetBool()  then
 		view.origin = headpos.Pos
 	end
 	view.fov = fov
@@ -997,10 +997,10 @@ local function bleedoutviewfunc(ply, pos, angles, fov) -- view - столбик,
 end
 local function bleedoutviewmodelviewfunc(wep, vm, oldp, olda, pos, ang)
 	local finalpos = pos - loweredview
-	if LocalPlayer():Crouching() == true then
+	if LocalPlayer():Crouching()  then
 		 finalpos = pos - loweredview + Vector(0, 0, 36)
 	end
-	if convar20:GetBool() == true then
+	if convar20:GetBool()  then
 		return finalpos, ang + Angle(0, 0, 10)
 	else
 		return finalpos, ang
@@ -1040,7 +1040,7 @@ if SERVER then
 		self:LagCompensation( true )
 		local trace = util.QuickTrace(self:EyePos(), self:EyeAngles():Forward() * distancetotrace, self)
 		self:LagCompensation(false)
-		if self:IsBleedOut() == false and self:IsReviving() == false and trace.Hit == true and trace.Entity:IsPlayer() == true and trace.Entity:IsBleedOut() == true and trace.Entity:IsBeingReviving() == false then
+		if self:IsBleedOut() == false and self:IsReviving() == false and trace.Hit  and trace.Entity:IsPlayer()  and trace.Entity:IsBleedOut()  and trace.Entity:IsBeingReviving() == false then
 			self:SetReviveTimeFromEntity(CurTime() - trace.Entity:GetBleedOutTime())
 			trace.Entity:StartReviving() -- Начатие процесса ревайвинга.
 			self:SetReviving(true)
@@ -1063,11 +1063,11 @@ if SERVER then
 	function PLAYER:GoBleedOut()
 		if self:Team() == 2 then self:Kill() return true end
 		self:SetBleedOut(true)
-		if convar22:GetBool() == true then -- convar22 - как я помню является конварой с нотаргетом. Если включена - значит ок.
+		if convar22:GetBool()  then -- convar22 - как я помню является конварой с нотаргетом. Если включена - значит ок.
 			self:SetNoTarget(true)
 		end
 		self:ExitVehicle()
-		if convar33:GetBool() == true then
+		if convar33:GetBool()  then
 			self:SetDSP( 16, false ) 
 		end
 		self:SetBloodDelay(CurTime() + 1)
@@ -1075,7 +1075,7 @@ if SERVER then
 		self:SetReviving(false)
 		self:SetReviveTime(0)
 		self:Give('bleedout_pist')
-		if self:GetRevivingEntity():IsPlayer() == true then 
+		if self:GetRevivingEntity():IsPlayer()  then 
 			self:GetRevivingEntity():StopReviving()
 			self:SetRevivingEntity(Entity(0))
 		end
@@ -1112,7 +1112,7 @@ end
 function player.GetRevivingPlayers() -- Дает список всех воскрешающих игроков.
 	local tab = {}
 	for k, v in ipairs(player.GetAll()) do
-		if v:IsReviving() == true then
+		if v:IsReviving()  then
 			table.insert(tab, v)
 		end
 	end
@@ -1121,7 +1121,7 @@ end
 function player.GetBleedOuts() -- Для рисовки обводки игроков. Работает онли на сервере, так что когда кто то падает/встает эта штука передается клиенту.
 	local tab = {}
 	for k, v in ipairs(player.GetAll()) do
-		if v:IsBleedOut() == true then
+		if v:IsBleedOut()  then
 			table.insert(tab, v)
 		end
 	end
@@ -1131,7 +1131,7 @@ function ents.GetShootingAtBleedOuts()
 	local tab = {}
 	for k, v in ipairs(ents.FindByClass("npc_*")) do
 		if v:GetEnemy():IsPlayer() then
-			if v:GetEnemy():IsBleedOut() == true then
+			if v:GetEnemy():IsBleedOut()  then
 				table.insert(tab, v)
 			end
 		end
@@ -1161,15 +1161,15 @@ if SERVER then
 		ply:StopSound( "vo/streetwar/sniper/male01/c17_09_help01.wav" )
 		ply:StopSound( "vo/streetwar/sniper/male01/c17_09_help02.wav" )
 		ply:StopSound( "vo/streetwar/sniper/male01/c17_09_help03.wav" )
-		if rand == 0 and IsValid(ply) and ply:IsBleedOut() == true and convar28:GetBool() == true then
+		if rand == 0 and IsValid(ply) and ply:IsBleedOut()  and convar28:GetBool()  then
 			ply:EmitSound( "vo/coast/bugbait/sandy_help.wav", 75, 100, 1, CHAN_AUTO)
-		elseif IsValid(ply) and rand == 1 and ply:IsBleedOut() == true and convar28:GetBool() == true then
+		elseif IsValid(ply) and rand == 1 and ply:IsBleedOut()  and convar28:GetBool()  then
 			ply:EmitSound( "vo/npc/male01/help01.wav", 75, 100, 1, CHAN_AUTO)
-		elseif IsValid(ply) and rand == 2 and ply:IsBleedOut() == true and convar28:GetBool() == true then
+		elseif IsValid(ply) and rand == 2 and ply:IsBleedOut()  and convar28:GetBool()  then
 			ply:EmitSound( "vo/streetwar/sniper/male01/c17_09_help01.wav", 75, 100, 1, CHAN_AUTO)
-		elseif IsValid(ply) and rand == 3 and ply:IsBleedOut() == true and convar28:GetBool() == true then
+		elseif IsValid(ply) and rand == 3 and ply:IsBleedOut()  and convar28:GetBool()  then
 			ply:EmitSound( "vo/streetwar/sniper/male01/c17_09_help02.wav", 75, 100, 1, CHAN_AUTO)
-		elseif IsValid(ply) and rand == 4 and ply:IsBleedOut() == true and convar28:GetBool() == true then
+		elseif IsValid(ply) and rand == 4 and ply:IsBleedOut()  and convar28:GetBool()  then
 			ply:EmitSound( "vo/streetwar/sniper/male01/c17_09_help03.wav", 75, 100, 1, CHAN_AUTO)
 		end
 	end)
@@ -1202,10 +1202,10 @@ hook.Add("PlayerSpawn", "BleedOutSet", bleedoutsetfunc)
 if SERVER then
 	hook.Add("EntityTakeDamage", "PlayerBleedOutWhen", function(ply, dmginfo)
 		if (ply:IsPlayer() ) then -- Если ply = игрок и получил дамаг от пули.
-			if ply:IsBleedOut() == true then
+			if ply:IsBleedOut()  then
 				dmginfo:ScaleDamage( (ply:GetMaxHealth() - convar23:GetInt()) / 100) -- Почему тут MaxHealth я уже не помню
 			end
-			if ply:Health() <= dmginfo:GetDamage() and ply:IsBleedOut() == false and convar4:GetBool() == true and ply:GetNumBleedOuts() < convar17:GetInt() then
+			if ply:Health() <= dmginfo:GetDamage() and ply:IsBleedOut() == false and convar4:GetBool()  and ply:GetNumBleedOuts() < convar17:GetInt() then
 				dmginfo:SetDamage(0)
 				ply:GoBleedOut()
 				ply:SetAttacker( dmginfo:GetAttacker() )
@@ -1220,14 +1220,14 @@ if SERVER then
 	hook.Add("PlayerShouldTakeDamage", "BleedOutDamage", function(attacked, inflictor)
 		local time = CurTime()
 		local time2 = attacked:GetBleedOutTime() + convar5:GetFloat()
-		if convar:GetBool() == false and attacked:IsBleedOut() == true and time < time2 or convar0:GetBool() == false and inflictor:IsPlayer() == true and attacked:IsBleedOut() == false or convar0:GetBool() == false and inflictor:IsPlayer() == true and attacked:IsBleedOut() == true and time < time2 then
+		if convar:GetBool() == false and attacked:IsBleedOut()  and time < time2 or convar0:GetBool() == false and inflictor:IsPlayer()  and attacked:IsBleedOut() == false or convar0:GetBool() == false and inflictor:IsPlayer()  and attacked:IsBleedOut()  and time < time2 then
 			return false
 		else
 			return true
 		end
 	end)
 	hook.Add("PlayerDeath", "BleedOutDeath", function(victim, inflicto, attacker)
-		if victim:IsBleedOut() == false and victim:IsReviving() == true then
+		if victim:IsBleedOut() == false and victim:IsReviving()  then
 			victim:SetReviving(false)
 			victim:GetRevivingEntity():StopReviving()
 			victim:GetRevivingEntity():SetBleedOutTime(CurTime() - victim:GetReviveTimeFromEntity())
@@ -1238,7 +1238,7 @@ if SERVER then
 		victim:SetNumBleedOuts(0)
 	end)
 	hook.Add("PlayerDisconnected", "BleedOutDisconnect", function(ply) -- Убираем с столбика значение игрока с дисконектом
-		if ply:IsBleedOut() == true then
+		if ply:IsBleedOut()  then
 			local tab = player.GetBleedOuts()
 			table.RemoveByValue(tab, ply)
 			net.Start("bleedout_settable")
@@ -1247,8 +1247,8 @@ if SERVER then
 		end
 	end)
 	hook.Add("EntityRemoved", "BleedOutRemove", function(ent) -- ТОже самое, но если игрок магически исчез.
-		if ent:IsPlayer() == true then
-			if ent:IsBleedOut() == true then
+		if ent:IsPlayer()  then
+			if ent:IsBleedOut()  then
 				local tab = player.GetBleedOuts()
 				table.RemoveByValue(tab, ent)
 				net.Start("bleedout_settable")
