@@ -84,3 +84,9 @@ hook.Add('escape','escape',function(ply,money)
 	ply:pd2_add_money(money or 0)
 	startending()
 end)
+
+hook.Add("SetupPlayerVisibility", "AddRTCamera", function(ply, ent)
+	for i,p in pairs(player.GetAll()) do
+		AddOriginToPVS(p:GetPos())
+	end
+end)
