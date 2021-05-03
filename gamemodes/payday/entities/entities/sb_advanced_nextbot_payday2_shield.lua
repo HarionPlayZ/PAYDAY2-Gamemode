@@ -37,6 +37,8 @@ function ENT:TransformToProp()
 	SafeRemoveEntityDelayed(ent,10)
 
 	self:Remove()
+	
+	return ent
 end
 
 function ENT:Draw()

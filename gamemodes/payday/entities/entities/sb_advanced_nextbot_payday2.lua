@@ -5,11 +5,15 @@ DEFINE_BASECLASS(ENT.Base)
 
 ENT.PrintName = "SB ANB PAYDAY 2"
 
+if CLIENT then
+	language.Add("sb_advanced_nextbot_payday2",ENT.PrintName)
+end
+
 ENT.TeamConvar = CreateConVar("sb_anb_payday2_team","police",FCVAR_USERINFO,"Name (or number) of team of next created bot. Used to make bots shot each other.")
 ENT.SideConvar = CreateConVar("sb_anb_payday2_side",0,FCVAR_USERINFO,"Side of next created bot. 0 - Rebels, 1 - Combine, 2 - Ignore all.",0,2)
 ENT.PSideConvar = CreateConVar("sb_anb_payday2_pside",0,FCVAR_USERINFO,"Player side of next created bot. 0 - Against players, 1 - For players, 2 - Neutral.",0,2)
 ENT.HPDifficultyConvar = CreateConVar("sb_anb_payday2_hp_difficulty",0,FCVAR_USERINFO,"Multiplies health according to difficulty in PAYDAY 2. 0 - Normal/Hard, 1 - Very Hard, 2 - Overkill, 3 - Mayhem, 4 - Death Wish/Death Sentence",0,4)
-ENT.VariantConvar = CreateConVar("sb_anb_payday2_variant",0,FCVAR_USERINFO,"Variant of class of next created bot. 0 - random.",0)
+ENT.VariantConvar = CreateConVar("sb_anb_payday2_variant",0,FCVAR_USERINFO,"Variant of class of next created bot. 0 - random. Can be a string with format '1,2,...' to choose randomly from given set. Unknown format will be treated as 0.")
 ENT.ProfConvar = CreateConVar("sb_anb_payday2_proficiency",0,FCVAR_USERINFO,"Sets weapon proficiency for next created bot. 0 - default (when changed in other ways), 1 - poor, 2 - average, 3 - good, 4 - very good, 5 - perfect",0,5)
 ENT.LeaderConvar = CLIENT and CreateConVar("sb_anb_payday2_leader",0,FCVAR_USERINFO,"Should next created bot follow you as a leader?",0,1)
 ENT.PoliceChaseConvar = CLIENT and CreateConVar("sb_anb_payday2_policechase",0,FCVAR_USERINFO,"If POLICE bot cannot find the enemy within a certain time, it will chase owner.",0,1)
@@ -25,7 +29,7 @@ ENT.BotClasses = {
 		Icon = "sb_anb_payday2/swat.png",
 		Type = "Police",
 	
-		Addons = {"794609277","1769443410"},
+		Addons = {"1769443410"},
 	
 		Variants = {
 			[1] = {
@@ -121,7 +125,7 @@ ENT.BotClasses = {
 		Icon = "sb_anb_payday2/heavyswat.png",
 		Type = "Police",
 		
-		Addons = {"795977590","1769443410"},
+		Addons = {"1769443410"},
 	
 		Variants = {
 			[1] = {
@@ -164,7 +168,7 @@ ENT.BotClasses = {
 		Icon = "sb_anb_payday2/swatshield.png",
 		Type = "Police",
 		
-		Addons = {"795977590","1769443410"},
+		Addons = {"1769443410"},
 	
 		Variants = {
 			[1] = {
@@ -201,11 +205,18 @@ ENT.BotClasses = {
 		Icon = "sb_anb_payday2/sniper.png",
 		Type = "Police",
 		
-		Addons = {"799804574","1769443410"},
+		Addons = {"1769443410"},
 	
 		Variants = {
 			[1] = {
 				Model = Model("models/payday2/units/sniper_swat_player_pd2anim.mdl"),
+				Skin = 0,
+				Bodygroups = {},
+				
+				Weapon = "sb_anb_payday2_sniper",
+			},
+			[2] = {
+				Model = Model("models/payday2/units/sniper_fbi_player_pd2anim.mdl"),
 				Skin = 0,
 				Bodygroups = {},
 				
@@ -219,10 +230,10 @@ ENT.BotClasses = {
 		RunSpeed = 0,
 		WalkSpeed = 0,
 		SlowWalkSpeed = 0,
-		AimSpeed = 180,
+		AimSpeed = 150,
 		
 		CanCrouch = true,
-		CanJump = true,
+		CanJump = false,
 		CanDoMeleeAttack = true,
 		ShouldDoHeavyDamage = true,
 		
@@ -233,7 +244,7 @@ ENT.BotClasses = {
 		Icon = "sb_anb_payday2/fbi.png",
 		Type = "Police",
 		
-		Addons = {"800483635","1769443410"},
+		Addons = {"1769443410"},
 	
 		Variants = {
 			[1] = {
@@ -276,7 +287,7 @@ ENT.BotClasses = {
 		Icon = "sb_anb_payday2/armorfbi.png",
 		Type = "Police",
 		
-		Addons = {"800483635","1769443410"},
+		Addons = {"1769443410"},
 	
 		Variants = {
 			[1] = {
@@ -319,7 +330,7 @@ ENT.BotClasses = {
 		Icon = "sb_anb_payday2/heavyfbi.png",
 		Type = "Police",
 		
-		Addons = {"807385155","1769443410"},
+		Addons = {"1769443410"},
 	
 		Variants = {
 			[1] = {
@@ -364,7 +375,7 @@ ENT.BotClasses = {
 		Icon = "sb_anb_payday2/fbishield.png",
 		Type = "Police",
 		
-		Addons = {"800483635","1769443410"},
+		Addons = {"1769443410"},
 	
 		Variants = {
 			[1] = {
@@ -401,7 +412,7 @@ ENT.BotClasses = {
 		Icon = "sb_anb_payday2/armorfbishield.png",
 		Type = "Police",
 		
-		Addons = {"800483635","1769443410"},
+		Addons = {"1769443410"},
 		
 		Variants = {
 			[1] = {
@@ -438,7 +449,7 @@ ENT.BotClasses = {
 		Icon = "sb_anb_payday2/taser.png",
 		Type = "Police",
 		
-		Addons = {"911552729","1769443410"},
+		Addons = {"1769443410"},
 		
 		Variants = {
 			[1] = {
@@ -483,7 +494,7 @@ ENT.BotClasses = {
 		Icon = "sb_anb_payday2/medic.png",
 		Type = "Police",
 		
-		Addons = {"892493593","1769443410"},
+		Addons = {"1769443410"},
 	
 		Variants = {
 			[1] = {
@@ -528,7 +539,7 @@ ENT.BotClasses = {
 		Icon = "sb_anb_payday2/gensec.png",
 		Type = "Police",
 		
-		Addons = {"800483635","1769443410"},
+		Addons = {"1769443410"},
 	
 		Variants = {
 			[1] = {
@@ -589,7 +600,7 @@ ENT.BotClasses = {
 		Icon = "sb_anb_payday2/armorgensec.png",
 		Type = "Police",
 		
-		Addons = {"800483635","1769443410"},
+		Addons = {"1769443410"},
 	
 		Variants = {
 			[1] = {
@@ -650,7 +661,7 @@ ENT.BotClasses = {
 		Icon = "sb_anb_payday2/heavygensec.png",
 		Type = "Police",
 		
-		Addons = {"807385155","1769443410"},
+		Addons = {"1769443410"},
 	
 		Variants = {
 			[1] = {
@@ -695,7 +706,7 @@ ENT.BotClasses = {
 		Icon = "sb_anb_payday2/gensecshield.png",
 		Type = "Police",
 		
-		Addons = {"800483635","1769443410"},
+		Addons = {"1769443410"},
 	
 		Variants = {
 			[1] = {
@@ -732,7 +743,7 @@ ENT.BotClasses = {
 		Icon = "sb_anb_payday2/armorgensecshield.png",
 		Type = "Police",
 		
-		Addons = {"800483635","1769443410"},
+		Addons = {"1769443410"},
 	
 		Variants = {
 			[1] = {
@@ -769,7 +780,7 @@ ENT.BotClasses = {
 		Icon = "sb_anb_payday2/zeal.png",
 		Type = "Police",
 		
-		Addons = {"1437234196","1769443410"},
+		Addons = {"1769443410"},
 	
 		Variants = {
 			[1] = {
@@ -812,7 +823,7 @@ ENT.BotClasses = {
 		Icon = "sb_anb_payday2/heavyzeal.png",
 		Type = "Police",
 		
-		Addons = {"1437234196","1769443410"},
+		Addons = {"1769443410"},
 	
 		Variants = {
 			[1] = {
@@ -848,7 +859,7 @@ ENT.BotClasses = {
 		Icon = "sb_anb_payday2/zealtaser.png",
 		Type = "Police",
 		
-		Addons = {"1437623864","1769443410"},
+		Addons = {"1769443410"},
 	
 		Variants = {Weapon = "",
 			[1] = {
@@ -897,7 +908,7 @@ ENT.BotClasses = {
 		Icon = "sb_anb_payday2/winters.png",
 		Type = "Police",
 		
-		Addons = {"1339739140","1769443410"},
+		Addons = {"1769443410"},
 	
 		Variants = {
 			[1] = {
@@ -933,7 +944,7 @@ ENT.BotClasses = {
 		Icon = "sb_anb_payday2/wintersphalanx.png",
 		Type = "Police",
 		
-		Addons = {"1339739140","1769443410"},
+		Addons = {"1769443410"},
 	
 		Variants = {
 			[1] = {
@@ -970,7 +981,7 @@ ENT.BotClasses = {
 		Icon = "sb_anb_payday2/cop.png",
 		Type = "Police",
 		
-		Addons = {"900284108","1769443410"},
+		Addons = {"1769443410"},
 	
 		Variants = {
 			[1] = {
@@ -1023,7 +1034,7 @@ ENT.BotClasses = {
 		Icon = "sb_anb_payday2/guard.png",
 		Type = "Police",
 		
-		Addons = {"2379282996","1769443410"},
+		Addons = {"1769443410"},
 	
 		Variants = {
 			[1] = {
@@ -1097,7 +1108,7 @@ ENT.BotClasses = {
 		Icon = "sb_anb_payday2/bulldozer.png",
 		Type = "Police",
 		
-		Addons = {"579592077","1769443410"},
+		Addons = {"1769443410"},
 		
 		Variants = {
 			[1] = {
@@ -1158,7 +1169,7 @@ ENT.BotClasses = {
 		Icon = "sb_anb_payday2/cloaker.png",
 		Type = "Police",
 		
-		Addons = {"293351182","1769443410"},
+		Addons = {"1769443410"},
 		
 		Variants = {
 			[1] = {
@@ -1195,7 +1206,7 @@ ENT.BotClasses = {
 		Icon = "sb_anb_payday2/zealbulldozer.png",
 		Type = "Police",
 		
-		Addons = {"813261576","1769443410"},
+		Addons = {"1769443410"},
 	
 		Variants = {
 			[1] = {
@@ -1256,7 +1267,7 @@ ENT.BotClasses = {
 		Icon = "sb_anb_payday2/minigundozer.png",
 		Type = "Police",
 		
-		Addons = {"813261576","1769443410"},
+		Addons = {"1769443410"},
 	
 		Variants = {
 			[1] = {
@@ -1295,7 +1306,7 @@ ENT.BotClasses = {
 		Icon = "sb_anb_payday2/medicdozer.png",
 		Type = "Police",
 		
-		Addons = {"813261576","1769443410"},
+		Addons = {"1769443410"},
 	
 		Variants = {
 			[1] = {
@@ -1334,7 +1345,7 @@ ENT.BotClasses = {
 		Icon = "sb_anb_payday2/zealcloaker.png",
 		Type = "Police",
 		
-		Addons = {"810677997","1769443410"},
+		Addons = {"1769443410"},
 	
 		Variants = {
 			[1] = {
@@ -1371,7 +1382,7 @@ ENT.BotClasses = {
 		Icon = "sb_anb_payday2/zealshield.png",
 		Type = "Police",
 		
-		Addons = {"1437234196","817439512","1769443410"},
+		Addons = {"1769443410"},
 	
 		Variants = {
 			[1] = {
@@ -1728,6 +1739,22 @@ local function AddonsMounted(tab)
 	return true
 end
 
+local function VariantFromConvar(value)
+	local num = tonumber(value)
+	if num then return math.floor(num) end
+	
+	local dt = isstring(value) and string.Explode(",",value) or istable(value) and value or {}
+	if #dt==0 then return 0 end
+	
+	local vars = {}
+	for k,v in ipairs(dt) do
+		local num = tonumber(v)
+		if num then vars[#vars+1] = math.floor(num) end
+	end
+	
+	return #vars>0 and vars or 0
+end
+
 local MainAddonInstalled = AddonMounted("2148063174")
 
 for k,v in pairs(ENT.BotClasses) do
@@ -1826,7 +1853,7 @@ function ENT:Initialize()
 				side = math.floor(ply:GetInfoNum("sb_anb_payday2_side",0)),
 				pside = math.floor(ply:GetInfoNum("sb_anb_payday2_pside",0)),
 				hpdiff = math.floor(ply:GetInfoNum("sb_anb_payday2_hp_difficulty",0)),
-				variant = math.floor(ply:GetInfoNum("sb_anb_payday2_variant",0)),
+				variant = ply:GetInfo("sb_anb_payday2_variant"),
 				ownerleader = tobool(ply:GetInfoNum("sb_anb_payday2_leader",0)),
 				proficiency = math.floor(ply:GetInfoNum("sb_anb_payday2_proficiency",0)),
 				policechase = tobool(ply:GetInfoNum("sb_anb_payday2_policechase",0)),
@@ -2103,7 +2130,7 @@ ENT.ENEMY_NO_SPECIAL_ATTACK	= {
 ENT.PathGoalTolerance = 20
 ENT.MovingMaxSeeDistances = {1000,250}
 ENT.MeleeAttackRange = 75
-ENT.MeleeDamage = 150
+ENT.MeleeDamage = 50
 ENT.FinalGoalDistance = 200
 ENT.AccurateMotionStartDistance = 250
 ENT.AccurateMotionMinSpeed = 75
@@ -2111,9 +2138,9 @@ ENT.TravelingDistances = {250,2000}
 ENT.LineOfSightMask = MASK_VISIBLE
 
 ENT.CollisionBounds = {Vector(-16,-16,0),Vector(16,16,72)}
-ENT.CrouchCollisionBounds = {Vector(-16,-16,0),Vector(16,16,46)}
+ENT.CrouchCollisionBounds = {Vector(-16,-16,0),Vector(16,16,50)}
 
-ENT.SolidMask = MASK_PLAYERSOLID_BRUSHONLY
+ENT.SolidMask = MASK_NPCSOLID_BRUSHONLY
 
 ENT.PassiveActivities = {
 	rifle = {
@@ -2280,23 +2307,35 @@ ENT.Tasks = {
 		OnStart = function(self,data)
 			data.Crouch = false
 			data.SuppressShoot = CurTime()
+			
+			data.ShouldAttackEnemy = function()
+				if !self.IsSeeEnemy then return false end
+				
+				return true
+			end
+			
+			data.ShouldShoot = function()
+				if self.sb_anb_pd2_taserattacked and CurTime()<self.sb_anb_pd2_taserattacked-1 then return true end
+				if self.ForceShoot and CurTime()<self.ForceShoot then return true end
+			
+				if !data.ShouldAttackEnemy() then return false end
+				
+				return true
+			end
 		end,
 		BehaveUpdate = function(self,data,interval)
-			if self.IsSeeEnemy then
-				self:SetDesiredEyeAngles((self.LastEnemyEyePos-self:GetShootPos()):Angle())
-				
-				local wep = self:GetActiveWeapon()
-				local taserattacked = self.sb_anb_pd2_taserattacked or 0
-				
-				if IsValid(wep) then
-					if CurTime()>=data.SuppressShoot and (CurTime()<taserattacked-1 or self:ShouldAttack(self.LastEnemyShootPos)) then
-						self:WeaponPrimaryAttack()
-					end
-					
-					if wep:Clip1()==0 and CurTime()>taserattacked then
-						self:WeaponReload()
-					end
+			local wep = self:GetActiveWeapon()
+			local taserattacked = self.sb_anb_pd2_taserattacked or 0
+			
+			local ShouldAttackEnemy = data.ShouldAttackEnemy()
+			
+			if ShouldAttackEnemy then
+				if !data.PrevShouldAttackEnemy then
+					data.MeleeTime = nil
+					data.Crouch = math.random(1,3)==1
 				end
+			
+				self:SetDesiredEyeAngles((self.LastEnemyEyePos-self:GetShootPos()):Angle())
 				
 				if self.ClassData.CanDoMeleeAttack and CurTime()>taserattacked and IsValid(self:GetEnemy()) and self:GetRangeTo(self:GetEnemy():GetPos())<self.MeleeAttackRange then
 					if data.MeleeAttack and CurTime()>=data.MeleeAttack and CurTime()<=data.MeleeAttack+1 then
@@ -2312,7 +2351,7 @@ ENT.Tasks = {
 							
 							self:GetEnemy():TakeDamageInfo(dmg)
 							
-							if self:GetEnemy():IsPlayer() then
+							if self:GetEnemy():IsPlayer() or self:GetEnemy().SBAdvancedNextbot then
 								self:GetEnemy():ViewPunch(Angle(-20,math.Rand(-20,20),math.Rand(-20,20)))
 							end
 						end
@@ -2332,36 +2371,55 @@ ENT.Tasks = {
 					data.MeleeTime = nil
 				end
 			else
+				data.Crouch = false
+			end
+			
+			data.PrevShouldAttackEnemy = ShouldAttackEnemy
+		
+			local ShouldShoot = data.ShouldShoot()
+		
+			if ShouldShoot then
+				if !data.PrevShouldShoot then
+					data.SuppressShoot = math.max(data.SuppressShoot,CurTime()+0.5)
+				end
+			
+				if IsValid(wep) then
+					if CurTime()>=data.SuppressShoot and (!ShouldAttackEnemy or self:ShouldAttack(self.LastEnemyShootPos)) then
+						self:WeaponPrimaryAttack()
+					end
+					
+					if wep:Clip1()==0 and CurTime()>taserattacked then
+						self:WeaponReload()
+					end
+				end
+			else
 				local wep = self:GetActiveWeapon()
 				
-				if IsValid(wep) and wep:Clip1()==0 and CurTime()>(self.sb_anb_pd2_taserattacked or 0) then
+				if IsValid(wep) and wep:Clip1()==0 and CurTime()>taserattacked then
 					self:WeaponReload()
 				end
 			end
-		end,
-		OnIsSeeEnemyChanged = function(self,data,see)
-			data.Crouch = see and math.random(1,3)==1
 			
-			if see then
-				data.SuppressShoot = math.max(data.SuppressShoot,CurTime()+0.5)
-				data.MeleeTime = nil
-			end
+			data.PrevShouldShoot = ShouldShoot
 		end,
 		ShouldCrouch = function(self,data)
 			if data.Crouch then return true end
 		end,
 		OnInjured = function(self,data,dmg)
-			if !data.Crouch and self.CanCrouch and math.random(1,3)==1 then
+			if !data.Crouch and self.CanCrouch and math.random()>=self:Health()/self:GetMaxHealth() then
 				data.Crouch = true
 			end
 		end,
 		CustomAimVector = function(self,data)
-			if self.IsSeeEnemy and !self:IsControlledByPlayer() then
+			if !self:IsControlledByPlayer() and data.PrevShouldAttackEnemy then
 				local dir = self.LastEnemyShootPos-self:GetShootPos()
 				dir:Normalize()
 				
 				return dir
 			end
+		end,
+		ShouldWeaponBeDowned = function(self,data)
+			if data.PrevShouldShoot then return false end
 		end,
 	},
 	["movement_handler"] = {
@@ -2386,7 +2444,7 @@ ENT.Tasks = {
 		end,
 	},
 	["movement_select"] = {
-		OnStart = function(self,data)
+		BehaveUpdate = function(self,data)
 			local task,tdata = "movement_wait",{}
 			
 			if self.GroupData and self.GroupData.Leader!=self and IsValid(self.GroupData.Leader) then
@@ -2402,7 +2460,7 @@ ENT.Tasks = {
 				else
 					local lasttime = self.LastEnemyTime and math.max(self:GetCreationTime(),self.LastEnemyTime) or self:GetCreationTime()
 					
-					if self.ClassData.Type=="Police" and self.PoliceChase and IsValid(self.Owner) and CurTime()-lasttime>1 then
+					if self.ClassData.Type=="Police" and self.PoliceChase and IsValid(self.Owner) and CurTime()-lasttime>30 then
 						task,tdata = "movement_traveling",{Pos = self.Owner:GetPos()}
 					else
 						task = "movement_traveling"
@@ -2720,7 +2778,7 @@ ENT.Tasks = {
 			local issee = self.IsSeeEnemy
 			
 			if !data.UpdateEnemies or CurTime()>data.UpdateEnemies or data.HasEnemy and !IsValid(prevenemy) then
-				data.UpdateEnemies = CurTime()+1
+				data.UpdateEnemies = CurTime()+math.Rand(0.9,1.1)
 				
 				self:FindEnemies()
 				
@@ -2833,11 +2891,15 @@ ENT.UniqueTasks = {
 			data.Shield:Spawn()
 			data.Shield:Parent(self,self:LookupBone(sdata.Bone) or 0,sdata.Pos,sdata.Ang)
 		end,
-		OnKilled = function(self,data)
+		OnKilled = function(self,data,dmg)
 			if !IsValid(data.Shield) then return end
 		
 			if self.ShieldsConvar:GetBool() then
-				data.Shield:TransformToProp()
+				local shield = data.Shield:TransformToProp()
+				
+				if dmg:IsDamageType(DMG_DISSOLVE) then
+					self:DissolveEntity(shield)
+				end
 			else
 				data.Shield:Remove()
 			end
@@ -2928,14 +2990,14 @@ ENT.UniqueTasks = {
 						
 						local npc
 						
-						enemy.sb_anb_pd2_taserattacked = CurTime()+1
+						enemy.sb_anb_pd2_taserattacked = CurTime()+1.5
 						enemy.sb_anb_pd2_taserattacker = self
 						
 						if enemy:GetClass()==self:GetClass() then
-							enemy:ViewPunch(Angle(math.Rand(-100,100),math.Rand(-100,100)))
+							enemy:ViewPunch(Angle(math.Rand(-25,25),math.Rand(-25,25)))
 						elseif enemy:IsPlayer() then
-							enemy:SetNWFloat("sb_anb_pd2_taserattacked",CurTime()+1)
-							enemy:ViewPunch(Angle(math.Rand(-100,100),math.Rand(-100,100)))
+							enemy:SetNWFloat("sb_anb_pd2_taserattacked",CurTime()+1.5)
+							enemy:ViewPunch(Angle(math.Rand(-25,25),math.Rand(-25,25)))
 						elseif enemy:IsNPC() then
 							npc = true
 							
@@ -3259,7 +3321,7 @@ ENT.UniqueTasks = {
 			
 			data.PerformPunch = function(enemy)
 				data.Punching = true
-				data.ChargeCooldown = CurTime()+15
+				data.ChargeCooldown = CurTime()+5
 				
 				self:DoPosture("pd2_cloakerkick_"..math.random(1,2),true)
 				
@@ -3274,7 +3336,7 @@ ENT.UniqueTasks = {
 					
 					if IsValid(enemy) and self:ShouldBeEnemy(enemy) then
 						local dmg = DamageInfo()
-						dmg:SetDamage(5000)
+						dmg:SetDamage(300)
 						dmg:SetAttacker(self)
 						dmg:SetInflictor(self)
 						dmg:SetDamageType(DMG_CLUB)
@@ -3436,7 +3498,10 @@ function ENT:Setup(class,spawndata)
 		self:SetCurrentWeaponProficiency(spawndata.proficiency-1)
 	end
 	
-	local variant = data.Variants[spawndata.variant>0 and math.Clamp(spawndata.variant,1,#data.Variants) or math.random(1,#data.Variants)]
+	local var = VariantFromConvar(spawndata.variant)
+	var = istable(var) and table.Random(var) or var
+	
+	local variant = data.Variants[var>0 and math.Clamp(var,1,#data.Variants) or math.random(1,#data.Variants)]
 	
 	self.ClassData = data
 	self.VariantData = variant
@@ -3498,6 +3563,7 @@ function ENT:SetupGroup(group,spawndata)
 		member:SetAngles(self:GetAngles())
 		member:SetCreator(self:GetCreator())
 		member.Owner = self.Owner
+		member.CustomSpawnData = spawndata
 		member:SetKeyValue("Class",data.MemberClass)
 		
 		if self:GetKeyValue("additionalequipment") then
@@ -3573,6 +3639,32 @@ function ENT:BehaviourThink()
 		self:Approach(self.EntityStuckMoveTo)
 		self.EntityStuckMoveTo = nil
 	end
+	
+	if self:PathIsValid() then
+		local filter = self:GetChildren()
+		filter[#filter+1] = self
+		
+		local pos = self:GetShootPos()
+		local endpos = pos+self:GetEyeAngles():Forward()*100
+		local ent = self:CheckMovePathBlocked(pos,endpos,filter)
+		
+		if ent then
+			local class = ent:GetClass()
+		
+			if self:HasWeapon() and class:StartWith("func_breakable") then
+				self.ForceShoot = CurTime()+0.6
+			elseif class=="prop_door_rotating" and ent:GetInternalVariable("m_eDoorState")!=2 and (!self.OpenDoorTime or CurTime()-self.OpenDoorTime>2) then
+				self.OpenDoorTime = CurTime()
+				ent:Fire("Use",nil,0,self,self)
+			elseif class=="func_door_rotating" and ent:GetInternalVariable("m_toggle_state")==1 and (!self.OpenDoorTime or CurTime()-self.OpenDoorTime>2) then
+				self.OpenDoorTime = CurTime()
+				ent:Fire("Use",nil,0,self,self)
+			elseif class=="func_door" and ent:GetInternalVariable("m_toggle_state")==1 and (!self.OpenDoorTime or CurTime()-self.OpenDoorTime>2) then
+				self.OpenDoorTime = CurTime()
+				ent:Fire("Use",nil,0,self,self)
+			end
+		end
+	end
 end
 
 function ENT:CheckAttackPathBlocked(start,pos,filter)
@@ -3583,7 +3675,18 @@ function ENT:CheckAttackPathBlocked(start,pos,filter)
 		mask = MASK_SHOT,
 	})
 	
-	return tr.Hit and tr.Entity
+	return tr.Hit and tr.Entity!=self:GetEnemy() and !self:ShouldBeEnemy(tr.Entity) and tr.Entity
+end
+
+function ENT:CheckMovePathBlocked(start,pos,filter)
+	local tr = util.TraceLine({
+		start = start,
+		endpos = pos,
+		filter = filter,
+		mask = self:GetSolidMask(),
+	})
+	
+	return tr.Hit and tr.Entity!=self:GetEnemy() and tr.Entity
 end
 
 function ENT:ShouldBeEnemy(ent)
@@ -3591,11 +3694,11 @@ function ENT:ShouldBeEnemy(ent)
 	if ent:IsPlayer() and (!ent:Alive() or ent:HasGodMode()) then return false end
 	
 	if self:IsMoving() then
-		local entdir = self:EntShootPos(ent)-self:GetPos()
+		local entdir = ent:GetPos()-self:GetPos()
 		entdir.z = 0
 		entdir:Normalize()
 		
-		local ang = math.deg(math.acos(self:GetEyeAngles():Forward():Dot(entdir)))
+		local ang = math.deg(math.acos(self:GetAngles():Forward():Dot(entdir)))
 		local maxdist = math.Remap(ang,0,180,self.MovingMaxSeeDistances[1],self.MovingMaxSeeDistances[2])
 		
 		if self:GetRangeTo(ent)>maxdist then return false end
@@ -3633,7 +3736,7 @@ function ENT:ShouldWeaponBeDowned()
 	if CurTime()<self.m_WeaponData.NextReloadTime then return false end
 	
 	local hook = self:RunTask("ShouldWeaponBeDowned")
-	return hook==nil and !self.IsSeeEnemy or hook
+	return hook==nil and true or hook
 end
 
 function ENT:SetupRelationships()
@@ -3685,6 +3788,14 @@ function ENT:OnOtherInjured(ent,dmg)
 end
 
 function ENT:GetDesiredEntityRelationship(ent,stdd)
+	if stdd and ent:IsNPC() then
+		if ent:Classify()==CLASS_PLAYER_ALLY then return (self.Side==0 or self.Side==2) and D_LI or D_HT end
+		
+		if (ent:GetClass()=="npc_antlion" or ent:GetClass()=="npc_antlion_worker") and game.GetGlobalState("antlion_allied")==GLOBAL_ON then
+			return (self.Side==0 or self.Side==2) and D_LI or D_HT
+		end
+	end
+
 	if stdd==ENEMY_MONSTER then return D_HT end
 	if stdd==ENEMY_FRIENDLY then return (self.Side==0 or self.Side==2) and D_LI or D_HT end
 	if stdd==ENEMY_HOSTILE then return (self.Side==1 or self.Side==2) and D_LI or D_HT end
@@ -3858,6 +3969,7 @@ end
 
 function ENT:StuckCheckShouldIgnoreEntity(ent)
 	if ent.ShouldCollide and ent:GetClass()=="sb_advanced_nextbot_payday2_shield" and !ent:ShouldCollide(self) then return true end
+
 	return BaseClass.StuckCheckShouldIgnoreEntity(self,ent)
 end
 
@@ -3872,9 +3984,6 @@ function ENT:Think()
 end
 
 function ENT:SetupCollisionBounds()
-	for k, v in pairs(player.GetAll()) do
-		if v:Team() == 2 then return true end
-	end
 	if self:IsPostureActive() then
 		local seq = self:GetSequenceInfo(self:GetSequence())
 		
