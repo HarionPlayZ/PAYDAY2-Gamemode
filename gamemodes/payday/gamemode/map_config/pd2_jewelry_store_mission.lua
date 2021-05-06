@@ -15,7 +15,7 @@ end)
 hook.Add('alarm','alarm',function()
 	if alarm then return end
 	alarm = true
-	ents.FindByName('van_escape')[1]:Fire('Disable')
+	for i,ent i pairs(ents.FindByName('van_escape')) do ent:Fire('Disable') end
 	pd2_taskbar_display_all("STEAL CASH IN SAFE",271)
 	pd2_assault_starting()
 	sound.Play( "alarm1.mp3", Vector(-3850, 1920, 120) )
