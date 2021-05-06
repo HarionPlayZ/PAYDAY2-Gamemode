@@ -3336,7 +3336,7 @@ ENT.UniqueTasks = {
 					
 					if IsValid(enemy) and self:ShouldBeEnemy(enemy) then
 						local dmg = DamageInfo()
-						dmg:SetDamage(300)
+						dmg:SetDamage(enemy:Health()+enemy:Armor())
 						dmg:SetAttacker(self)
 						dmg:SetInflictor(self)
 						dmg:SetDamageType(DMG_CLUB)
