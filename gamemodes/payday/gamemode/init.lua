@@ -13,6 +13,11 @@ end
 --* Global registration
 --? For subsequent call on the client side
 AddCSLuaFile('shared.lua')
+
+-- Registering helpers
+AddCSLuaFile('helpers/sh_player_helper.lua')
+
+-- Registering a working code
 AddCSLuaFile('bleedout/bleedout.lua')
 AddCSLuaFile('client/pd2_timer.lua')
 AddCSLuaFile('client/pd2text.lua')
@@ -34,6 +39,10 @@ AddCSLuaFile('cl_init.lua')
 --? shared.lua - is called simultaneously on both the client and the server.
 --? Recommended only for generic elements
 include('shared.lua')
+
+-- Initializing helpers
+
+-- Initializing working code
 include('server/pd2_hud.lua')
 include('server/pd2_assautphases.lua')
 include('server/pd2_assault_settings.lua')

@@ -2,6 +2,10 @@
 --? shared.lua - is called simultaneously on both the client and the server.
 --? Recommended only for generic elements
 include('shared.lua')
+
+-- Initializing helpers
+
+-- Initializing working code
 include('client/pd2_hud.lua')
 include('client/pd2_outline.lua')
 include('client/pd2_show_items.lua')
