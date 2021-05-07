@@ -4,8 +4,8 @@
 -- @return player or (nil): found closest player relative to entity. if the player is not found, it will return a nil, and no other arguments will be received.
 -- @return number or (nil): distance of the found player to the target entity
 function pd2_helpers.GetClosestPlayerByTeamWithEntity(team_id, ent)
-	assert(isnumber(team_id), 'The value must be of type - number!')
-	assert(IsEntity(ent), 'The value must be of type - Entity!')
+	assert(isnumber(team_id), 'The passed argument 1 (team_id) must be of type - number!')
+	assert(IsEntity(ent), 'The passed argument 2 (ent) must be of type - Entity!')
 
 	local valid_players = {}
 	local real_players = player.GetHumans()
@@ -26,10 +26,7 @@ function pd2_helpers.GetClosestPlayerByTeamWithEntity(team_id, ent)
 		local player_position = ply:GetPos()
 		local dist_calculate = player_position:DistToSqr(ent_position)
 
-		if dist == nil then
-			closest_player = ply
-			dist = dist_calculate
-		elseif dist_calculate < dist then
+		if dist == nil or dist_calculate < dist then
 			closest_player = ply
 			dist = dist_calculate
 		end
