@@ -16,6 +16,7 @@ include('client/pd2_timer.lua')
 include('bleedout/bleedout.lua')
 include('client/pd2text.lua')
 include('client/pd2_drawscreen.lua')
+include('client/f4.lua')
 
 net.Receive('padpd2',function()
 	padpd = net.ReadInt(4)

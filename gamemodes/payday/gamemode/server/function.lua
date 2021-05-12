@@ -9,6 +9,8 @@ RunConsoleCommand( "bleedout_view_draw_body", 0)
 RunConsoleCommand( "bleedout_sound_enable", 0)
 RunConsoleCommand( "bleedout_shouldshoot", 0)
 
+global_skip_cutscene = false
+
 local ply = FindMetaTable("Player")
 local ent = FindMetaTable('Entity')
 
@@ -86,12 +88,16 @@ util.AddNetworkString( 'stop_display_time'  )
 util.AddNetworkString( 'set_start_time'  )
 
 function start_display_time()
-	net.Start('start_display_time')
-	net.Send(player.GetAll())
-	timer_Map(0, function() RunConsoleCommand("pd2_assaultphases_server_assaultphase", 1) end)
+	RunConsoleCommand("pd2_assaultphases_server_assaultphase", 1)
 	for i,p in pairs(player.GetAll()) do
-		timer_Map(0, function() p:SetNWBool("pd2dif", true) p:ConCommand("pd2_hud_enable 0") end)
-		timer_Map(5, function() p:SetNWBool("pd2dif", false) p:ConCommand("pd2_hud_enable 1") end)
+		p:SetNWBool("pd2dif", true) 
+		p:ConCommand("pd2_hud_enable 0")
+		timer_Map(5, function() 
+			p:SetNWBool("pd2dif", false)
+			p:ConCommand("pd2_hud_enable 1")
+			net.Start('start_display_time')
+			net.Send(p)
+		end)
 	end
 end
 
@@ -156,4 +162,25 @@ end )
 
 function ent:timer_Simple(delay,f)
 	timer.Simple(delay,function() if IsValid(self) then f() end end)
+end
+
+function game_start()
+for i,p in pairs(player.GetAll()) do
+	if p:Team() == 1 then
+		p:Freeze(true)
+		p:SetNWBool("pd2brief", true)
+		p:EmitSound('pd2_plan_music.ogg')
+		p:ConCommand('pd2_hud_enable 0')
+		p:SelectWeapon( "cw_extrema_ratio_official" )
+		p:SetNWBool('cutscene',true)
+		timer_Map(60, function() if IsValid(p) and p:GetNWBool('cutscene') then
+			p:SetNWBool("pd2brief", false)
+			p:Freeze(false)
+			p:ConCommand('pd2_hud_enable 1')
+			p:SetNWBool('cutscene',false)
+		end end)
+	end
+end
+spawn = false
+timer_Map(60, function() if not global_skip_cutscene then hook.Call('game_start') end end)
 end

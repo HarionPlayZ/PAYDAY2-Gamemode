@@ -1,7 +1,9 @@
 local pl = FindMetaTable("Player")
-local changeteam = true
+global_can_changeteam = true
 ctgang_pd2 = true
 start_player_police = false
+
+global_gang_table = {}
 
 local health_pd2 = {7500, 5000, 3000, 2000, 1500, 1000, 750}
 local health_police = {100, 125 , 150, 175, 200, 225, 250}
@@ -13,13 +15,15 @@ weapon_random_swat = {"cw_m3super90", "cw_ar15", "cw_mac11", "cw_g36c", "cw_mp5"
 local pd2gang_skins = {{model = "models/player/pd2_chains_p.mdl", exist = false}, {model = "models/player/pd2_dallas_p.mdl", exist = false}, {model = "models/player/pd2_hoxton_p.mdl", exist = false}, {model = "models/player/pd2_wolf_p.mdl", exist = false}}
 
 function pl:PD2SetPolice()
-    self:StripWeapons()
-    self:StripAmmo()
-    self:SetTeam(2)
+	self:SetTeam(2)
 	self:SetModel(models_p[global_dif+1])
+	
 	self:SetHealth(health_police[global_dif+1])
 	self:SetMaxHealth( self:Health() )
 	self:SetArmor(0)
+	
+	self:StripWeapons()
+    self:StripAmmo()
 	local weapon = self:Give(table.Random(weapon_random_swat))
 	self:GiveAmmo(weapon:Clip1() * 500, weapon:GetPrimaryAmmoType(), true)
     self:SetWalkSpeed(150)
@@ -35,11 +39,13 @@ function pl:PD2SetPolice()
         self:DrawWorldModel( false )
         self:SetNWBool("pd2policestop", true)
     end
+	
+	table.RemoveByValue(global_gang_table,self)
+	
+	self:EmitSound("pd2_player_join.ogg")
 end
 
 function pl:PD2SetGang()
-    self:StripWeapons()
-    self:StripAmmo()
 	for i,v in pairs(pd2gang_skins) do
 	    v.exist = false
 	end
@@ -62,11 +68,11 @@ function pl:PD2SetGang()
     	end
     end
     if c == 4 then self:ChatPrint("You can't join to team, reason: Full team.") return end
-	self:SetTeam(1)
-    self:SetNWBool("pd2policestop", false)
+	
+	self:StripWeapons()
+    self:StripAmmo()
 	self:GiveAmmo(500, 'pistol', true)
 	self:GiveAmmo(50, 8, true)
-    self:SetBodyGroups( "02" )
     local prim_weapon = self:GetNWString('weapon_main')
 		if prim_weapon == '' then 
 			prim_weapon = self:Give(table.Random(weapon_random_main))
@@ -84,6 +90,7 @@ function pl:PD2SetGang()
     self:GiveAmmo(2, 55, true)
     self:Give("cw_extrema_ratio_official")
     self:Give("cw_pd2_frag_grenade")
+	
     self:SetHealth(health_pd2[global_dif+1])
     self:SetMaxHealth( self:Health() )
     local armor = self:GetNWInt('armor_init')
@@ -96,44 +103,30 @@ function pl:PD2SetGang()
     end
     self:SetWalkSpeed(140)
     self:SetRunSpeed(200)
+	
+	self:SetBodyGroups( "02" )
+	self:SetTeam(1)
     self:Freeze(false)
     self:SetRenderMode(1)
     self:GodDisable()
     self:SetNoTarget(false)
-    self:SetPos(spawner_gang)
     self:SetNoCollideWithTeammates( true )
-    self:SetNWInt("havemedkit", 1)
     self:AllowFlashlight(true)
-end
-function pl:PD2SetSpectator()
-	self:SetTeam(1001)
-	self:StripAmmo()
-	self:StripWeapons()
-	self:Spawn()
+	
+    self:SetNWInt("havemedkit", 1)
+    self:SetNWBool("pd2policestop", false)
+	self:SetNWBool('ready',false)
+	
+	table.insert(global_gang_table,self)
+	
+	self:EmitSound("pd2_player_join.ogg")
 end
 
-hook.Add("PlayerSay", "JoinTeams", function( ply, text )
-	if text == "/police" or text == "!police" then
-		if GetConVar("policejoin"):GetInt() == 1 then ply:ChatPrint("Host disabled police team!") return end
-		if ply:Team() == 1 and not changeteam then ply:ChatPrint("You cant change team on police, when game started and you gangster!") return true end
-		timer.Simple(0, function() ply:Spawn() end)
-		ply:PD2SetPolice()
-		ply:EmitSound("pd2_player_join.ogg")
-	end
-	if text == "/gang" or text == "!gang" then
-		if voted == false then ply:ChatPrint('Difficulty not choosed!') return end
-		if ply:Team() == 1 then return true end
-		if not changeteam then ply:ChatPrint("You cant change team, when game started!") return true end
-		timer.Simple(0, function() ply:Spawn() end)
-		ply:PD2SetGang()
-		ply:EmitSound("pd2_player_join.ogg")
-	end
-	if text == "/spectator" or text == "!spectator" then
-		if changeteam or ctgang then
-			ply:PD2SetSpectator()
-		end
-	end
-end)
+function pl:PD2SetSpectator()
+	self:StripWeapons()
+	self:SetTeam(1001)
+	table.RemoveByValue(global_gang_table,self)
+end
 
 hook.Add("PlayerSpawn", "PD2PoliceGiver", function(ply)
 	ply:SetModel("models/player/gman_high.mdl")
@@ -159,9 +152,10 @@ end)
 
 hook.Add( "game_start", "teams", function()
 	ctgang_pd2 = false
-	timer_Map(60, function() changeteam = false end)
+	timer_Map(60, function() global_can_changeteam = false end)
 end )
 
 hook.Add('pd2_map_spawned','team',function()
-	changeteam = true
+	global_can_changeteam = true
+	global_gang_table = {}
 end)

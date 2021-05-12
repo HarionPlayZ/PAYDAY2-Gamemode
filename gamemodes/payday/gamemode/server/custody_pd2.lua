@@ -19,6 +19,7 @@ hook.Add("PlayerSpawn", "falseifspawnedicon", function(ply)
 end)
 
 hook.Add("PlayerDeath","playerdeath", function(victim, inflictor, attacker)
+	table.RemoveByValue(global_gang_table,victim)
 	if victim:Team() == 2 then timer.Simple(3, function() victim:Spawn() end) return end
 	for i,p in pairs (player.GetAll()) do
 		p:ChatPrint(victim:Name() .. langs_pd2['pd2.arrest.player'])

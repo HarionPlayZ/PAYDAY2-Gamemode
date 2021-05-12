@@ -1,6 +1,5 @@
 police_vectable = {Vector(2993.843018, -903.920959, -1011.968750),Vector(-2020.054932, -1256.504272, -1015.977905),Vector(373.001007, 3383.392090, -1015.618347),Vector(373.001007, 3383.392090, -1015.618347)}
 spawner_police = {Vector(2253.890625, 3140.556641, -1011.968750), Vector(2096.237305, -796.061829, -1011.981628), Vector(-982.990540, -749.902649, -1011.968750)}
-spawner_gang = Vector(3849.046631, 2554.394531, -470.968750)
 sniper_vectable = {Vector(-481.048065, -439.249176, -559.968750),Vector(-857.031250, 281.031250, -735.968750)}
 money_dif_pd2 = {1500, 4000, 7500, 17500, 30000, 42500, 75000}
 xp_tables = {3000, 7500, 15000, 30000, 55000, 75500, 125000}
@@ -129,15 +128,13 @@ hook.Add( "AcceptInput", "pd2_htbank_mission", function( ent, name, activator )
 end)				
 
 hook.Add('game_start','pd2_htbank_mission',function()
-	timer_Map(60,function()
-		for i,p in pairs(gang_table) do	
-			p:SetPos(Vector(-2055, -590, -1014) + Vector( math.Rand( -1, 1 ), math.Rand( -1, 1 ), 0 ) * 100)
-			p:SetEyeAngles(Angle(0,0,0))
-		end
-		pd2_taskbar_display_all("PLACE DRILL ON VAULT",304)  
-		start_display_time() 
-		guard_spawners()
-	end)
+	for i,p in pairs(global_gang_table) do	
+		p:SetPos(Vector(-2055, -590, -1014) + Vector( math.Rand( -1, 1 ), math.Rand( -1, 1 ), 0 ) * 100)
+		p:SetEyeAngles(Angle(0,0,0))
+	end
+	pd2_taskbar_display_all("PLACE DRILL ON VAULT",304)  
+	start_display_time() 
+	guard_spawners()
 end)
 
 hook.Add('escape','pd2_htbank_mission',function(ply)

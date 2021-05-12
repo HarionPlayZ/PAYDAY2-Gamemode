@@ -1,6 +1,5 @@
 police_vectable = {Vector(3457.714600, 898.945679, 64.031250),Vector(5403.900391, 1574.928101, 64.031250),Vector(3070.912598, 273.047791, 64.031250),Vector(3070.912598, 273.047791, 64.031250)}
 spawner_police = {Vector(3462.708984, 202.040253, 64.031250), Vector(5462.325195, 2032.598511, 64.031250), Vector(5099.486328, 493.386292, 64.031250)}
-spawner_gang = Vector(-250.250427, 178.540894, -121.968750)
 sniper_vectable = {Vector(),Vector()}
 money_dif_pd2 = {2000, 5000, 10000, 18750, 30000, 45000, 80000}
 xp_tables = {4500, 10000, 17500, 35000, 65000, 87500, 150000}
@@ -90,15 +89,13 @@ hook.Add( "AcceptInput", "pd2_warehouse_mission", function( ent, name, activator
 end )
 
 hook.Add('game_start','pd2_warehouse_mission',function()
-	timer_Map(60,function()
-		for i,p in pairs(gang_table) do	
-			p:SetPos(Vector(3780, 2450, -63) + Vector( math.Rand( -1, 1 ), math.Rand( -1, 1 ), 0 ) * 60)
-			p:SetEyeAngles(Angle(0,0,0))
-		end
-		pd2_taskbar_display_all('HACK THE DOOR',212)
-		start_display_time()
-		gang_spawner()
-	end)
+	for i,p in pairs(global_gang_table) do	
+		p:SetPos(Vector(3780, 2450, -63) + Vector( math.Rand( -1, 1 ), math.Rand( -1, 1 ), 0 ) * 60)
+		p:SetEyeAngles(Angle(0,0,0))
+	end
+	pd2_taskbar_display_all('HACK THE DOOR',212)
+	start_display_time()
+	gang_spawner()
 end)
 
 hook.Add('escape','pd2_warehouse_mission',function(ply)

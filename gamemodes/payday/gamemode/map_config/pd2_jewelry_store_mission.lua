@@ -1,6 +1,5 @@
 police_vectable = {Vector(-5835.604980, 810.292603, 68.031250),Vector(-4622.043457, 3271.763184, 68.031250),Vector(-5835.604980, 810.292603, 68.031250),Vector(-4622.043457, 3271.763184, 68.031250)}
 spawner_police = {Vector(-4158.414063, 3250.695801, 68.031250), Vector(-4641.425781, 468.396393, 68.031250), Vector(-5929.043457, 1284.832031, 68.031250)}
-spawner_gang = Vector(4876.448730, -1681.583130, 68.031250)
 sniper_vectable = {Vector(),Vector()}
 money_dif_pd2 = {1000, 2500, 5000, 10000, 17500, 25000, 50000}
 xp_tables = {2000, 5000, 10000, 20000, 37500, 50000, 75000}
@@ -81,9 +80,9 @@ hook.Add( "AcceptInput", "pd2_jewelry_store_mission", function( ent, name, activ
 	if ent:GetName() == "gold" and can_pickup_gold then
 		pd2_taskbar_display_all("WAIT VAN",137)
 		ents.FindByName('money')[1]:Fire('kill')
-		timer_Map(30,function() playsound(gang_table,'pd2_bain_van_30.mp3') end)
+		timer_Map(30,function() playsound(global_gang_table,'pd2_bain_van_30.mp3') end)
 		timer_Map(60,function()
-			playsound(gang_table,'pd2_bain_van_0.mp3')
+			playsound(global_gang_table,'pd2_bain_van_0.mp3')
 			ents.FindByName('van_escape')[1]:Fire('Enable')
 			pd2_taskbar_display_all("YOU CAN ESCAPE",228.5)
 			timer.Start('escape_zone')
@@ -93,14 +92,12 @@ hook.Add( "AcceptInput", "pd2_jewelry_store_mission", function( ent, name, activ
 end )
 
 hook.Add('game_start','pd2_jewelry_store_mission',function()
-	timer_Map(60, function() 
-		pd2_taskbar_display_all("PLACE DRILL ON SAFE",290)  
-		start_display_time()
-		for i,p in pairs(gang_table) do
-			p:SetPos(Vector(-5290, 2315, 67))
-			p:SetEyeAngles(Angle(0,0,0))
-		end
-	end)
+	for i,p in pairs(global_gang_table) do
+		p:SetPos(Vector(-5290, 2315, 67))
+		p:SetEyeAngles(Angle(0,0,0))
+	end
+	pd2_taskbar_display_all("PLACE DRILL ON SAFE",290)  
+	start_display_time()
 end)
 
 hook.Add('escape','pd2_jewelry_store_mission',function(ply)
