@@ -25,8 +25,8 @@ local function start_escape(id)
 	if id == 1 then
 		timer.Start('escape_zone')
 		pd2_taskbar_display_all('WAIT ESCAPE VAN',240)
-		timer_Map(30,function() playsound(player.GetAll(),'pd2_bain_van_30.mp3') end)
-		timer_Map(60,function()
+		timer_map(30,function() playsound(player.GetAll(),'pd2_bain_van_30.mp3') end)
+		timer_map(60,function()
 			playsound(player.GetAll(),'pd2_bain_van_0.mp3')
 			pd2_taskbar_display_all('ESCAPE WITH MONEY',277)
 			for i,ent in pairs(ents.FindByName('van_escape1')) do ent:Fire('Enable') end
@@ -94,9 +94,9 @@ hook.Add( "AcceptInput", "pd2_htbank_mission", function( ent, name, activator )
 		ents.FindByName('drill_spark')[1]:Fire('StartSpark')
 		pd2_taskbar_display_all('WAIT AND DEFEND',242)
 		pd2_assault_starting()
-		timer_Map(5,function() playsound(player.GetAll(),'pd2_bain_police_40.mp3') end)
-		timer_Map(200,function() sniper_spawners() end)
-		timer_Map(360,function() hook.Call('dril_comlited',nil,'dril') end)
+		timer_map(5,function() playsound(player.GetAll(),'pd2_bain_police_40.mp3') end)
+		timer_map(200,function() sniper_spawners() end)
+		timer_map(360,function() hook.Call('dril_comlited',nil,'dril') end)
 		ent:Remove()
 	return end
 	if ent:GetName() == "money_button" then

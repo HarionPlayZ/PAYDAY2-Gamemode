@@ -14,13 +14,13 @@ end)
 hook.Add('alarm','alarm',function()
 	if alarm then return end
 	alarm = true
-	for i,ent i pairs(ents.FindByName('van_escape')) do ent:Fire('Disable') end
+	-- for i,ent i pairs(ents.FindByName('van_escape')) do ent:Fire('Disable') end
 	pd2_taskbar_display_all("STEAL CASH IN SAFE",271)
 	pd2_assault_starting()
 	sound.Play( "alarm1.mp3", Vector(-3850, 1920, 120) )
 	playsound(player.GetAll(),'pd2_bain_alarm.mp3')
-	timer_Map(5,function() playsound(player.GetAll(),'pd2_bain_police_40.mp3') end)
-	timer_Map(40,function()
+	timer_map(5,function() playsound(player.GetAll(),'pd2_bain_police_40.mp3') end)
+	timer_map(40,function()
 		local car = ents.FindByName('police_car')[1] 
 		if IsValid(car) then car:Fire('Enable') end
 		timer.Start('police_light')
@@ -32,7 +32,7 @@ timer.Create('police_light',0.25,0,function()
 	timer.Stop('police_light')
 	pcb:Fire('TurnOn')
 	pcr:Fire('TurnOff')
-	timer_Map(0.25,function()
+	timer_map(0.25,function()
 		pcb:Fire('TurnOff')
 		pcr:Fire('TurnOn')
 		timer.Start('police_light')
@@ -80,8 +80,8 @@ hook.Add( "AcceptInput", "pd2_jewelry_store_mission", function( ent, name, activ
 	if ent:GetName() == "gold" and can_pickup_gold then
 		pd2_taskbar_display_all("WAIT VAN",137)
 		ents.FindByName('money')[1]:Fire('kill')
-		timer_Map(30,function() playsound(global_gang_table,'pd2_bain_van_30.mp3') end)
-		timer_Map(60,function()
+		timer_map(30,function() playsound(global_gang_table,'pd2_bain_van_30.mp3') end)
+		timer_map(60,function()
 			playsound(global_gang_table,'pd2_bain_van_0.mp3')
 			ents.FindByName('van_escape')[1]:Fire('Enable')
 			pd2_taskbar_display_all("YOU CAN ESCAPE",228.5)

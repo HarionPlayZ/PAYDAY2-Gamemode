@@ -70,7 +70,7 @@ local all_escape = true
 		if p:Team() == 1 then all_escape = false end
 	end
 	if all_escape then
-		timer_Map(5, function() RunConsoleCommand("map", table.Random(maps)) end)
+		timer_map(5, function() RunConsoleCommand("map", table.Random(maps)) end)
 	end
 end
 
@@ -92,7 +92,7 @@ function start_display_time()
 	for i,p in pairs(player.GetAll()) do
 		p:SetNWBool("pd2dif", true) 
 		p:ConCommand("pd2_hud_enable 0")
-		timer_Map(5, function() 
+		timer_map(5, function() 
 			p:SetNWBool("pd2dif", false)
 			p:ConCommand("pd2_hud_enable 1")
 			net.Start('start_display_time')
@@ -114,7 +114,7 @@ end
 timer.Create("killteam1", 2, 1, function()
 	for k, v in pairs(player.GetAll()) do
 		if v:Team() == 1 then
-			timer_Map(2, function() v:Kill() end)
+			timer_map(2, function() v:Kill() end)
 		end
 	end
 end)
@@ -166,6 +166,7 @@ end
 
 function game_start()
 for i,p in pairs(player.GetAll()) do
+	p:SetNWBool('ready',true)
 	if p:Team() == 1 then
 		p:Freeze(true)
 		p:SetNWBool("pd2brief", true)
@@ -173,7 +174,7 @@ for i,p in pairs(player.GetAll()) do
 		p:ConCommand('pd2_hud_enable 0')
 		p:SelectWeapon( "cw_extrema_ratio_official" )
 		p:SetNWBool('cutscene',true)
-		timer_Map(60, function() if IsValid(p) and p:GetNWBool('cutscene') then
+		timer_map(60, function() if IsValid(p) and p:GetNWBool('cutscene') then
 			p:SetNWBool("pd2brief", false)
 			p:Freeze(false)
 			p:ConCommand('pd2_hud_enable 1')
@@ -182,5 +183,13 @@ for i,p in pairs(player.GetAll()) do
 	end
 end
 spawn = false
-timer_Map(60, function() if not global_skip_cutscene then hook.Call('game_start') end end)
+timer_map(60, function() if not global_skip_cutscene then hook.Call('game_start') end end)
+end
+
+function ent:timer_ent(s,f)
+	timer.Simple(s,function()
+		if IsValid(self) then
+			f(self)
+		end
+	end)
 end

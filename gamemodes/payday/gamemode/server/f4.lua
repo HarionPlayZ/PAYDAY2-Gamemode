@@ -44,7 +44,6 @@ local function vote_ready(self)
 end
 
 hook.Add( "PlayerButtonDown", "f4_menu", function( self, key )
-	-- print(key)
 	if key==17 and self:Team()==1 and not voted then vote_ready(self) end
 	if key==65 and self:GetNWBool('cutscene') then 
 		self:SetNWBool("pd2brief", false)
@@ -67,26 +66,25 @@ end)
 util.AddNetworkString('select_team')
 net.Receive('select_team',function(len,self)
 local team = net.ReadString()
-if team == 'spectator' and self:Team() != 1001 then
-	if global_can_changeteam then
-		if not self:Alive() then self:Spawn() end
+	if team == 'spectator' then
+		self:Kill()
 		self:PD2SetSpectator()
 	end
-end
-if team == 'gang' and self:Team() != 1 then
-	-- if not voted then self:ChatPrint('Difficulty not choosed!') return end
-	if not global_can_changeteam then self:ChatPrint("You cant change team, when game started!") return end
-	if not self:Alive() then self:Spawn() end
-	self:PD2SetGang()
-	net.Start('vote_dif')
-	net.Send(self)
-end
-if team == 'police' and self:Team() != 2 then
-	if GetConVar("policejoin"):GetInt() == 1 then self:ChatPrint("Host disabled police team!") end
-	if self:Team() == 1 and not global_can_changeteam then self:ChatPrint("You cant change team on police, when game started and you gangster!") return true end
-	if not self:Alive() then self:Spawn() end
-	self:PD2SetPolice()
-end
+	if team == 'gang' and self:Team() != 1 then
+		if not global_can_changeteam then self:ChatPrint("You cant change team, when game started!") return end
+		self:PD2SetGang()
+		self:Spawn()
+		net.Start('vote_dif')
+		net.Send(self)
+	end
+	if team == 'police' and self:Team() != 2 then
+		if GetConVar("policejoin"):GetInt() == 1 then self:ChatPrint("Host disabled police team!") end
+		if self:Team() == 1 and not global_can_changeteam then self:ChatPrint("You cant change team on police, when game started and you gangster!")
+		else
+			if not self:Alive() then self:Spawn() end
+		end
+		self:PD2SetPolice()
+	end
 end)
 
 util.AddNetworkString('vote_dif')

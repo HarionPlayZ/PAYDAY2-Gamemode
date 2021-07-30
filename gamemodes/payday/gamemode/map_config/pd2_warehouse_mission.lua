@@ -60,16 +60,16 @@ hook.Add( "AcceptInput", "pd2_warehouse_mission", function( ent, name, activator
 	end
 	if ent:GetName() == "computer_button" then
 		pd2_taskbar_display_all('HACKING IN PROGRESS',299)
-		timer_Map(15*(global_dif+1),function()
+		timer_map(15*(global_dif+1),function()
 			ents.FindByName('door_vault_start')[1]:Fire('Open')
 			pd2_assault_starting()
 			pd2_taskbar_display_all("PLACE DRILL ON VAULT",305)
 			playsound(player.GetAll(),'pd2_bain_police_40.mp3')
-			timer_Map(95,function() 
+			timer_map(95,function() 
 				for i,ent in pairs(ents.FindByName('door_breaking_ex')) do ent:Fire('Explode') end
 				for i,ent in pairs(ents.FindByName('door_breaking')) do ent:Fire('Break') end 
 			end)
-			timer_Map(120, function() pd2_gamemode_police_spawners[7]:Disable() end)
+			timer_map(120, function() pd2_gamemode_police_spawners[7]:Disable() end)
 		end)
 		ent:Remove()
 	end

@@ -1,8 +1,12 @@
 global_game_id = 0
 
-function timer_Map(delay,f)
-local g_id = global_game_id
-timer.Simple(delay,function() if g_id == global_game_id then f() end end)
+function timer_map(s,f)
+	local gid = global_game_id
+	timer.Simple(s,function()
+		if global_game_id==gid then
+			f()
+		end
+	end)
 end
 
 hook.Add('pd2_map_spawned','pd2_map_spawned',function()

@@ -76,7 +76,7 @@ for i,vec in pairs(sniper_vectable) do
 	spawnsniper:Spawn()
 	spawnsniper:SetRenderMode(10)
 	spawnsniper:Enable()
-	timer_Map(1.1, function() spawnsniper:Disable() end)
+	timer_map(1.1, function() spawnsniper:Disable() end)
 end
 	for k, v in pairs(player.GetAll()) do
 		v:EmitSound('pd2_bain_sniper.mp3')
@@ -157,7 +157,7 @@ function pd2_assault_starting()
 	con4:SetInt( global_dif )
 	police_spawners()
 	con2:SetInt( 2 )
-	timer_Map(40, function() 
+	timer_map(40, function() 
 		pd2_gamemode_police_spawners[3]:Enable() 
 		start_player_police = true 
 			for k, v in pairs(player.GetAll()) do
@@ -169,17 +169,17 @@ function pd2_assault_starting()
 			end 
 		timer.Start("ReCreateAssaultPhase") 
 	end)
-	timer_Map(110, function() 
-		timer_Map(10, function() con2:SetInt( 3 ) end)
+	timer_map(110, function() 
+		timer_map(10, function() con2:SetInt( 3 ) end)
 		for k, v in pairs(player.GetAll()) do v:EmitSound("pd2_bain_armor.mp3") end
 		pd2_gamemode_police_spawners[1]:Enable()
 		pd2_gamemode_police_spawners[2]:Enable()
 		if global_dif >= 3 then 
-			timer_Map(timer_c, function() 
+			timer_map(timer_c, function() 
 				pd2_gamemode_police_spawners[4]:Enable()
 				con5:SetInt( 1 )
 				for k, v in pairs(player.GetAll()) do v:EmitSound("pd2_captain_spawned.mp3") end
-				timer_Map(2, function() pd2_gamemode_police_spawners[4]:Disable() end)
+				timer_map(2, function() pd2_gamemode_police_spawners[4]:Disable() end)
 			end)
 		end
 	end)
@@ -191,9 +191,9 @@ timer.Create("ReCreateAssaultPhase", 150, 2, function()
 	pd2_gamemode_police_spawners[2]:Disable()
 	for k, v in pairs(player.GetAll()) do
 		v:EmitSound('pd2_bain_stop_assault.wav')
-		timer_Map(25, function() v:EmitSound('pd2_bain_giveemhell.mp3') end)
-		timer_Map(10, function() v:EmitSound('pd2_bain_morepolice.wav') end)
-		timer_Map(30, function()
+		timer_map(25, function() v:EmitSound('pd2_bain_giveemhell.mp3') end)
+		timer_map(10, function() v:EmitSound('pd2_bain_morepolice.wav') end)
+		timer_map(30, function()
 			con2:SetInt(3)
 			pd2_gamemode_police_spawners[1]:Enable()
 			pd2_gamemode_police_spawners[2]:Enable()
@@ -209,43 +209,43 @@ function GM:OnNPCKilled(npc, attacker, inflictor)
 		con5:SetInt( 0 )
 		attacker:pd2_add_xp(1000,true)
 		attacker:ChatPrint("You earned 1000 xp for killing captain!")
-		timer_Map(1, function() attacker:EmitSound("pd2_voice/shield.mp3") end)
+		timer_map(1, function() attacker:EmitSound("pd2_voice/shield.mp3") end)
 	end
 	if npc:GetModel():match("models/sb_anb_payday2/bulldozer_") then
 		if attacker:Team() == 2 then return true end
 		attacker:pd2_add_xp(200,true)
 		attacker:ChatPrint("You earned 200 xp for killing bulldozer!")
-		timer_Map(1, function() attacker:EmitSound("pd2_voice/bulldozer.mp3") end)
+		timer_map(1, function() attacker:EmitSound("pd2_voice/bulldozer.mp3") end)
 	end
 	if npc:GetModel():match("models/sb_anb_payday2/cloaker_")then
 		if attacker:Team() == 2 then return true end
 		attacker:pd2_add_xp(250,true)
 		attacker:ChatPrint("You earned 250 xp for killing cloaker!")
-		timer_Map(1, function() attacker:EmitSound("pd2_voice/clocker.mp3") end)
+		timer_map(1, function() attacker:EmitSound("pd2_voice/clocker.mp3") end)
 	end
 	if npc:GetModel():match("taser_player_pd2anim.mdl") then
 		if attacker:Team() == 2 then return true end
 		attacker:pd2_add_xp(75,true)
 		attacker:ChatPrint("You earned 75 xp for killing taser!")
-		timer_Map(1, function() attacker:EmitSound("pd2_voice/taser.mp3") end)
+		timer_map(1, function() attacker:EmitSound("pd2_voice/taser.mp3") end)
 	end
 	if npc:GetModel() == "models/payday2/units/medic_player_pd2anim.mdl" then
 		if attacker:Team() == 2 then return true end
 		attacker:pd2_add_xp(125,true)
 		attacker:ChatPrint("You earned 125 xp for killing medic!")
-		timer_Map(1, function() attacker:EmitSound("pd2_voice/medic.mp3") end)
+		timer_map(1, function() attacker:EmitSound("pd2_voice/medic.mp3") end)
 	end
 	if npc:GetModel():match("_player_pd2anim_shield.mdl") then
 		if attacker:Team() == 2 then return true end
 		attacker:pd2_add_xp(25,true)
 		attacker:ChatPrint("You earned 25 xp for killing shield!")
-		timer_Map(1, function() attacker:EmitSound("pd2_voice/shield.mp3") end)
+		timer_map(1, function() attacker:EmitSound("pd2_voice/shield.mp3") end)
 	end
 	if npc:GetModel() == "models/payday2/units/sniper_swat_player_pd2anim.mdl" then
 		if attacker:Team() == 2 then return true end
 		attacker:pd2_add_xp(500,true)
 		attacker:ChatPrint("You earned 500 xp for killing sniper!")
-		timer_Map(1, function() attacker:EmitSound("pd2_voice/sniper.mp3") end)
+		timer_map(1, function() attacker:EmitSound("pd2_voice/sniper.mp3") end)
 	end	
 	end
 	local ammo_enemy = ents.Create("pd2_ammo")

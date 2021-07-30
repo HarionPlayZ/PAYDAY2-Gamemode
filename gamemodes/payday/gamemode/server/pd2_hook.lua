@@ -21,9 +21,6 @@ local commandtable = {
 	'/buy or /buy - this command buy any weapon from list.',
 	'/weapon or !weapon - if you want help with buying weapon.',
 	'/armor or !armor - if you want help with buying armor.',
-	'/gang or !gang - change team on gang.',
-	'/police or !police - change team on police.',
-	'/spectator or !spectator - change team on spectator.',
 	'/dif or !dif - Show voted difficulty in game.',
 	'/giveup or !giveup - Kill player if him in team gang.',
 	'If you write in console (bind g medkit_use_pd2) you will can use medkit on g button.'
@@ -70,3 +67,9 @@ hook.Add("SetupPlayerVisibility", "AddRTCamera", function(ply, ent)
 		AddOriginToPVS(p:GetPos())
 	end
 end) 
+
+hook.Add('pd2_map_spawned','notready',function()
+	for i,p in pairs(player.GetAll()) do
+		p:SetNWBool('ready',false)
+	end
+end)

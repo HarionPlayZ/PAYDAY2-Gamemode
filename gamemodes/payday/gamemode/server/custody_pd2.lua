@@ -33,7 +33,7 @@ hook.Add("PlayerDeath","playerdeath", function(victim, inflictor, attacker)
 			end
 		end
 		if all_death then
-			timer_Map(5, function() GetConVar( "pd2_assaultphases_server_assaultphase" ):SetInt( 0 ) game.CleanUpMap() end)
+			timer_map(5, function() GetConVar( "pd2_assaultphases_server_assaultphase" ):SetInt( 0 ) game.CleanUpMap() end)
 			for i,p in pairs (player.GetAll()) do
 				if p:Team() == 2 then
 					p:pd2_add_money(1000)
@@ -42,7 +42,7 @@ hook.Add("PlayerDeath","playerdeath", function(victim, inflictor, attacker)
 				end
 			p:UnSpectate()
 			end
-			timer_Map(1, function() 
+			timer_map(1, function() 
 				for i,p in pairs (player.GetAll()) do
 					p:ChatPrint(langs_pd2['pd2.arrest.players.all']) 
 					p:ScreenFade( SCREENFADE.OUT, Color( 0, 0, 0, 255 ), 4, 1 ) 
@@ -50,8 +50,8 @@ hook.Add("PlayerDeath","playerdeath", function(victim, inflictor, attacker)
 			end)
 		end
 		if IsValid(victim) then
-			if victim:Team() == 2 then timer_Map(10, function() victim:Spawn() end) end
-			if victim:Team() == 1001 then timer_Map(0, function() victim:Spawn() end) end
+			if victim:Team() == 2 then timer_map(10, function() victim:Spawn() end) end
+			if victim:Team() == 1001 then timer_map(0, function() victim:Spawn() end) end
 			if victim:Team() == 1 then
 				victim:SetNWBool("cant_respawn", true)
 				victim:Spectate(5)

@@ -1,4 +1,4 @@
-map_tag = game.GetMap():Left(4)
+local map_tag = game.GetMap():Left(4)
 timer.Simple(0,function()
 	if gmod.GetGamemode().Name!="PAYDAY 2" and map_tag=="pd2_" then
 		RunConsoleCommand("gamemode", "payday")
